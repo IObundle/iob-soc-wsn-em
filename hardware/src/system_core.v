@@ -1,10 +1,13 @@
 `timescale 1 ns / 1 ps
 `include "system.vh"
-`include "iob_uart.vh"
 `include "interconnect.vh"
+
+//do not remove line below
+//PH
 
 module system 
   (
+   //do not remove line below
    //PIO
 
 `ifdef USE_DDR //AXI MASTER INTERFACE
