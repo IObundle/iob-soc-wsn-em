@@ -5,15 +5,16 @@ FIRM_ADDR_W:=13
 SRAM_ADDR_W=13
 
 #DDR
-USE_DDR:=1
-RUN_DDR:=1
+USE_DDR:=0
+RUN_DDR:=0
 DDR_ADDR_W:=30
+CACHE_ADDR_W:=24
 
 #ROM
 BOOTROM_ADDR_W:=12
 
 #Init memory (only works in simulation or FPGA not running DDR)
-INIT_MEM:=0
+INIT_MEM:=1
 
 #Peripheral list (must match respective submodule name)
 PERIPHERALS:=UART LNA MIXER LPF MIXER RSSI LIMITER
@@ -65,6 +66,7 @@ AXI_MEM_DIR:=$(CACHE_DIR)/submodules/axi-mem
 DEFINE+=$(define)BOOTROM_ADDR_W=$(BOOTROM_ADDR_W)
 DEFINE+=$(define)SRAM_ADDR_W=$(SRAM_ADDR_W)
 DEFINE+=$(define)FIRM_ADDR_W=$(FIRM_ADDR_W)
+DEFINE+=$(define)CACHE_ADDR_W=$(FIRM_ADDR_W)
 ifeq ($(USE_DDR),1)
 DEFINE+=$(define)USE_DDR
 DEFINE+=$(define)DDR_ADDR_W=$(DDR_ADDR_W)

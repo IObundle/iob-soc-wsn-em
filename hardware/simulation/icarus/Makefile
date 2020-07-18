@@ -9,11 +9,11 @@ include ../simulation.mk
 VLOG = iverilog -W all -g2005-sv $(INCLUDE) $(DEFINE) 
 
 #run the simulator
-run: $(VSRC) $(VHDR) firmware.hex boot.hex periphs
+run: $(VSRC) $(VHDR) firmware.bin firmware.hex boot.hex periphs
 	$(VLOG) $(VSRC)
 	./a.out
 
-sim_clean:
+clean: hw-clean
 	@rm -f ./a.out
 
-.PHONY: sim_clean
+.PHONY: clean

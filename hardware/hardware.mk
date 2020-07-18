@@ -40,11 +40,15 @@ VSRC+=$(SRC_DIR)/system.v
 periphs:
 	$(foreach p, $(PERIPHERALS), $(eval include $(SUBMODULES_DIR)/$p/hardware/hardware.mk))
 
+$(HW_DIR)/src/system.v:
+	$(foreach p, $(PERIPHERALS), sed '/endmodule/e cat $(SUBMODULES_DIR)/UART/hardware/include/inst.v' $(HW_DIR)/src/system_core.v > $(HW_DIR)/src/system.v)
+	$(foreach p, $(PERIPHERALS), sed -i '/PIO/r $(SUBMODULES_DIR)/UART/hardware/include/pio.v' $(HW_DIR)/src/system.v)
+
 # data files
 firmware.hex: $(FIRM_DIR)/firmware.bin
 ifeq ($(INIT_MEM),1)
-	$(PYTHON_DIR)/makehex.py firmware.bin $(FIRM_ADDR_W) > firmware.hex
-	$(PYTHON_DIR)/hex_split.py $(FIRM_DIR)/firmware.hex .
+	$(PYTHON_DIR)/makehex.py $(FIRM_DIR)/firmware.bin $(FIRM_ADDR_W) > firmware.hex
+	$(PYTHON_DIR)/hex_split.py firmware .
 else
 	cp $(FIRM_DIR)/firmware.bin .
 endif
@@ -52,4 +56,9 @@ endif
 boot.hex: $(BOOT_DIR)/boot.bin
 	$(PYTHON_DIR)/makehex.py $(BOOT_DIR)/boot.bin $(BOOTROM_ADDR_W) > boot.hex
 
-.PHONY: periphs
+hw-clean:
+	@rm -f *# *~ *.vcd *.dat *.hex *.bin $(HW_DIR)/src/system.v
+
+.PHONY: periphs hw-clean
+
+
