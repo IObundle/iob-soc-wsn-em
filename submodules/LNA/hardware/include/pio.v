@@ -1,2 +1,2 @@
    output lna_pd,
-   output lna_mode,
+   output [2:0] lna_mode,

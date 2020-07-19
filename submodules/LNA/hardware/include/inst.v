@@ -7,7 +7,6 @@
              .address(slaves_req[`address(`LNA,`LNA_ADDR_W+2)-2]),
 	     .wdata(slaves_req[`wdata(`LNA)]),
              .wstrb(|slaves_req[`wstrb(`LNA)]),
-	     .rdata(slaves_resp[`rdata(`LNA)]),
 	     .ready(slaves_resp[`ready(`LNA)]),
              
              //serial i/f
