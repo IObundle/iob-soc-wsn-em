@@ -14,19 +14,19 @@ module lna (
 
             //serial i/f
 	    output reg          pd,
-	    output reg [2:0]    mode
+	    output reg [1:0]    mode
             );
 
 
    always @(posedge clk, posedge rst)
      if(rst) begin          
         pd <= 1'b0;
-        mode <= 3'b0;
+        mode <= 2'b0;
      end else if(valid) begin
         if(address == `LNA_PD)
           pd <= wdata[0];
         else
-          mode <= wdata[2:0];
+          mode <= wdata[1:0];
         ready <= 1'b1;
      end else 
        ready <= 1'b0;
