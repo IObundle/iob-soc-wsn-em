@@ -17,19 +17,28 @@ BOOTROM_ADDR_W:=12
 INIT_MEM:=1
 
 #Peripheral list (must match respective submodule name)
-PERIPHERALS:=UART LNA
+PERIPHERALS:=UART PA MIXER LPF
 
 #RTL simulator
 SIMULATOR:=icarus
 #SIMULATOR:=modelsim
 #SIMULATOR:=ncsim
+#SIM_SERVER:=$(USER)@micro7.lx.it.pt
+SIM_ROOT_DIR=$(ROOT_DIR)/sandbox/iob-soc
 
-#FPGA board (associated with server below)
+#FPGA
+FPGA_COMPILE_SERVER:=$(USER)@pudim-flan.iobundle.com
+FPGA_COMPILE_ROOT_DIR=$(ROOT_DIR)/sandbox/iob-soc
 FPGA_BOARD:=AES-KU040-DB-G
 #FPGA_BOARD:=CYCLONEV-GT-DK
+FPGA_BOARD_SERVER:=$(USER)@pudim-flan.iobundle.com
+#FPGA_BOARD_SERVER:=$(USER)@baba-de-camelo.iobundle.com
+FPGA_BOARD_ROOT_DIR=$(ROOT_DIR)/sandbox/iob-soc
 
-#ASIC node
+#ASIC
 ASIC_NODE:=umc130
+ASIC_COMPILE_SERVER=$(USER)@micro7.lx.it.pt
+ASIC_COMPILE_ROOT_DIR=$(ROOT_DIR)/sandbox/iob-soc
 
 #DOC_TYPE
 DOC_TYPE:=presentation
@@ -102,30 +111,5 @@ N_SLAVES:=0
 dummy:=$(foreach p, $(PERIPHERALS), $(eval $p_DIR:=$(SUBMODULES_DIR)/$p))
 dummy:=$(foreach p, $(PERIPHERALS), $(eval $p=$(N_SLAVES)) $(eval N_SLAVES:=$(shell expr $(N_SLAVES) \+ 1)))
 dummy:=$(foreach p, $(PERIPHERALS), $(eval DEFINE+=$(define)$p=$($p)))
-
-FPGA_COMPILE_SERVER=$(PUDIM)
-
-ifeq ($(FPGA_BOARD),AES-KU040-DB-G)
-FPGA_BOARD_SERVER=$(BABA)
-else ifeq ($(FPGA_BOARD),CYCLONEV-GT-DK)
-FPGA_BOARD_SERVER=$(PUDIM)
-endif
-
-ifeq ($(SIMULATOR),ncsim)
-SIM_SERVER=$(MICRO)
-endif
-
-ASIC_SERVER=$(MICRO)
-
-#server list
-PUDIM:=pudim-flan.iobundle.com
-BABA:=baba-de-camelo.iobundle.com
-MICRO:=micro5.lx.it.pt
-
-#user list
-MICRO_USER=user19
-MICRO_ROOT_DIR=./$(USER)/sandbox/iob-soc
-
-REMOTE_ROOT_DIR=./sandbox/iob-soc
 
 .PHONY: all
