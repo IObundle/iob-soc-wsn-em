@@ -64,6 +64,13 @@ boot.hex: $(BOOT_DIR)/boot.bin
 hw-clean:
 	@rm -f *# *~ *.vcd *.dat *.hex *.bin $(SRC_DIR)/system.v $(TB_DIR)/system_tb.v
 
-.PHONY: periphs hw-clean
+include $(SUBMODULES_DIR)/FSK_DEMOD/fsk_demod.mk
+
+demod_coeffs:
+	make -C $(SUBMODULES_DIR)/FSK_DEMOD
+	mv $(SUBMODULES_DIR)/FSK_DEMOD/*.hex .
+
+.PHONY: periphs hw-clean demod_coefs
+
 
 

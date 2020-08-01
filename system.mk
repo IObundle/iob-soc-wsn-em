@@ -17,7 +17,8 @@ BOOTROM_ADDR_W:=12
 INIT_MEM:=1
 
 #Peripheral list (must match respective submodule name)
-PERIPHERALS:=UART PA MIXER LPF
+PERIPHERALS:=UART PA MIXER LPF TXRX
+#ADPLL LIMITER IREFGEN ATEST DTEST
 
 #RTL simulator
 SIMULATOR:=icarus
