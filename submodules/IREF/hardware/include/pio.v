@@ -1,2 +1,2 @@
-   output lpf_pd,
-   output [7:0] lpf_fc,
+   output iref_pd,
+   output iref_charge,

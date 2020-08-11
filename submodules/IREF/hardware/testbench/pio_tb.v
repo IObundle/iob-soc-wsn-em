@@ -1,4 +1,4 @@
-               //LPFER
-	       .lpf_pd           (lpf_pd_tb),
-	       .lpf_fc          (lpf_fc_tb),
+               //IREF
+	       .iref_pd           (iref_pd_tb),
+	       .iref_charge          (iref_charge_tb),
             
