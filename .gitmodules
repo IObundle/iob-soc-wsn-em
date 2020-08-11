@@ -10,3 +10,6 @@
 [submodule "submodules/FIR"]
 	path = submodules/FIR
 	url = git@github.com:IObundle/iob-fir.git
+[submodule "submodules/ADPLL"]
+	path = submodules/ADPLL
+	url = git@bitbucket.org:Marco_P/adpll_rtl_wsn.git
