@@ -73,7 +73,8 @@ ASIC_COMPILE_SERVER=$(USER)@micro7.lx.it.pt
 ASIC_COMPILE_ROOT_DIR=$(ROOT_DIR)/sandbox/iob-soc
 
 #DOC_TYPE
-DOC_TYPE:=presentation
+#DOC_TYPE:=presentation
+DOC_TYPE:=pb
 
 
 #############################################################
