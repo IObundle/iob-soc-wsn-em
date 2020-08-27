@@ -47,10 +47,11 @@ $(SRC_DIR)/system.v:
 	cp $(SRC_DIR)/system_core.v $@
 	$(foreach p, $(PERIPHERALS), sed -i '/endmodule/e cat $(SUBMODULES_DIR)/$p/hardware/include/inst.v' $@;)
 	$(foreach p, $(PERIPHERALS), if test -f $(SUBMODULES_DIR)/$p/hardware/include/pio.v; then sed -i '/PIO/r $(SUBMODULES_DIR)/$p/hardware/include/pio.v' $@; fi;)
-	$(foreach p, $(PERIPHERALS), if test -f $(SUBMODULES_DIR)/$p/hardware/include/*.vh; then sed -i '/PHEADER/a `include \"$(shell echo `ls $(SUBMODULES_DIR)/$p/hardware/include/*.vh`)\"' $@; fi;)\
+	$(foreach p, $(PERIPHERALS), if [ `ls -1 $(SUBMODULES_DIR)/$p/hardware/include/*.vh 2>/dev/null | wc -l ` -gt 0 ]; then $(foreach f, $(shell echo `ls $(SUBMODULES_DIR)/$p/hardware/include/*.vh`), sed -i '/PHEADER/a `include \"$f\"' $@;) break; fi;)\
+
 
 # data files
-firmware.hex: $(FIRM_DIR)/firmware.bin
+firmware: $(FIRM_DIR)/firmware.bin
 ifeq ($(INIT_MEM),1)
 	$(PYTHON_DIR)/makehex.py $(FIRM_DIR)/firmware.bin $(FIRM_ADDR_W) > firmware.hex
 	$(PYTHON_DIR)/hex_split.py firmware .
@@ -64,13 +65,11 @@ boot.hex: $(BOOT_DIR)/boot.bin
 hw-clean:
 	@rm -f *# *~ *.vcd *.dat *.hex *.bin $(SRC_DIR)/system.v $(TB_DIR)/system_tb.v
 
+
 include $(SUBMODULES_DIR)/FSK_DEMOD/fsk_demod.mk
 
 demod_coeffs:
 	make -C $(SUBMODULES_DIR)/FSK_DEMOD
 	mv $(SUBMODULES_DIR)/FSK_DEMOD/*.hex .
 
-.PHONY: periphs hw-clean demod_coefs
-
-
-
+.PHONY: periphs firmware hw-clean demod_coefs

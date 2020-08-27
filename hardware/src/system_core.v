@@ -33,7 +33,7 @@ module system
    input                    m_axi_wready,
 
    //write response
-   input [0:0]              m_axi_bid,
+   //input [0:0]              m_axi_bid,
    input [1:0]              m_axi_bresp,
    input                    m_axi_bvalid,
    output                   m_axi_bready,
@@ -52,7 +52,7 @@ module system
    input                    m_axi_arready,
 
    //read
-   input [0:0]              m_axi_rid,
+   //input [0:0]              m_axi_rid,
    input [`DATA_W-1:0]      m_axi_rdata,
    input [1:0]              m_axi_rresp,
    input                    m_axi_rlast, 
@@ -121,24 +121,27 @@ module system
    // INSTRUCTION BUS
    split #(
 `ifdef RUN_DDR_USE_SRAM
-           .N_SLAVES(2)
+           .N_SLAVES(2),
 `else
-           .N_SLAVES(1)
+           .N_SLAVES(1),
 `endif
+           .P_SLAVES(`E_BIT)
            )
    ibus_split
      (
+      .clk    ( clk                              ),
+      .rst    ( reset                            ),
       // master interface
-      .m_req  (cpu_i_req),
-      .m_resp (cpu_i_resp),
+      .m_req  ( cpu_i_req                        ),
+      .m_resp ( cpu_i_resp                       ),
       
       // slaves interface
 `ifdef RUN_DDR_USE_SRAM
-      .s_req ({ext_mem_i_req, int_mem_i_req}),
-      .s_resp ({ext_mem_i_resp, int_mem_i_resp})
+      .s_req  ( {ext_mem_i_req, int_mem_i_req}   ),
+      .s_resp ( {ext_mem_i_resp, int_mem_i_resp} )
 `else
-      .s_req (int_mem_i_req),
-      .s_resp (int_mem_i_resp)
+      .s_req  (  int_mem_i_req                   ),
+      .s_resp ( int_mem_i_resp                   )
 `endif
       );
 
@@ -162,26 +165,28 @@ module system
    split 
      #(
 `ifdef USE_DDR
-       .N_SLAVES(3),
-       .P_SLAVES(`E_BIT)
+       .N_SLAVES(3), //E,P,I
 `else
-       .N_SLAVES(2),
-       .P_SLAVES(`P_BIT)
+       .N_SLAVES(2),//P,I
 `endif
+       .P_SLAVES(`E_BIT)
        )
    dbus_split    
      (
+      .clk    ( clk                      ),
+      .rst    ( reset                    ),
+
       // master interface
-      .m_req  (cpu_d_req),
-      .m_resp (cpu_d_resp),
+      .m_req  ( cpu_d_req                                  ),
+      .m_resp ( cpu_d_resp                                 ),
 
       // slaves interface
 `ifdef USE_DDR
-      .s_req ({ext_mem_d_req, pbus_req, int_mem_d_req}),
-      .s_resp({ext_mem_d_resp, pbus_resp, int_mem_d_resp})
+      .s_req  ( {ext_mem_d_req, pbus_req, int_mem_d_req}   ),
+      .s_resp ({ext_mem_d_resp, pbus_resp, int_mem_d_resp} )
 `else
-      .s_req ({pbus_req, int_mem_d_req}),
-      .s_resp({pbus_resp, int_mem_d_resp})
+      .s_req  ({pbus_req, int_mem_d_req}                   ),
+      .s_resp ({pbus_resp, int_mem_d_resp}                 )
 `endif
       );
    
@@ -201,13 +206,15 @@ module system
        )
    pbus_split
      (
+      .clk    ( clk                      ),
+      .rst    ( reset                    ),
       // master interface
-      .m_req(pbus_req),
-      .m_resp(pbus_resp),
+      .m_req   ( pbus_req    ),
+      .m_resp  ( pbus_resp   ),
       
       // slaves interface
-      .s_req(slaves_req),
-      .s_resp(slaves_resp)
+      .s_req   ( slaves_req  ),
+      .s_resp  ( slaves_resp )
       );
 
    
@@ -235,67 +242,67 @@ module system
    //
    // EXTERNAL DDR MEMORY
    //
-   ext_mem 
-     ext_mem0 
-       (
-        .clk                  (clk ),
-        .rst                  (reset),
+   ext_mem ext_mem0 
+     (
+      .clk                  (clk),
+      .rst                  (cpu_reset),
+      
+ `ifdef RUN_DDR_USE_SRAM
+      // instruction bus
+      .i_req                ({ext_mem_i_req[`valid(0)], ext_mem_i_req[`address(0, `FIRM_ADDR_W)-2], ext_mem_i_req[`write(0)]}),
+      .i_resp               (ext_mem_i_resp),
+ `endif
+      //data bus
+      .d_req                ({ext_mem_d_req[`valid(0)], ext_mem_d_req[`address(0, `CACHE_ADDR_W+1)-2], ext_mem_d_req[`write(0)]}),
+      .d_resp               (ext_mem_d_resp),
 
-`ifdef RUN_DDR_USE_SRAM
-        // instruction bus
-        .i_req                (ext_mem_i_req),
-        .i_resp               (ext_mem_i_resp),
-`endif
-        //data bus
-        .d_req                (ext_mem_d_req),
-        .d_resp               (ext_mem_d_resp),
-
-        //AXI INTERFACE 
-        //address write
-        .axi_awid(m_axi_awid), 
-        .axi_awaddr(m_axi_awaddr), 
-        .axi_awlen(m_axi_awlen), 
-        .axi_awsize(m_axi_awsize), 
-        .axi_awburst(m_axi_awburst), 
-        .axi_awlock(m_axi_awlock), 
-        .axi_awcache(m_axi_awcache), 
-        .axi_awprot(m_axi_awprot),
-        .axi_awqos(m_axi_awqos), 
-        .axi_awvalid(m_axi_awvalid), 
-        .axi_awready(m_axi_awready), 
+      //AXI INTERFACE 
+      //address write
+      .axi_awid(m_axi_awid), 
+      .axi_awaddr(m_axi_awaddr), 
+      .axi_awlen(m_axi_awlen), 
+      .axi_awsize(m_axi_awsize), 
+      .axi_awburst(m_axi_awburst), 
+      .axi_awlock(m_axi_awlock), 
+      .axi_awcache(m_axi_awcache), 
+      .axi_awprot(m_axi_awprot),
+      .axi_awqos(m_axi_awqos), 
+      .axi_awvalid(m_axi_awvalid), 
+      .axi_awready(m_axi_awready), 
         //write
-        .axi_wdata(m_axi_wdata), 
-        .axi_wstrb(m_axi_wstrb), 
-        .axi_wlast(m_axi_wlast), 
-        .axi_wvalid(m_axi_wvalid), 
-        .axi_wready(m_axi_wready), 
-        //write response
-        .axi_bid(m_axi_bid), 
-        .axi_bresp(m_axi_bresp), 
-        .axi_bvalid(m_axi_bvalid), 
-        .axi_bready(m_axi_bready), 
-        //address read
-        .axi_arid(m_axi_arid), 
-        .axi_araddr(m_axi_araddr), 
-        .axi_arlen(m_axi_arlen), 
-        .axi_arsize(m_axi_arsize), 
-        .axi_arburst(m_axi_arburst), 
-        .axi_arlock(m_axi_arlock), 
-        .axi_arcache(m_axi_arcache), 
-        .axi_arprot(m_axi_arprot), 
-        .axi_arqos(m_axi_arqos), 
-        .axi_arvalid(m_axi_arvalid), 
-        .axi_arready(m_axi_arready), 
-        //read 
-        .axi_rid(m_axi_rid), 
-        .axi_rdata(m_axi_rdata), 
-        .axi_rresp(m_axi_rresp), 
-        .axi_rlast(m_axi_rlast), 
-        .axi_rvalid(m_axi_rvalid),  
-        .axi_rready(m_axi_rready)
-        );
+      .axi_wdata(m_axi_wdata), 
+      .axi_wstrb(m_axi_wstrb), 
+      .axi_wlast(m_axi_wlast), 
+      .axi_wvalid(m_axi_wvalid), 
+      .axi_wready(m_axi_wready), 
+      //write response
+      //.axi_bid(m_axi_bid), 
+      .axi_bresp(m_axi_bresp), 
+      .axi_bvalid(m_axi_bvalid), 
+      .axi_bready(m_axi_bready), 
+      //address read
+      .axi_arid(m_axi_arid), 
+      .axi_araddr(m_axi_araddr), 
+      .axi_arlen(m_axi_arlen), 
+      .axi_arsize(m_axi_arsize), 
+      .axi_arburst(m_axi_arburst), 
+      .axi_arlock(m_axi_arlock), 
+      .axi_arcache(m_axi_arcache), 
+      .axi_arprot(m_axi_arprot), 
+      .axi_arqos(m_axi_arqos), 
+      .axi_arvalid(m_axi_arvalid), 
+      .axi_arready(m_axi_arready), 
+      //read 
+      //.axi_rid(m_axi_rid), 
+      .axi_rdata(m_axi_rdata), 
+      .axi_rresp(m_axi_rresp), 
+      .axi_rlast(m_axi_rlast), 
+      .axi_rvalid(m_axi_rvalid),  
+      .axi_rready(m_axi_rready)
+      );
 `endif
 
-
+   //peripheral instances are inserted here
+   
 endmodule
  
