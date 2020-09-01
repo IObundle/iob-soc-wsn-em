@@ -2,19 +2,19 @@
 `define IREF_PD 0
 
 module iref (
-	    input                     clk,
-	    input                     rst,
+	    input                    clk,
+	    input                    rst,
 
             //cpu interface 
-	    input                     valid,
+	    input                    valid,
             input [`IREF_ADDR_W-1:0] address,
-	    input [`DATA_W-1:0]       wdata,
-            input                     wstrb,
-	    output reg                ready,
+	    input [`DATA_W-1:0]      wdata,
+            input                    wstrb,
+	    output reg               ready,
 
             //serial i/f
-	    output reg                pd,
-	    output reg [7:0]          charge
+	    output reg               pd,
+	    output reg               charge
             );
 
 

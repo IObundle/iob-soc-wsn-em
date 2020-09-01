@@ -25,7 +25,7 @@ endif
 
 
 #Peripheral list (must match respective submodule or folder name in the submodules directory)
-PERIPHERALS:=UART PA MIXER LPF TXRX IREF
+PERIPHERALS:=UART PA MIXER LPF TXRX IREF ADPLL
 
 #SIMULATION TEST
 SIM_LIST="SIMULATOR=icarus" "SIMULATOR=ncsim"
