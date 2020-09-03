@@ -43,13 +43,12 @@ VSRC+=system.v
 periphs:
 	$(foreach p, $(PERIPHERALS), $(eval include $(SUBMODULES_DIR)/$p/hardware/hardware.mk))
 
-# insert peripheral external IOs
+# insert peripherals
 system.v:
 	cp $(SRC_DIR)/system_core.v $@ # create system.v
 	$(foreach p, $(PERIPHERALS), if [ `ls -1 $(SUBMODULES_DIR)/$p/hardware/include/*.vh 2>/dev/null | wc -l ` -gt 0 ]; then $(foreach f, $(shell echo `ls $(SUBMODULES_DIR)/$p/hardware/include/*.vh`), sed -i '/PHEADER/a `include \"$f\"' $@;) break; fi;) # insert header files
 	$(foreach p, $(PERIPHERALS), if test -f $(SUBMODULES_DIR)/$p/hardware/include/pio.v; then sed -i '/PIO/r $(SUBMODULES_DIR)/$p/hardware/include/pio.v' $@; fi;) #insert system IOs for peripheral
 	$(foreach p, $(PERIPHERALS), sed -i '/endmodule/e cat $(SUBMODULES_DIR)/$p/hardware/include/inst.v' $@;) # insert peripheral instances
-	$(foreach p, $(PERIPHERALS), sed s/input// $(SUBMODULES_DIR)/$p/hardware/include/pio.v | sed s/output// | sed 's/\([A-Za-z].*\),/\.\1(\1),/' > ./ports.v; sed -i '/PORTS/r ports.v' $@) #insert ports in uut instance
 
 
 # data files
