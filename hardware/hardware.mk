@@ -63,14 +63,18 @@ endif
 boot.hex: $(BOOT_DIR)/boot.bin
 	$(PYTHON_DIR)/makehex.py $(BOOT_DIR)/boot.bin $(BOOTROM_ADDR_W) > boot.hex
 
+noise_floor: $(ROOT_DIR)/noise_floor.txt
+	cp $(ROOT_DIR)/noise_floor.txt $(MIXER_INC_DIR)
+
 hw-clean:
 	@rm -f *# *~ *.vcd *.dat *.hex *.bin $(SRC_DIR)/system.v $(TB_DIR)/system_tb.v
 
 
+include $(ADPLL_DIR)/adpll.mk
 include $(SUBMODULES_DIR)/FSK_DEMOD/fsk_demod.mk
 
 demod_coeffs:
 	make -C $(SUBMODULES_DIR)/FSK_DEMOD
 	mv $(SUBMODULES_DIR)/FSK_DEMOD/*.hex .
 
-.PHONY: periphs firmware hw-clean demod_coefs
+.PHONY: periphs firmware noise_floor hw-clean demod_coefs

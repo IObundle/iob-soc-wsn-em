@@ -1,7 +1,7 @@
 ROOT_DIR:=.
 include ./system.mk
 
-sim: firmware bootloader
+sim: firmware bootloader noise_floor.txt
 ifeq ($(SIMULATOR),$(filter $(SIMULATOR), $(LOCAL_SIM_LIST)))
 	make -C $(SIM_DIR)  INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD)
 else
@@ -93,6 +93,8 @@ firmware:
 bootloader: firmware
 	make -C $(BOOT_DIR) BAUD=$(BAUD)
 
+noise_floor.txt: $(OCTAVE_DIR)/noise_gen.m
+	octave-cli $(OCTAVE_DIR)/noise_gen.m
 
 sw-clean:
 	make -C $(FIRM_DIR) clean
@@ -156,7 +158,7 @@ test-fpga:
 	@echo FPGA TEST PASSED FOR $(BOARD_LIST)
 
 .PHONY: sim sim-waves sim-clean \
-	firmware bootloader sw-clean
+	firmware bootloader sw-clean \
 	doc doc-clean \
 	fpga fpga-load fpga-clean fpga-clean-ip \
 	run-hw \

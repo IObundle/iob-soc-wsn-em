@@ -36,3 +36,4 @@ document/presentation/*
 !document/presentation/Makefile
 
 test.log
+noise_floor.txt

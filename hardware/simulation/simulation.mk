@@ -6,7 +6,9 @@ DEFINE+=$(defmacro)VCD
 endif
 
 #testbench source files
-VSRC+=system_tb.v $(AXI_MEM_DIR)/rtl/axi_ram.v
+VSRC+=system_tb.v \
+$(AXI_MEM_DIR)/rtl/axi_ram.v \
+$(ADPLL_TB_SVSRC)
 
 #create testbench system_tb.v
 system_tb.v:

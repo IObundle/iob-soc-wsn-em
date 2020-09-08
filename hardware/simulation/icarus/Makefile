@@ -9,7 +9,7 @@ include ../simulation.mk
 VLOG = iverilog -W all -g2005-sv $(INCLUDE) $(DEFINE) 
 
 #run the simulator
-run: $(VSRC) $(VHDR) firmware boot.hex periphs demod_coeffs
+run: $(VSRC) $(VHDR) firmware boot.hex periphs demod_coeffs noise_floor
 	$(VLOG) $(VSRC)
 	./a.out $(LOG)
 
