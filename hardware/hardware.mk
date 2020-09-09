@@ -48,7 +48,7 @@ system.v:
 	cp $(SRC_DIR)/system_core.v $@ # create system.v
 	$(foreach p, $(PERIPHERALS), if [ `ls -1 $(SUBMODULES_DIR)/$p/hardware/include/*.vh 2>/dev/null | wc -l ` -gt 0 ]; then $(foreach f, $(shell echo `ls $(SUBMODULES_DIR)/$p/hardware/include/*.vh`), sed -i '/PHEADER/a `include \"$f\"' $@;) break; fi;) # insert header files
 	$(foreach p, $(PERIPHERALS), if test -f $(SUBMODULES_DIR)/$p/hardware/include/pio.v; then sed -i '/PIO/r $(SUBMODULES_DIR)/$p/hardware/include/pio.v' $@; fi;) #insert system IOs for peripheral
-	$(foreach p, $(PERIPHERALS), sed -i '/endmodule/e cat $(SUBMODULES_DIR)/$p/hardware/include/inst.v' $@;) # insert peripheral instances
+	$(foreach p, $(PERIPHERALS), if test -f $(SUBMODULES_DIR)/$p/hardware/include/inst.v; then sed -i '/endmodule/e cat $(SUBMODULES_DIR)/$p/hardware/include/inst.v' $@; fi;) # insert peripheral instances
 
 
 # data files
@@ -63,14 +63,18 @@ endif
 boot.hex: $(BOOT_DIR)/boot.bin
 	$(PYTHON_DIR)/makehex.py $(BOOT_DIR)/boot.bin $(BOOTROM_ADDR_W) > boot.hex
 
+noise_floor: $(ROOT_DIR)/noise_floor.txt
+	cp $(ROOT_DIR)/noise_floor.txt $(MIXER_INC_DIR)
+
 hw-clean:
 	@rm -f *# *~ *.vcd *.dat *.hex *.bin $(SRC_DIR)/system.v $(TB_DIR)/system_tb.v
 
 
+include $(ADPLL_DIR)/adpll.mk
 include $(SUBMODULES_DIR)/FSK_DEMOD/fsk_demod.mk
 
 demod_coeffs:
 	make -C $(SUBMODULES_DIR)/FSK_DEMOD
 	mv $(SUBMODULES_DIR)/FSK_DEMOD/*.hex .
 
-.PHONY: periphs firmware hw-clean demod_coefs
+.PHONY: periphs firmware noise_floor hw-clean demod_coefs

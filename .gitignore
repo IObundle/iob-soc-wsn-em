@@ -36,4 +36,6 @@ document/presentation/*
 !document/presentation/Makefile
 
 test.log
+noise_floor.txt
+submodules/FSK_DEMOD/params.m
 submodules/MIXER/hardware/include/noise_floor.txt
