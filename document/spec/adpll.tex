@@ -1,0 +1,436 @@
+\section{ADPLL}
+\label{sec:adpll}
+
+In this section the detailed specifications of the All-Digital Phase-Locked-loop
+(ADPLL) and its internal mixed-signal blocks are presented.
+
+
+\subsection{General specifications}
+
+The general specifications of the ADPLL block are given in
+Table~\ref{tab:adpll_specs}.
+
+\begin{table}[!h]
+  \centering
+  \begin{tabular}{|p{5cm}|p{2cm}|p{7cm}|}
+    \hline
+    \rowcolor{tab-green}
+    & {\bf Spec} & {\bf Notes} \\
+    \hline \hline {\bf Ouput Frequency} & X - X MHz &  \\
+    \hline {\bf Reference Frequency} & 32 MHz &   \\
+    \hline {\bf RX RMS Integrated Jitter} & X ps & phase-noise integration \\
+    \hline {\bf RX Integration Range} & 0.1-100 MHz & \\
+    \hline {\bf RX Loop Bandwidth} &  X MHz & \\
+    \hline {\bf TX Loop Bandwidth} & X MHz & e \\
+    \hline {\bf TX FSK error} & X $\%$ &  \\
+    \hline {\bf Power Consumption} &  X mW & 1.2 V supply\\
+    \hline {\bf Area} & X mm$^2$ &  \\
+    \hline                                   
+  \end{tabular}
+  \caption{General specfications.}
+  \label{tab:adpll_specs}
+\end{table}
+
+
+
+\subsection{Block diagram}
+
+The ADPLL is comprised of a digital core unit, a digital-controlled
+oscillator (DCO), a time-to-digital converter (TDC), and a clock
+retiming unit, as can be seen in Fig. \ref{fig:adpll_bd}.
+
+Details about the TDC and the DCO blocks can be found in section \ref{sec:tdc} and \ref{sec:dco}, respectively.
+
+The retiming unit synchronizes the DCO and adpll\_ctr clock domains.
+This is achieved by oversampling of the FREF clock by the high-rate
+DCO clock. To reduce metastability issues, the retiming unit employs
+custom-designed flip-flops.
+
+
+
+
+\begin{figure}[!h]
+  \centering
+      {\includegraphics[width=12cm]{./drawings/adpll_bd.png}}
+  \caption{Diagram block}
+  \label{fig:adpll_bd}
+\end{figure}
+
+
+
+\subsection{Interface signals}
+
+The ADPLL interface signals are shown in Table~\ref{tab:adpll_interface}. 
+
+\begin{table}[!h]
+  \centering
+    \begin{tabular}{|p{3cm}|p{1.5cm}|p{2cm}|p{1.5cm}|p{7cm}|}
+      \hline
+      \rowcolor{tab-green}
+    {\bf Name} & {\bf Type} & {\bf Direction} & {\bf Width} & {\bf Description} \\
+    \hline \hline 
+    rst & digital & in & 1 & System reset\\
+    \hline
+    en & digital & in & 1 & System enable \\
+    \hline
+    clk &  digital & in & 1 & 32 MHz system clock \\
+    \hline
+    sel &  digital & in & 1 & CPU interface \\
+    \hline
+    write &  digital & in & 1 & CPU interface \\
+    \hline
+    address &  digital & in & 5 & CPU interface \\
+    \hline
+    data\_in &  digital & in & 32 & CPU interface \\
+    \hline
+    ready &  digital & out & 1 & CPU interface \\
+    \hline
+    FCW &  digital & in &  26 & Channel frequency in MHz (Q12.14) \\
+    \hline
+    adpll\_mode & digital & in & 2 & ADPLL operation mode \\
+    \hline
+    data\_mod & digital & in & 1 & Data bit to modulated in TX mode\\
+    \hline
+    channel\_lock & digital & out & 1 & Channel frequency locking flag \\
+    \hline
+    DVDD & analog &  & 1 & Digital core supply voltage \\
+    \hline
+    VDD\_TDC & analog &   & 1 & TDC supply voltage \\
+    \hline
+    VDD\_DCO & analog &  & 1 & DCO supply voltage \\
+    \hline
+    DGND & analog &    & 1 & Digital ground \\
+    \hline
+    GND & analog &    & 1 & Analog ground \\
+    \hline
+    IREF & analog &    & 1 & Analog reference current (5$\mu$A) \\
+    \hline
+    CKV\_P & analog &    & 1 & DCO positive output \\
+    \hline
+    CKV\_N & analog &    & 1 & DCO negative output \\
+    \hline
+    
+    \end{tabular}
+  \caption{Interface signals}
+  \label{tab:adpll_interface}
+\end{table}
+
+
+\subsection{Memory mapped registers}
+
+The list of memory mapped registers is shown in Table~\ref{tab:adpll_registers}.
+
+\begin{table}[!h]
+  \centering
+    \begin{tabular}{|p{3.7cm}|p{1cm}|p{1.2cm}|p{0.8cm}|p{7cm}|p{1.2cm}|}
+      \hline
+      \rowcolor{tab-green}
+    {\bf Name} & {\bf Read/ Write} & {\bf Address} & {\bf Width} & {\bf Description} & {\bf Default} after rst \\
+    \hline \hline 
+    ALPHA\_L     & write & 0 & 4 & Proportional gain in C\_L state & 14\\
+    \hline
+    ALPHA\_M     & write & 1 & 4 & Proportional gain in C\_M state & 8\\
+    \hline
+    ALPHA\_S\_RX & write & 2 & 4 & Proportional gain in C\_S state and RX mode & 7\\
+    \hline
+    ALPHA\_S\_TX & write & 3 & 4 & Proportional gain in C\_L state and TX mode & 4\\
+    \hline
+    BETA         & write & 4 & 4 & Integral gain in RX mode  & 0\\
+    \hline
+    LAMBDA\_RX   & write & 5 & 3 & 1st order IIR LPF coeficient in RX mode & 2\\
+    \hline
+    LAMBDA\_TX   & write & 6 & 3 & 1st order IIR LPF coeficient in TX mode & 2\\
+    \hline
+    IIR\_N\_RX   & write & 7 & 2 & Number of 1st order IIR LPFs in RX mode & 3\\
+    \hline
+    IIR\_N\_TX   & write & 8 & 2 & Number of 1st order IIR LPFs in TX mode & 2\\
+    \hline
+    FCW\_mod     & write & 9 & 5 & FSK modulation freq deviation (lsb=32kHz) & 9\\
+    \hline
+    DCO\_C\_L\_WORD\_TEST & write & 10 & 5 & DCO Large Cap bank control signed word  & 0\\
+    \hline
+    DCO\_C\_M\_WORD\_TEST & write & 11 & 8 & DCO Medium Cap bank control signed word  & 0\\
+    \hline
+    DCO\_C\_S\_WORD\_TEST & write & 12 & 8 & DCO Small Cap bank control signed word  & 0\\
+    \hline
+    DCO\_PD\_TEST & write & 13 & 1 & DCO power down in TEST mode  & 1 \\
+    \hline
+    TDC\_PD\_TEST & write & 14 & 1 & TDC power down in TEST mode  & 1 \\
+    \hline
+    TDC\_PD\_INJ\_TEST & write & 15 & 1 & TDC injection-locking power down in TEST mode  & 1 \\
+    \hline
+    TDC\_CTR\_FREQ & write & 16 & 3 & TDC ring oscillator control frequency  & 4 \\
+    \hline
+    DCO\_OSC\_GAIN & write & 17 & 3 & DCO oscillator control gm  & 2 \\
+    \hline
+    ADPLL\_SOFT\_RST & write & 18 & 3 & ADPLL soft reset  & 0 \\
+    \hline
+    
+    
+    \end{tabular}
+  \caption{List of meory mapped registers}
+  \label{tab:adpll_registers}
+\end{table}
+
+
+\subsection{Operation}
+
+The ADPLL performs two different tasks: RF channel frequency synthesis, and FSK
+modulation. While the former is required on both modes (TX and RX), the latter
+is only used in the TX mode. Table~\ref{tab:adpll_modes} shows all different
+operation modes that can be programmed according to the adpll\_mode[1:0] input.
+
+\begin{table}[!h]
+  \centering
+    \begin{tabular}{|p{2.5cm}|p{1.5cm}|p{9cm}|}
+      \hline
+      \rowcolor{tab-green}
+    {\bf adpll\_mode[1:0]} & {\bf Mode} & {\bf Description} \\
+    \hline \hline 
+    0    & PD   & Power down\\
+    \hline
+    1    & TEST & Test mode where TDC and DCO blocks can be controlled via CPU\\
+    \hline
+    2    & RX   & Synthetizes FCW using the ADPLL receiver filtering response \\
+    \hline
+    3    & TX   & Synthetizes FCW using the ADPLL transmitter filtering response, after the channel lock flag goes high, the input data\_mod bit is synthetized at 1 MHz rate\\
+    \hline
+    
+    \end{tabular}
+  \caption{Operation modes}
+  \label{tab:adpll_modes}
+\end{table}
+
+
+
+
+\begin{figure}[!h]
+  
+  \centering
+      {\includegraphics[width=15cm]{./drawings/adpll_flowchart.png}}
+  \caption{ADPLL state flowchart}
+  \label{fig:adpll_flowchart}
+\end{figure}
+
+The operation of the adpll\_ctr module is shown in
+Fig. \ref{fig:adpll_flowchart}, by means of its state flowchart state diagram.
+After the initial system reset and enable activation, the controller is in the
+IDLE state, remaining here if the ADPLL operation mode is PD or TEST. Otherwise,
+it goes to the PU state in the next CLK cycle. In the PU state, the controller
+successively powers up the DCO and TDC. After 32 clk cycles (3 $\mu$s), the
+controller enters into the C\_L state. This state selects the command word of
+the large capacitor bank that generates the closest output frequency to the
+target frequency. The transition to C\_M state takes place when an internal
+flag (lock\_detect) goes up. The C\_M state operates similarly to the C\_L
+state but acting on the medium capacitor bank. Once locked, the controller
+goes to the C\_S state. This state gives the finest resolution by acting on the
+small capacitor bank during 480 clk cycles (15 $\mu$s). After that, the
+channel\_lock output flag is activated meaning that the channel tracking is
+completed. In the case of RX mode operation, the controller continuous the
+channel frequency tracking, otherwise, it performs data modulation within the
+channel (TX mode operation).
+
+Fig. \ref{fig:adpll_filters} shows the block diagram of the filters in the loop.
+In the RX mode, a proportional filter and integral filter, as well as
+a cascade of first-order LPF IIR filters, can be selected and programmed. The
+same filters are available in the TX mode, with the exception of the integral
+one.
+
+In the case of TEST mode selection, the TDC and DCO are power-down, ready to be
+fully controlled by the CPU. 
+
+Note that whenever the FCW or the adpll\_mode input words are changed, the ADPLL
+returns to the IDLE state.
+
+
+
+
+\begin{figure}[!h]
+  %\vspace{-.5cm}
+  \centering
+      {\includegraphics[width=18cm]{./drawings/adpll_filters.png}}
+  \caption{ADPLL filters block diagram}
+  \label{fig:adpll_filters}
+\end{figure}
+
+\subsection{ADPLL Controller}
+
+\subsubsection{Interface signals}
+
+The interface signals of the adpll\_ctr module  are
+shown in Table~\ref{tab:adpll_ctr_interface}. 
+
+\begin{table}[!h]
+  \centering
+    \begin{tabular}{|p{3cm}|p{1.5cm}|p{2cm}|p{1.5cm}|p{7cm}|}
+      \hline
+      \rowcolor{tab-green}
+    {\bf Name} & {\bf Type} & {\bf Direction} & {\bf Width} & {\bf Description} \\
+    \hline \hline 
+    rst & digital & in & 1 & System reset\\
+    \hline
+    en & digital & in & 1 & System enable \\
+    \hline
+    clk &  digital & in & 1 & 32 MHz system clock \\
+    \hline
+    sel &  digital & in & 1 & CPU interface \\
+    \hline
+    write &  digital & in & 1 & CPU interface \\
+    \hline
+    address &  digital & in & 5 & CPU interface \\
+    \hline
+    data\_in &  digital & in & 32 & CPU interface \\
+    \hline
+    ready &  digital & out & 1 & CPU interface \\
+    \hline
+    FCW &  digital & in &  26 & Channel frequency in MHz (Q12.14) \\
+    \hline
+    adpll\_mode & digital & in & 2 & ADPLL operation mode \\
+    \hline
+    data\_mod & digital & in & 1 & Data bit to modulated in TX mode\\
+    \hline
+    channel\_lock & digital & out & 1 & Channel frequency locking flag \\
+    \hline
+    dco\_pd & digital & out  & 1 & DCO power-down\\
+    \hline
+    dco\_osc\_gain & digital & out  & 2 & DCO gm control\\
+    \hline
+    dco\_c\_l\_rall & digital & out  & 5 & DCO large cap bank full row control\\
+    \hline
+    dco\_c\_l\_row & digital & out  & 5 & DCO large cap bank row control\\
+    \hline
+    dco\_c\_l\_col & digital & out  & 5 & DCO large cap bank column control\\
+    \hline
+    dco\_c\_m\_rall & digital & out  & 8 & DCO medium cap bank full row control\\
+    \hline
+    dco\_c\_m\_row & digital & out  & 8 & DCO medium cap bank row control\\
+    \hline
+    dco\_c\_m\_col & digital & out  & 8 & DCO medium cap bank column control\\
+    \hline
+     dco\_c\_s\_rall & digital & out  & 8 & DCO small cap bank full row control\\
+    \hline
+    dco\_c\_s\_row & digital & out  & 8 & DCO small cap bank row control\\
+    \hline
+    dco\_c\_s\_col & digital & out  & 8 & DCO small cap bank column control\\
+    \hline
+    tdc\_pd & digital & out  & 1 & TDC power-down\\
+    \hline
+    tdc\_pd\_inj & digital & out  & 1 & TDC injection-locking power-down\\
+    \hline
+    tdc\_ctr\_freq & digital & out  & 3 & TDC ring oscillator frequency control\\
+    \hline
+    tdc\_ripple\_count & digital & in  & 7 & RF ripple counter output\\
+    \hline
+    tdc\_phase & digital & in  & 16 & TDC ring oscillator phases\\
+    \hline
+    \end{tabular}
+  \caption{Controller interface}
+  \label{tab:adpll_ctr_interface}
+\end{table}
+
+
+
+
+\subsection{Time-to-Digital Converter}
+\label{sec:tdc}
+A TDC plays a major role in digital PLLs since converts the local oscillator output frequency into a digital word that is processed by the PLL unit control. This is a high-resolution TDC suitable for digital PLLs operating in the 2-3 GHz frequency band. The TDC employs a novel circuit topology that allows wide range injection-locking (more than 1 GHz) without compromise the TDC DNL.
+
+\subsubsection{Interface signals}
+
+The TDC interface signals are shown in Table~\ref{tab:tdc_interface}. 
+\begin{table}[!h]
+  \centering
+    \begin{tabular}{|p{3cm}|p{1.5cm}|p{2cm}|p{1.5cm}|p{7cm}|}
+      \hline
+      \rowcolor{tab-green}
+    {\bf Name} & {\bf Type} & {\bf Direction} & {\bf Width} & {\bf Description} \\
+    \hline \hline   
+    tdc\_pd & digital & in  & 1 & TDC power-down\\
+    \hline
+    tdc\_pd\_inj & digital & in  & 1 & TDC injection-locking power-down\\
+    \hline
+    clk &  digital & in & 1 & 32 MHz system clock \\
+    \hline
+    tdc\_ctr\_freq & digital & in  & 3 & TDC ring oscillator frequency control\\
+    \hline
+    tdc\_ripple\_count & digital & out  & 7 & RF ripple counter output\\
+    \hline
+    tdc\_phase & digital & out  & 16 & TDC ring oscillator phases\\
+    \hline
+    DVDD & analog &  & 1 & Digital core supply voltage \\
+    \hline
+    VDD & analog &   & 1 & TDC supply voltage \\
+    \hline
+    DGND & analog &    & 1 & Digital ground \\
+    \hline
+    GND & analog &    & 1 & Analog ground \\
+    \hline
+    IREF & analog &    & 1 & Analog reference current (5$\mu$A) \\
+    \hline
+    INJ\_P & analog &    & 1 & DCO positive output injector\\
+    \hline
+    INJ\_N & analog &    & 1 & DCO negative output injector \\
+    \hline
+  
+    \end{tabular}
+  \caption{TDC interface signals}
+  \label{tab:tdc_interface}
+\end{table}
+
+The TDC employs a ring oscillator that requires an initial settling time at the time the TDC is powered up. At the worst PVT case, simulation results show an RO initial settling time of about 300 ns. Thus, it is recommended to wait for at least 300 ns before the injection of an external RF input signal. After the signal injection activation , it is recommended to wait for at least 100 ns plus five CLK cycles in order to get a valid tdc output word.
+
+
+
+\subsection{Digital-Controlled Oscillator}
+\label{sec:dco}
+\subsubsection{Interface signals}
+The DCO interface signals are shown in Table~\ref{tab:dco_interface}. 
+
+\begin{table}[!h]
+  \centering
+    \begin{tabular}{|p{3cm}|p{1.5cm}|p{2cm}|p{1.5cm}|p{7cm}|}
+      \hline
+      \rowcolor{tab-green}
+    {\bf Name} & {\bf Type} & {\bf Direction} & {\bf Width} & {\bf Description} \\
+    \hline \hline    
+    pd & digital & in  & 1 & DCO power-down\\
+    \hline
+    dco\_osc\_gain & digital & in  & 2 & DCO gm control\\
+    \hline
+    dco\_c\_l\_rall & digital & in  & 5 & DCO large cap bank full row control\\
+    \hline
+    dco\_c\_l\_row & digital & in  & 5 & DCO large cap bank row control\\
+    \hline
+    dco\_c\_l\_col & digital & in  & 5 & DCO large cap bank column control\\
+    \hline
+    dco\_c\_m\_rall & digital & in  & 8 & DCO medium cap bank full row control\\
+    \hline
+    dco\_c\_m\_row & digital & in  & 8 & DCO medium cap bank row control\\
+    \hline
+    dco\_c\_m\_col & digital & in  & 8 & DCO medium cap bank column control\\
+    \hline
+    dco\_c\_s\_rall & digital & in  & 8 & DCO small cap bank full row control\\
+    \hline
+    dco\_c\_s\_row & digital & in  & 8 & DCO small cap bank row control\\
+    \hline
+    dco\_c\_s\_col & digital & in  & 8 & DCO small cap bank column control\\
+    \hline
+    VDD & analog &  & 1 & DCO supply voltage \\
+    \hline
+    GND & analog &    & 1 & Analog ground \\
+    \hline
+    IREF & analog &    & 1 & Analog reference current (5$\mu$A) \\
+    \hline
+    CKV\_P & analog &    & 1 & DCO positive output \\
+    \hline
+    CKV\_N & analog &    & 1 & DCO negative output \\
+    \hline
+
+  
+    \end{tabular}
+  \caption{DCO interface signals}
+  \label{tab:dco_interface}
+\end{table}
+
+\newpage 
+

@@ -1,0 +1,33 @@
+\subsection{Block Diagram}
+\label{sec:bd}
+
+A high-level block diagram of Versat is presented in Figure
+\ref{fig:versat_arch} and a brief explanation of each block is given
+in Table~\ref{tab:blocks}.
+
+\begin{figure}[!htbp]
+    \centerline{\includegraphics[width=16cm]{top.png}}
+    \vspace{0cm}\caption{The Versat architecture.}
+    \label{fig:versat_arch}
+\end{figure}
+
+\begin{table}[!h]
+  \centering
+    \begin{tabular}{|p{2cm}|p{12cm}|}
+    \hline 
+    {\bf Block} & {\bf Description} \\
+    \hline \hline 
+     Controller & Main Versat controller. Reads instructions from the Instruction Bus and is the master of the Read/Write (RW) bus. Controls the Data Engine and the Configuration Module. \\
+    \hline
+     Program Memory & Stores the Versat Controller program. Program accessed via the Instruction Bus and loaded from the Data Interface or from the RW bus. \\
+    \hline
+     Control Register File & Used for communication between the host (Control Interface) and the Versat Controller (RW bus). \\
+    \hline
+     Data Engine & Performs computation on data vectors according to configuration supplied by Config Bus. Data loaded/unloaded by Data Interface.\\
+    \hline
+     Configuration Module & Holds current configuration of the Data Engine supplied via the Config Bus, and stores most used configurations. \\
+    \hline
+    \end{tabular}
+  \caption{Block descriptions.}
+  \label{tab:blocks}
+\end{table}
