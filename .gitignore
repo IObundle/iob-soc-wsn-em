@@ -36,3 +36,4 @@ document/presentation/*
 !document/presentation/Makefile
 
 test.log
+submodules/MIXER/hardware/include/noise_floor.txt
