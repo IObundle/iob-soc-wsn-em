@@ -1,3 +1,5 @@
+defmacro:=-D
+
 include fsk_demod.mk
 
 IOB_FIR_M:=../FIR/software/octave/iob_fir.m

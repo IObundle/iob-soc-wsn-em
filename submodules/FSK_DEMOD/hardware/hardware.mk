@@ -31,16 +31,16 @@ T = 45  #threshhold
 H = 10  #histeresis
 
 # Demod defines
-DEFINE = -DT=$(T) -DH=$(H) -DI1_W=$(I1_W) -DO1_W=$(O1_W) -DL1=$(L1) -DL1_W=$(L1_W) -DC1_W=$(C_W) -DO2_W=$(O2_W) -DL2=$(L2) -DL2_W=$(L2_W) -DC2_W=$(C_W) -DO3_W=$(O3_W) -DL3=$(L3) -DL3_W=$(L3_W) -DC3_W=$(C_W)
+DEFINE+=$(defmacro)T=$(T) $(defmacro)H=$(H) $(defmacro)I1_W=$(I1_W) $(defmacro)O1_W=$(O1_W) $(defmacro)L1=$(L1) $(defmacro)L1_W=$(L1_W) $(defmacro)C1_W=$(C_W) $(defmacro)O2_W=$(O2_W) $(defmacro)L2=$(L2) $(defmacro)L2_W=$(L2_W) $(defmacro)C2_W=$(C_W) $(defmacro)O3_W=$(O3_W) $(defmacro)L3=$(L3) $(defmacro)L3_W=$(L3_W) $(defmacro)C3_W=$(C_W)
 
 # Testbench tx_rx_bb defines
-DEFINE_BB = -DSNR_DB=$(SNR_DB) -DN_PCKTS_W=$(N_PCKTS_W) -DN_PCKT_BYTE=$(N_PCKT_BYTE)
+DEFINE_BB=$(defmacro)SNR_DB=$(SNR_DB) $(defmacro)N_PCKTS_W=$(N_PCKTS_W) $(defmacro)N_PCKT_BYTE=$(N_PCKT_BYTE)
 
-DEFINE_RF = -DFREQ_CHANNEL=$(FREQ_CHANNEL) -DDCO_PN=$(DCO_PN)
+DEFINE_RF=$(defmacro)FREQ_CHANNEL=$(FREQ_CHANNEL) $(defmacro)DCO_PN=$(DCO_PN)
 
 
-FIR_DIR = ../../submodules/fir
-ADPLL_DIR = ../../submodules/adpll_rtl_wsn
+#FIR_DIR = ../../submodules/fir
+#ADPLL_DIR = ../../submodules/adpll_rtl_wsn
 
 #Icarus (-pfileline=1)
 CC = iverilog

@@ -20,4 +20,4 @@ FNS4 = 0 #transition detect
 #snr=14dB works with 3 filters, T=45 and H=10
 
 
-DEFINE+=  -DTL=$(TL) -DTH=$(TH) -DH=$(H) -DL1_W=$(N1_W) -DC1_W=$(C_W) -DL2_W=$(N2_W) -DC2_W=$(C_W) -DL3_W=$(N3_W) -DC3_W=$(C_W) -DL4_W=$(N4_W) -DC4_W=$(C_W)
+DEFINE+=$(defmacro)TL=$(TL) $(defmacro)TH=$(TH) $(defmacro)H=$(H) $(defmacro)L1_W=$(N1_W) $(defmacro)C1_W=$(C_W) $(defmacro)L2_W=$(N2_W) $(defmacro)C2_W=$(C_W) $(defmacro)L3_W=$(N3_W) $(defmacro)C3_W=$(C_W) $(defmacro)L4_W=$(N4_W) $(defmacro)C4_W=$(C_W)
