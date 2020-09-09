@@ -115,11 +115,11 @@ p2s:
 	./a.out
 
 demod_iir_cal:
-	echo "L=$(L1); L_W=$(L1_W); C_W=2;COEFF_FILE='fir1.hex'" > params.m
+	echo "L=$(L1); L_W=$(L1_W); C_W=2;COEFF_FILE='fir1.hex';" > params.m
 	octave --no-window-system -W $(FIR_DIR)/iob_fir.m
-	echo "L=$(L2); L_W=$(L2_W); C_W=2; COEFF_FILE='fir2.hex'" > params.m
+	echo "L=$(L2); L_W=$(L2_W); C_W=2; COEFF_FILE='fir2.hex';" > params.m
 	octave --no-window-system -W $(FIR_DIR)/iob_fir.m
-	echo "L=$(L3); L_W=$(L3_W); C_W=$(C_W); COEFF_FILE='fir3.hex'" > params.m
+	echo "L=$(L3); L_W=$(L3_W); C_W=$(C_W); COEFF_FILE='fir3.hex';" > params.m
 	octave --no-window-system -W $(FIR_DIR)/iob_fir.m	
 
 clean:
