@@ -7,8 +7,7 @@ endif
 
 #testbench source files
 VSRC+=system_tb.v \
-$(AXI_MEM_DIR)/rtl/axi_ram.v \
-$(ADPLL_TB_SVSRC)
+$(AXI_MEM_DIR)/rtl/axi_ram.v
 
 #create testbench system_tb.v
 system_tb.v:
