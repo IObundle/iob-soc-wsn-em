@@ -1,5 +1,7 @@
 ROOT_DIR:=../..
 include ../software.mk
+include $(ADPLL_DIR)/adpll.mk
+include $(ADPLL_DIR)/software/software.mk
 
 #include peripherals
 dummy:=$(foreach p, $(PERIPHERALS), $(eval include $(SUBMODULES_DIR)/$p/software/embedded/embedded.mk))
