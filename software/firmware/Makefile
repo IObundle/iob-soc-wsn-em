@@ -10,6 +10,8 @@ dummy:=$(foreach p, $(PERIPHERALS), $(eval include $(SUBMODULES_DIR)/$p/software
 #local flags
 CFLAGS+=--specs=nano.specs -Wl,-Bstatic,-T,../template.lds,-Map,firmware.map,--strip-debug
 
+DEFINE+=$(defmacro)FLOAT
+
 #local sources
 HDR+=$(SW_DIR)/periphs.h
 SRC+= firmware.S firmware.c

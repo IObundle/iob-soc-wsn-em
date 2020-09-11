@@ -19,7 +19,7 @@ int main() {
 
   int adpll_mode = ADPLL_OPERATION;
   int fcw = (int)(FREQ_CHANNEL*16384);
-  uart_printf("freq_channel = %d.%d MHz, FCW = %d, adpll_mode = %d\n", (int)FREQ_CHANNEL,(int)((FREQ_CHANNEL-(int)FREQ_CHANNEL)*1000), fcw, ADPLL_OPERATION);
+  uart_printf("freq_channel = %fMHz, FCW = %d, adpll_mode = %d\n", FREQ_CHANNEL, fcw, ADPLL_OPERATION);
 
   // Configure ADPLL
   char alpha_l = 14;
