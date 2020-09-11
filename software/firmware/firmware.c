@@ -31,7 +31,7 @@ int main() {
   char lambda_tx = 2;
   char iir_n_rx = 3;
   char iir_n_tx = 2;
-  char FCW_mod = 0b01001;//298kHz
+  char FCW_mod = 0b01001; // 288kHz
   char dco_c_l_word_test = 0;
   char dco_c_m_word_test = 0;
   char dco_c_s_word_test = 0;
