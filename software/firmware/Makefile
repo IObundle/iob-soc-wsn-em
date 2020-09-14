@@ -10,6 +10,8 @@ dummy:=$(foreach p, $(PERIPHERALS), $(eval include $(SUBMODULES_DIR)/$p/software
 #local flags
 CFLAGS+=--specs=nano.specs -Wl,-Bstatic,-T,../template.lds,-Map,firmware.map,--strip-debug
 
+INCLUDE+=$(incdir).
+
 DEFINE+=$(defmacro)FLOAT
 
 #local sources
@@ -23,6 +25,6 @@ firmware.elf: ../template.lds $(HDR) $(SRC)
 	$(TOOLCHAIN_PREFIX)objcopy -O binary firmware.elf firmware.bin
 
 clean:
-	@rm -rf firmware.bin firmware.elf firmware.map *.hex ../periphs.h *~
+	@rm -rf firmware.bin firmware.elf firmware.map *.hex ../periphs.h *~ *.h
 
 .PHONY: run clean
