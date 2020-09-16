@@ -18,11 +18,11 @@ SIM_ROOT_DIR=./sandbox/iob-soc
 export VSRC CFLAGS EFLAGS SFLAGS 
 
 #simulate
-run: $(VSRC) $(VHDR) firmware boot.hex periphs
+sim: $(VSRC) $(VHDR) firmware boot.hex periphs demod_coeffs noise_floor
 	./run_ncsim.sh
 	grep -v xcelium xmsim.log | grep -v xmsim $(LOG)
 
 clean: hw-clean
-	@rm -rf xcelium.d xmsim.key *.log *.v
+	@rm -rf xcelium.d xmsim.key *.log *.v $(OUTPUT_FILES)
 
-.PHONY: clean
+.PHONY: sim clean
