@@ -52,16 +52,19 @@ int main() {
   adpll_enable();
 
   // Wait for results
+  while(adpll_lock() != 1);
+
   unsigned int i;
   unsigned int k = 0;
-  unsigned int end = SIM_TIME;
+  unsigned int end = SIM_TIME/2;
   for (i = 0; i < end; i++) {
-    if (i == end*k/100) {
+    adpll_lock();
+    /*if (i == end*k/100) {
       uart_printf("Loading progress: %d percent\n", k);
       k += 10;
-    }
+      }*/
   }
-  uart_printf("Loading progress: %d percent\n", 100);
+  //uart_printf("Loading progress: %d percent\n", 100);
 
   return 0;
 }
