@@ -141,12 +141,10 @@ DEFINE+=$(defmacro)B=$B
 SIM_BAUD:=10000000
 HW_BAUD:=115200
 
-ifeq ($(MAKECMDGOALS),)
-BAUD:=$(SIM_BAUD)
-else ifeq ($(word 1, $(MAKECMDGOALS)),sim)
-BAUD:=$(SIM_BAUD)
-else
+ifeq ($(word 1, $(MAKECMDGOALS)),fpga)
 BAUD:=$(HW_BAUD)
+else
+BAUD:=$(SIM_BAUD)
 endif
 
 
