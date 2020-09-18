@@ -3,7 +3,7 @@ include ./system.mk
 
 sim: firmware bootloader demod_coeffs noise_floor.txt
 ifeq ($(SIMULATOR),$(filter $(SIMULATOR), $(LOCAL_SIM_LIST)))
-	make -C $(SIM_DIR)  INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD)
+	make -C $(SIM_DIR) run INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD)
 else
 	ssh $(SIM_SERVER) "if [ ! -d $(REMOTE_ROOT_DIR) ]; then mkdir -p $(REMOTE_ROOT_DIR); fi"
 	rsync -avz --exclude .git $(ROOT_DIR) $(SIM_SERVER):$(REMOTE_ROOT_DIR)
@@ -88,10 +88,10 @@ asic-clean:
 	ssh $(ASIC_COMPILE_SERVER) "cd $(ASIC_COMPILE_ROOT_DIR); make -C $(ASIC_DIR) clean"
 
 firmware:
-	make -C $(FIRM_DIR) BAUD=$(BAUD)
+	make -C $(FIRM_DIR) run BAUD=$(BAUD)
 
 bootloader: firmware
-	make -C $(BOOT_DIR) BAUD=$(BAUD)
+	make -C $(BOOT_DIR) run BAUD=$(BAUD)
 
 sw-clean:
 	make -C $(FIRM_DIR) clean
