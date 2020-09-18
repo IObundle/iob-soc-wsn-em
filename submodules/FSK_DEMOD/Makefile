@@ -14,3 +14,8 @@ demod:
 	octave $(IOB_FIR_M)
 	echo "FNS=$(FNS4); N_W=$(N4_W); C_W=$(C_W); FC=$(FC); COEFF_FILE='fir4.hex';" > params.m
 	octave $(IOB_FIR_M)
+
+clean:
+	@rm -rf *.hex
+
+.PHONY: demod clean

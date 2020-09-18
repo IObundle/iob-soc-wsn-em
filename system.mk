@@ -66,12 +66,12 @@ else
 endif
 
 #ROOT DIR ON REMOTE MACHINES
-REMOTE_ROOT_DIR=./sandbox/iob-soc
+REMOTE_ROOT_DIR=./sandbox/iob-soc-wsn-em
 
 #ASIC
 ASIC_NODE:=umc130
 ASIC_COMPILE_SERVER=$(USER)@micro7.lx.it.pt
-ASIC_COMPILE_ROOT_DIR=$(ROOT_DIR)/sandbox/iob-soc
+ASIC_COMPILE_ROOT_DIR=$(ROOT_DIR)/sandbox/iob-soc-wsn-em
 
 #DOC_TYPE
 #DOC_TYPE:=presentation
