@@ -159,11 +159,7 @@ DEFINE+=$(defmacro)FREQ=$(FREQ)
 endif
 
 
-
-#target is run by default
-TARGET:=run
-
-all: usage $(TARGET)
+all: usage
 
 usage:
 	@echo "INFO: Top target must me defined so that target \"run\" can be found" 
