@@ -1,9 +1,9 @@
 ROOT_DIR:=.
 include ./system.mk
 
-sim: firmware bootloader noise_floor.txt
+sim: firmware bootloader demod_coeffs noise_floor.txt
 ifeq ($(SIMULATOR),$(filter $(SIMULATOR), $(LOCAL_SIM_LIST)))
-	make -C $(SIM_DIR)  INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD)
+	make -C $(SIM_DIR) run INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD)
 else
 	ssh $(SIM_SERVER) "if [ ! -d $(REMOTE_ROOT_DIR) ]; then mkdir -p $(REMOTE_ROOT_DIR); fi"
 	rsync -avz --exclude .git $(ROOT_DIR) $(SIM_SERVER):$(REMOTE_ROOT_DIR)
@@ -17,7 +17,7 @@ sim-waves:
 	make sim INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD)
 	gtkwave -a $(SIM_DIR)/../waves.gtkw $(SIM_DIR)/system.vcd
 
-sim-clean: sw-clean
+sim-clean: sw-clean hex-clean
 	make -C $(SIM_DIR) clean SIMULATOR=$(SIMULATOR)
 ifneq ($(SIMULATOR),$(filter $(SIMULATOR), $(LOCAL_SIM_LIST)))
 	rsync -avz --exclude .git $(ROOT_DIR) $(SIM_SERVER):$(REMOTE_ROOT_DIR)
@@ -88,18 +88,24 @@ asic-clean:
 	ssh $(ASIC_COMPILE_SERVER) "cd $(ASIC_COMPILE_ROOT_DIR); make -C $(ASIC_DIR) clean"
 
 firmware:
-	make -C $(FIRM_DIR) BAUD=$(BAUD)
+	make -C $(FIRM_DIR) run BAUD=$(BAUD)
 
 bootloader: firmware
-	make -C $(BOOT_DIR) BAUD=$(BAUD)
-
-noise_floor.txt: $(OCTAVE_DIR)/noise_gen.m
-	octave-cli $(OCTAVE_DIR)/noise_gen.m
+	make -C $(BOOT_DIR) run BAUD=$(BAUD)
 
 sw-clean:
 	make -C $(FIRM_DIR) clean
 	make -C $(BOOT_DIR) clean
 	make -C $(CONSOLE_DIR) clean
+
+noise_floor.txt: $(OCTAVE_DIR)/noise_gen.m
+	octave-cli $(OCTAVE_DIR)/noise_gen.m
+
+demod_coeffs:
+	make -C $(SUBMODULES_DIR)/FSK_DEMOD
+
+hex-clean:
+	make -C $(SUBMODULES_DIR)/FSK_DEMOD clean
 
 doc:
 	make -C $(DOC_DIR)
@@ -159,6 +165,7 @@ test-fpga:
 
 .PHONY: sim sim-waves sim-clean \
 	firmware bootloader sw-clean \
+	demod_coeffs \
 	doc doc-clean \
 	fpga fpga-load fpga-clean fpga-clean-ip \
 	run-hw \

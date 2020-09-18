@@ -74,7 +74,6 @@ include $(ADPLL_DIR)/adpll.mk
 include $(SUBMODULES_DIR)/FSK_DEMOD/fsk_demod.mk
 
 demod_coeffs:
-	make -C $(SUBMODULES_DIR)/FSK_DEMOD
 	mv $(SUBMODULES_DIR)/FSK_DEMOD/*.hex .
 
 .PHONY: periphs firmware noise_floor hw-clean demod_coefs
