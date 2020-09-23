@@ -1,4 +1,8 @@
 
+   wire mix_out;
+   wire mix_sampling_clk;
+   wire mix_osc_in = dco_ckv;
+   wire mix_rf_in = antena;
    mixer_tb mixer_tb0
      (
       .rf_in        (mix_rf_in),
