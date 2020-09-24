@@ -1,0 +1,3 @@
+`define LIMITER_ADDR_W 1
+
+`define LIMITER_PD (`LIMITER_ADDR_W'd0)
