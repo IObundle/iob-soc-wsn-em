@@ -3,7 +3,7 @@
 //
 
 `timescale 1ns / 1ps
-
+`include "header.vh"
 module whitening(
 	   input                 data_in,
 	   input                 en,
