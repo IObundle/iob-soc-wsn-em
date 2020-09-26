@@ -101,17 +101,17 @@ sw-clean:
 	make -C $(BOOT_DIR) clean
 	make -C $(CONSOLE_DIR) clean
 
-noise_floor.txt: $(OCTAVE_DIR)/noise_gen.m
-	octave-cli $(OCTAVE_DIR)/noise_gen.m
+noise_floor.txt:
+	make -C $(SUBMODULES_DIR)/FSK_DEMOD noise_floor.txt
 
 demod_coeffs:
-	make -C $(SUBMODULES_DIR)/FSK_DEMOD
+	make -C $(SUBMODULES_DIR)/FSK_DEMOD demod_coeffs
 
 hex-clean:
 	make -C $(SUBMODULES_DIR)/FSK_DEMOD clean
 
 doc:
-	make -C $(DOC_DIR)
+	make -C $(DOC_DIR) run
 
 doc-clean:
 	make -C $(DOC_DIR) clean

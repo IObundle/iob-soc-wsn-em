@@ -4,7 +4,7 @@
 
 `timescale 1ns / 1ps
 
-module tx_rx_bb_tb;
+module fsk_demod_tb;
    //blocks enable and rst
    reg demod_en;
    reg rx_en;
@@ -83,25 +83,25 @@ module tx_rx_bb_tb;
    reg [7:0] 		lpf_fc;
    real 		lpf_out;
    // instantiate the rx channel filtering
-   lpf lpf(	  
-		  // Inputs
-		  .sampling_clk(sampling_clk),
-		  .lpf_pd(lpf_pd),
-		  .lpf_fc(lpf_fc),
-		  .signal_input(fsk_mod_noise_out),
-		  //Outputs
-		  .signal_out(lpf_out));
+   lpf_tb lpf(
+		      // Inputs
+		      .sampling_clk(sampling_clk),
+		      .pd(lpf_pd),
+		      .fc(lpf_fc),
+		      .in(fsk_mod_noise_out),
+		      //Outputs
+		      .out(lpf_out));
 
    
    reg 			limiter_pd;
    wire 		limiter_out;   
    // instantiate the limiter analog block
-   limiter limiter(	  
-				  // Inputs
-				  .signal_in(lpf_out),
-				  .limiter_pd(limiter_pd),
-				  //Outputs
-				  .square_out(limiter_out));
+   limiter_tb limiter(
+				      // Inputs
+				      .signal_in(lpf_out),
+				      .limiter_pd(limiter_pd),
+				      //Outputs
+				      .square_out(limiter_out));
    
 
 
@@ -137,7 +137,7 @@ module tx_rx_bb_tb;
 
    //just issue clock cyles and a start pulse with fixed data at input
    initial begin
-      $dumpfile("tx_rx_bb_tb.vcd");
+      $dumpfile("fsk_demod_tb.vcd");
       $dumpvars();
 
       clk = 1;

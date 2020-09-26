@@ -1,5 +1,6 @@
 `timescale 1fs / 1fs
-`include "rcntlr_defines.v"
+
+`include "rcntlr_defines.vh"
 
 //
 // Authors: Patrick Gonçalves Pereira, Jose T. de Sousa

@@ -96,7 +96,6 @@ FIRM_DIR:=$(SW_DIR)/firmware
 BOOT_DIR:=$(SW_DIR)/bootloader
 CONSOLE_DIR:=$(SW_DIR)/console
 PYTHON_DIR:=$(SW_DIR)/python
-OCTAVE_DIR:=$(SW_DIR)/octave
 
 DOC_DIR:=$(ROOT_DIR)/document/$(DOC_TYPE)
 

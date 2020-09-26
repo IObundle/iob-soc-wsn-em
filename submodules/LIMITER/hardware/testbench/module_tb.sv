@@ -1,6 +1,6 @@
 `timescale 1fs / 1fs
 
-// Description: Emulates the limiter
+// Description: Emulates the limiter behaviour
 // 
 
 module limiter_tb
