@@ -24,7 +24,7 @@ ifeq ($(INIT_MEM),)
 endif
 
 #Peripheral list (must match respective submodule or folder name in the submodules directory)
-PERIPHERALS:=UART PA MIXER LPF LIMITER TXRX IREF ADPLL
+PERIPHERALS:=UART ADPLL PA MIXER LPF LIMITER TXRX IREF
 
 #SIMULATION TEST
 SIM_LIST="SIMULATOR=icarus" "SIMULATOR=ncsim"
