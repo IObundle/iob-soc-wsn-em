@@ -23,7 +23,6 @@ ifeq ($(INIT_MEM),)
 	INIT_MEM:=0
 endif
 
-
 #Peripheral list (must match respective submodule or folder name in the submodules directory)
 PERIPHERALS:=UART PA MIXER LPF LIMITER TXRX IREF ADPLL
 
@@ -34,7 +33,7 @@ SIM_LIST="SIMULATOR=icarus" "SIMULATOR=ncsim"
 LOCAL_SIM_LIST=icarus #leave space in the end
 
 ifeq ($(SIMULATOR),ncsim)
-	SIM_SERVER=$(SIM_USER)@micro7.lx.it.pt
+	SIM_SERVER=micro7.lx.it.pt
 ifeq ($(SIM_USER),)
 	SIM_USER=user19
 endif
@@ -53,17 +52,17 @@ BOARD_LIST="BOARD=CYCLONEV-GT-DK" "BOARD=AES-KU040-DB-G"
 
 ifeq ($(BOARD),AES-KU040-DB-G)
 	COMPILE_USER=$(USER)
-	COMPILE_SERVER=$(COMPILE_USER)@pudim-flan.iobundle.com
+	COMPILE_SERVER=pudim-flan.iobundle.com
 	COMPILE_OBJ=synth_system.bit
 	BOARD_USER=$(USER)
-	BOARD_SERVER=$(BOARD_USER)@baba-de-camelo.iobundle.com
+	BOARD_SERVER=baba-de-camelo.iobundle.com
 else
 #default
 	BOARD=CYCLONEV-GT-DK
-	COMPILE_SERVER=$(COMPILE_USER)@pudim-flan.iobundle.com
+	COMPILE_SERVER=pudim-flan.iobundle.com
 	COMPILE_USER=$(USER)
 	COMPILE_OBJ=output_files/top_system.sof
-	BOARD_SERVER=$(BOARD_USER)@pudim-flan.iobundle.com
+	BOARD_SERVER=pudim-flan.iobundle.com
 	BOARD_USER=$(USER)
 endif
 
@@ -164,7 +163,6 @@ usage:
 	@echo "INFO: Top target must me defined so that target \"run\" can be found" 
 	@echo "      For example, \"make sim INIT_MEM=0\"." 
 	@echo "Usage: make target [parameters]"
-
 
 #create periph indices and directories
 N_SLAVES:=0
