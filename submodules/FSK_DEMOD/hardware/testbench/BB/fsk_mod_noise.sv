@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-`include "rcntlr_defines.v"
+`include "rcntlr_defines.vh"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Date: 28/02/2020

@@ -9,4 +9,5 @@ VHDR+=$(wildcard $(TXRX_INC_DIR)/*.vh)
 
 #sources
 TXRX_SRC_DIR:=$(TXRX_DIR)/hardware/src
-VSRC+=$(wildcard $(TXRX_HW_DIR)/src/*.v) $(SUBMODULES_DIR)/FIR/hardware/src/*.v
+VSRC+=$(wildcard $(TXRX_HW_DIR)/src/*.v) \
+$(wildcard $(SUBMODULES_DIR)/FIR/hardware/src/*.v)

@@ -1,23 +1,32 @@
-# fir filter lengths
-N1_W = 5
-N2_W = 4
-N3_W = 4
-N4_W = 2
-# coefficient width (min is 2 for all 1s)
-C_W = 2
-# cut frequency
-FC = 600
-# compare histeresis
-H = 1
-TH = 9
-TL = -45
+# Signal noise ratio in dB
+SNR_DB=50
+# Number of packets = 2**NR_PCTKS_EXP (exponent of base 2)
+N_PCKTS_W=2
+# Packet paylod bytes 
+N_PCKT_BYTE=8
 
-FNS1 = 1 #mov av 32
-FNS2 = 1 #mov av 16
-FNS3 = 1 #mov av 16
-FNS4 = 0 #transition detect
+# fir coefficient width (min is 2 for all 1s)
+C_W=2
 
-#snr=14dB works with 3 filters, T=45 and H=10
+# firs
+I1_W=2
+O1_W=6
+L1=32
+L1_W=5
 
+O2_W=11
+L2=16
+L2_W=4
 
-DEFINE+=$(defmacro)TL=$(TL) $(defmacro)TH=$(TH) $(defmacro)H=$(H) $(defmacro)L1_W=$(N1_W) $(defmacro)C1_W=$(C_W) $(defmacro)L2_W=$(N2_W) $(defmacro)C2_W=$(C_W) $(defmacro)L3_W=$(N3_W) $(defmacro)C3_W=$(C_W) $(defmacro)L4_W=$(N4_W) $(defmacro)C4_W=$(C_W)
+O3_W=15
+L3=16
+L3_W=4
+
+# slicer
+#threshhold
+T=45
+#histeresis
+H=10
+
+# Demod defines
+DEFINE+=$(defmacro)T=$(T) $(defmacro)H=$(H) $(defmacro)I1_W=$(I1_W) $(defmacro)O1_W=$(O1_W) $(defmacro)L1=$(L1) $(defmacro)L1_W=$(L1_W) $(defmacro)C1_W=$(C_W) $(defmacro)O2_W=$(O2_W) $(defmacro)L2=$(L2) $(defmacro)L2_W=$(L2_W) $(defmacro)C2_W=$(C_W) $(defmacro)O3_W=$(O3_W) $(defmacro)L3=$(L3) $(defmacro)L3_W=$(L3_W) $(defmacro)C3_W=$(C_W)
