@@ -88,7 +88,7 @@ asic-clean:
 	make -C $(ASIC_DIR) clean
 
 firmware:
-	make -C $(FIRM_DIR) BAUD=$(BAUD)
+	make -C $(FIRM_DIR) run BAUD=$(BAUD)
 
 bootloader: firmware
 	make -C $(BOOT_DIR) run BAUD=$(BAUD)
