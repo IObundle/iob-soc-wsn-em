@@ -19,7 +19,7 @@ include $(ROOT_DIR)/fsk_demod.mk
 INCLUDE=-I$(INC_DIR) -I$(TXRX_DIR)/hardware/include
 
 # Testbench tx_rx_bb defines
-DEFINE_BB=$(defmacro)SNR_DB=$(SNR_DB) $(defmacro)N_PCKTS_W=$(N_PCKTS_W) $(defmacro)N_PCKT_BYTE=$(N_PCKT_BYTE)
+DEFINE_BB=$(defmacro)N_PCKTS_W=$(N_PCKTS_W) $(defmacro)N_PCKT_BYTE=$(N_PCKT_BYTE)
 
 #Icarus (-pfileline=1)
 CC = iverilog

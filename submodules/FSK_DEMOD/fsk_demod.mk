@@ -29,4 +29,4 @@ T=45
 H=10
 
 # Demod defines
-DEFINE+=$(defmacro)T=$(T) $(defmacro)H=$(H) $(defmacro)I1_W=$(I1_W) $(defmacro)O1_W=$(O1_W) $(defmacro)L1=$(L1) $(defmacro)L1_W=$(L1_W) $(defmacro)C1_W=$(C_W) $(defmacro)O2_W=$(O2_W) $(defmacro)L2=$(L2) $(defmacro)L2_W=$(L2_W) $(defmacro)C2_W=$(C_W) $(defmacro)O3_W=$(O3_W) $(defmacro)L3=$(L3) $(defmacro)L3_W=$(L3_W) $(defmacro)C3_W=$(C_W)
+DEFINE+=$(defmacro)T=$(T) $(defmacro)H=$(H) $(defmacro)I1_W=$(I1_W) $(defmacro)O1_W=$(O1_W) $(defmacro)L1=$(L1) $(defmacro)L1_W=$(L1_W) $(defmacro)C1_W=$(C_W) $(defmacro)O2_W=$(O2_W) $(defmacro)L2=$(L2) $(defmacro)L2_W=$(L2_W) $(defmacro)C2_W=$(C_W) $(defmacro)O3_W=$(O3_W) $(defmacro)L3=$(L3) $(defmacro)L3_W=$(L3_W) $(defmacro)C3_W=$(C_W) $(defmacro)SNR_DB=$(SNR_DB)

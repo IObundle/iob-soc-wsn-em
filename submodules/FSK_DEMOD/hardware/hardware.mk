@@ -1,3 +1,5 @@
+include $(FSK_DEMOD_DIR)/fsk_demod.mk
+
 FSK_DEMOD_HW_DIR:=$(FSK_DEMOD_DIR)/hardware
 
 #include
