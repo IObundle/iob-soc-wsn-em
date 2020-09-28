@@ -1,47 +1,24 @@
 `define TXRX_ADDR_W 4
 
-`define TX_DATA 0 //write
-`define TX_START 1 //write
-`define TX_EN 2 //write
-`define TX_READY 3 //read
+`define TX_DATA      (`TXRX_ADDR_W'd0)  // write
+`define TX_START     (`TXRX_ADDR_W'd1)  // write
+`define TX_EN        (`TXRX_ADDR_W'd2)  // write
+`define TX_READY     (`TXRX_ADDR_W'd3)  // read
 
-`define TXRX_AA 4 //write
-`define TXRX_CH_IDX 5 //write
+`define TXRX_AA      (`TXRX_ADDR_W'd4)  // write
+`define TXRX_CH_IDX  (`TXRX_ADDR_W'd5)  // write
 
-`define RX_START 6 //write
-`define RX_EN 7 //write
-`define RX_AA_FOUND 8 //read
-`define RX_CRC_VALID 9 //read
-`define RX_EMPTY 10 //read
-`define RX_DATA 11 //read
-`define DEMOD_EN 12 //write
+`define RX_START     (`TXRX_ADDR_W'd6)  // write
+`define RX_EN        (`TXRX_ADDR_W'd7)  // write
+`define RX_AA_FOUND  (`TXRX_ADDR_W'd8)  // read
+`define RX_CRC_VALID (`TXRX_ADDR_W'd9)  // read
+`define RX_EMPTY     (`TXRX_ADDR_W'd10) // read
+`define RX_DATA      (`TXRX_ADDR_W'd11) // read
+`define DEMOD_EN     (`TXRX_ADDR_W'd12) // write
 
 `define CH_IDX_W 6
 
 `define PREAMBLE_MSB0 8'b01010101
 `define PREAMBLE_MSB1 8'b10101010
 
-`define ACCESSADDRESS 32'h8E89BED6 //advertising channel AA 
-
-// firs
-
-`define C_W 2
-
-
-`define I1_W  2
-`define O1_W  6
-`define L1  32 
-`define L1_W  5
-
-`define O2_W  11
-`define L2  16
-`define L2_W  4
-
-`define O3_W  15
-`define L3  16
-`define L3_W  4
-
-// slicer 
-`define T  45  //threshhold
-`define H  10  //histeresis
-
+`define ACCESSADDRESS 32'h8E89BED6 // advertising channel AA
