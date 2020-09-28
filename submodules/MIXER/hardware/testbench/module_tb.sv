@@ -5,7 +5,7 @@ module mixer_tb
    input       rf_in, 
    input       osc_in, 
    output real out, 
-   output      sampling_clk,
+   output reg  sampling_clk,
    input       ota, 
    input [1:0] buff, 
    input       pd 
@@ -33,7 +33,6 @@ module mixer_tb
 
    parameter real 			 offset = 0; // dc output signal
 			 
-   reg 	    sampling_clk;
    real     phase_inst, phase_last; 
    real     out_noise;
    real     intermediate_freq;

@@ -103,14 +103,14 @@ module txrx (
            );
 
    // FSK demodulator
-   fsk_demod fsk_demod (
-                        .clk            (clk),
-                        .rst            (rst | rx_start),
-                        .en             (rx_en & demod_en), // write
-                        .data_in        (rx),               // limiter output // DTEST OUTPUT
-                        .data_out       (rx_in),            // DTEST OUTPUT
-                        .data_out_valid (rxdata_in_valid)   // DTEST OUTPUT
-                        );
+   fsk_demod fsk_demod0 (
+                         .clk            (clk),
+                         .rst            (rst | rx_start),
+                         .en             (rx_en & demod_en), // write
+                         .data_in        (rx),               // limiter output // DTEST OUTPUT
+                         .data_out       (rx_in),            // DTEST OUTPUT
+                         .data_out_valid (rxdata_in_valid)   // DTEST OUTPUT
+                         );
    // Receiver
    rx rx0 (
            .rst             (rst),

@@ -104,7 +104,8 @@ module rx (
 	    .data_in	(wht_out),
 	    .crc_en	(rx_valid & aa_found & en),			   
 	    // Outputs
-	    .lfsr		(crc_out)
+	    .lfsr		(crc_out),
+	    .data_out ()
 	    );
 
    //assign crc_valid = (crc_out == 24'd0 && aa_found) ? 1'b1: 1'b0;
