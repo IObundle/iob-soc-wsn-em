@@ -8,7 +8,7 @@ TXRX_HW_DIR:=$(TXRX_DIR)/hardware
 
 #include
 TXRX_INC_DIR:=$(TXRX_HW_DIR)/include
-INCLUDE+=$(incdir) $(TXRX_INC_DIR)
+INCLUDE+=$(incdir)$(TXRX_INC_DIR)
 
 #headers
 VHDR+=$(wildcard $(TXRX_INC_DIR)/*.vh)
