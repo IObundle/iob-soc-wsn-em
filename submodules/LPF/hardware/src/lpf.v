@@ -1,5 +1,5 @@
 `timescale 1ns/1ps
-`define LPF_PD 0
+`include "header.vh"
 
 module lpf (
 	    input                     clk,
