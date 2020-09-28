@@ -1,5 +1,5 @@
 `timescale 1ns/1ps
-`define IREF_PD 0
+`include "header.vh"
 
 module iref (
 	    input                    clk,
