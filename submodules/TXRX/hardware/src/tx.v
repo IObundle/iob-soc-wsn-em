@@ -117,7 +117,8 @@ module tx (
 	    .data_in	(serial_dat),
 	    .crc_en	(serial_en_middle & crc_en & en),			   
 	    // Outputs
-	    .lfsr		(crc_out)
+	    .lfsr		(crc_out),
+	    .data_out ()
 	    );
 
 

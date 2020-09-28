@@ -2,7 +2,7 @@ LIMITER_HW_DIR:=$(LIMITER_DIR)/hardware
 
 #include
 LIMITER_INC_DIR:=$(LIMITER_HW_DIR)/include
-INCLUDE+=$(incdir) $(LIMITER_INC_DIR)
+INCLUDE+=$(incdir)$(LIMITER_INC_DIR)
 
 #headers
 VHDR+=$(wildcard $(LIMITER_INC_DIR)/*.vh)

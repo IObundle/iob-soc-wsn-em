@@ -20,7 +20,6 @@ export VSRC CFLAGS EFLAGS SFLAGS
 #simulate
 sim: $(VSRC) $(VHDR) firmware boot.hex periphs demod_coeffs noise_floor
 	./run_ncsim.sh
-	grep -v xcelium xmsim.log | grep -v xmsim $(LOG)
 
 clean: hw-clean
 	@rm -rf xcelium.d xmsim.key *.log *.v $(OUTPUT_FILES)

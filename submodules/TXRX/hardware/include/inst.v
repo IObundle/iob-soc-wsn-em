@@ -7,6 +7,7 @@
                .address(slaves_req[`address(`TXRX,`TXRX_ADDR_W+2)-2]),
                .wdata(slaves_req[`wdata(`TXRX)]),
                .wstrb(|slaves_req[`wstrb(`TXRX)]),
+               .rdata(slaves_resp[`rdata(`TXRX)]),
                .ready(slaves_resp[`ready(`TXRX)]),
 
                // Serial i/f
