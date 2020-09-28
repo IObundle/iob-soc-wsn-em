@@ -1,5 +1,4 @@
 `timescale 1fs / 1fs
-`define SNR_DB 80
 
 module mixer_tb 
   (

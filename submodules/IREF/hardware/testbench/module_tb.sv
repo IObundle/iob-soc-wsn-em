@@ -15,5 +15,16 @@ module iref_tb (
 
 // iref_charge default value is high, but shoud be low a little bit after iref_pd
 // goes low
+   always @*
+      if (pd)
+	    $display("$WARNING: RF IREF power mode is on!");
+      else
+        $display("$WARNING: RF IREF power mode is off!");
+
+   always @*
+      if (charge)
+	    $display("$WARNING: RF IREF is in charged!");
+      else
+        $display("$WARNING: RF IREF is out of charge!");
    
 endmodule
