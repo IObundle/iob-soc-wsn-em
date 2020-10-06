@@ -91,6 +91,7 @@ ASIC_DIR=$(HW_DIR)/asic/$(ASIC_NODE)
 
 
 SW_DIR:=$(ROOT_DIR)/software
+BLE_DIR:=$(SW_DIR)/ble
 FIRM_DIR:=$(SW_DIR)/firmware
 BOOT_DIR:=$(SW_DIR)/bootloader
 CONSOLE_DIR:=$(SW_DIR)/console

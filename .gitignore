@@ -37,6 +37,7 @@ document/presentation/*
 
 test.log
 noise_floor.txt
+submodules/FSK_DEMOD/*.hex
 submodules/FSK_DEMOD/params.m
 submodules/FSK_DEMOD/noise_floor.txt
 submodules/MIXER/hardware/include/noise_floor.txt

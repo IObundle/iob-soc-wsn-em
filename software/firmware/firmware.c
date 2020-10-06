@@ -4,15 +4,15 @@
 
 #include "iob-uart.h"
 
-#include "adpll.h"
+#include "ble.h"
 
 int main() {
   // Init UART
   uart_init(UART_BASE,FREQ/BAUD);   
   uart_printf("\n\n\nHello world!\n\n\n");
 
-  // Init ADPLL
-  adpll_init(ADPLL_BASE);
+  // Init BLE
+  ble_init();
 
   // Configure ADPLL
   int mode = ADPLL_OPERATION;
@@ -48,8 +48,7 @@ int main() {
                dco_pd_test, dco_osc_gain,
                tdc_pd_test, tdc_pd_inj_test, tdc_ctr_freq);
 
-  adpll_soft_rst();
-  adpll_enable();
+  adpll_on();
 
   // Wait for results
   while(adpll_lock() != 1);
@@ -65,6 +64,18 @@ int main() {
       }*/
   }
   //uart_printf("Loading progress: %d percent\n", 100);
+
+  //recv
+  //ble_recv_on();
+
+  //Receive data
+  
+
+  //send
+  //ble_send_on();
+
+  //Send data
+  
 
   return 0;
 }
