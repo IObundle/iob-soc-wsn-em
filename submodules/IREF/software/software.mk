@@ -6,7 +6,7 @@ INCLUDE+=-I$(IREF_SW_DIR)
 
 #headers
 HDR+=$(IREF_SW_DIR)/*.h \
-mixer_mem_map.h
+iref_mem_map.h
 
 #sources
 SRC+=$(IREF_SW_DIR)/*.c
