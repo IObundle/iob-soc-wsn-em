@@ -55,7 +55,7 @@ void demod_set_en(char value);
 #define tx_disable() tx_set_en(0)
 
 // Enable RX
-#define rx_enable() rx_set_pd(1)
+#define rx_enable() rx_set_en(1)
 
 // Disable RX
 #define rx_disable() rx_set_en(0)
@@ -65,3 +65,27 @@ void demod_set_en(char value);
 
 // Disable DEMOD
 #define demod_disable() demod_set_en(0)
+
+// TX On
+#define tx_on() tx_enable()
+
+// RX On
+#define rx_on() ({\
+      rx_enable();\
+      demod_enable();\
+    })
+
+// TX Off
+#define tx_off() tx_disable()
+
+// RX Off
+#define rx_off() ({\
+      rx_disable();\
+      demod_disable();\
+    })
+
+// TXRX Off
+#define txrx_off() ({\
+      tx_off();\
+      rx_off();\
+    })
