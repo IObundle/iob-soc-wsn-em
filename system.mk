@@ -176,4 +176,4 @@ ifneq ($(TEST_LOG),)
 LOG=>test.log
 endif
 
-.PHONY: all
+.PHONY: all usage

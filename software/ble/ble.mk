@@ -13,5 +13,5 @@ include $(IREF_DIR)/software/software.mk
 INCLUDE+=$(incdir)$(BLE_DIR)
 
 #local sources
-HDR+=$(BLE_DIR)/ble.h
-SRC+=$(BLE_DIR)/ble.c
+HDR+=$(BLE_DIR)/*.h
+SRC+=$(BLE_DIR)/*.c
