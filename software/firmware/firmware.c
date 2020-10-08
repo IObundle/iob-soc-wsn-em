@@ -65,17 +65,17 @@ int main() {
   }
   //uart_printf("Loading progress: %d percent\n", 100);
 
-  //recv
-  //ble_recv_on();
-
-  //Receive data
-  
-
-  //send
+  // Configure BLE for send data
   //ble_send_on();
 
-  //Send data
-  
+  // Send data
+  //ble_send(buffer, size);
+
+  // Configure BLE for receive data
+  //ble_recv_on();
+
+  // Receive data
+  //nbytes = ble_receive(buffer);
 
   return 0;
 }
