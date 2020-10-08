@@ -73,6 +73,7 @@ void demod_set_en(char value);
 #define rx_on() ({\
       rx_enable();\
       demod_enable();\
+      rx_start();\
     })
 
 // TX Off
@@ -88,4 +89,16 @@ void demod_set_en(char value);
 #define txrx_off() ({\
       tx_off();\
       rx_off();\
+    })
+
+// Start TX
+#define tx_start() ({\
+      tx_set_start(1);\
+      tx_set_start(0);\
+    })
+
+// Start RX
+#define rx_start() ({\
+      rx_set_start(1);\
+      rx_set_start(0);\
     })

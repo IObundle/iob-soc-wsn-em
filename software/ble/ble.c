@@ -156,11 +156,13 @@ char ble_receive(char *buffer) {
   if (on == RX) {
     nbytes = 0;
 
-    while (!rx_empty()) {
-      if (rx_crc_valid()) {
+    if (rx_crc_valid()) {
+      while (!rx_empty()) {
         buffer[nbytes++] = receive();
       }
     }
+
+    rx_start();
   }
 
   return nbytes;
@@ -172,10 +174,12 @@ char ble_send(char *buffer, char size) {
   if (on == TX) {
     nbytes = 0;
 
-    while (nbytes == size) {
-      if (tx_ready()) {
+    if (tx_ready()) {
+      while (nbytes != size) {
         send(buffer[nbytes++]);
       }
+
+      tx_start();
     }
   }
 
