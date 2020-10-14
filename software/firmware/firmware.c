@@ -60,7 +60,7 @@ int main() {
   // Wait for results
   while(adpll_lock() != 1);
 
-  while(timer_time_us(TIMER_BASE) < SIM_TIME);
+  while(timer_time_us() < SIM_TIME);
   adpll_off();
 
   // Configure BLE for send data
@@ -76,8 +76,8 @@ int main() {
   //nbytes = ble_receive(buffer);
 
   //read current timer count, compute elapsed time
-  elapsed  = timer_get_count(TIMER_BASE);
-  elapsedu = timer_time_us(TIMER_BASE);
+  elapsed  = timer_get_count();
+  elapsedu = timer_time_us();
 
   uart_printf("\nExecution time: %d clocks in %dus @%dMHz\n\n",
               (unsigned int)elapsed, elapsedu, FREQ/1000000);
