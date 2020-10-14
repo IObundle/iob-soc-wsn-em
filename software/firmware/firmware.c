@@ -3,10 +3,17 @@
 #include "periphs.h"
 
 #include "iob-uart.h"
+#include "iob_timer.h"
 
 #include "ble.h"
 
 int main() {
+  unsigned long long elapsed;
+  unsigned int elapsedu;
+
+  // Init Timer
+  timer_init(TIMER_BASE);
+
   // Init UART
   uart_init(UART_BASE,FREQ/BAUD);   
   uart_printf("\n\n\nHello world!\n\n\n");
@@ -53,17 +60,8 @@ int main() {
   // Wait for results
   while(adpll_lock() != 1);
 
-  unsigned int i;
-  unsigned int k = 0;
-  unsigned int end = SIM_TIME/2;
-  for (i = 0; i < end; i++) {
-    adpll_lock();
-    /*if (i == end*k/100) {
-      uart_printf("Loading progress: %d percent\n", k);
-      k += 10;
-      }*/
-  }
-  //uart_printf("Loading progress: %d percent\n", 100);
+  while(timer_time_us(TIMER_BASE) < SIM_TIME);
+  adpll_off();
 
   // Configure BLE for send data
   //ble_send_on();
@@ -76,6 +74,13 @@ int main() {
 
   // Receive data
   //nbytes = ble_receive(buffer);
+
+  //read current timer count, compute elapsed time
+  elapsed  = timer_get_count(TIMER_BASE);
+  elapsedu = timer_time_us(TIMER_BASE);
+
+  uart_printf("\nExecution time: %d clocks in %dus @%dMHz\n\n",
+              (unsigned int)elapsed, elapsedu, FREQ/1000000);
 
   return 0;
 }

@@ -1,8 +1,8 @@
 #FIRMWARE
-FIRM_ADDR_W:=14
+FIRM_ADDR_W:=16
 
 #SRAM
-SRAM_ADDR_W=14
+SRAM_ADDR_W=16
 
 #DDR
 ifeq ($(USE_DDR),)
@@ -24,7 +24,7 @@ ifeq ($(INIT_MEM),)
 endif
 
 #Peripheral list (must match respective submodule or folder name in the submodules directory)
-PERIPHERALS:=UART ADPLL PA MIXER LPF LIMITER TXRX IREF
+PERIPHERALS:=UART TIMER ADPLL PA MIXER LPF LIMITER TXRX IREF
 
 #SIMULATION TEST
 SIM_LIST="SIMULATOR=icarus" "SIMULATOR=ncsim"
