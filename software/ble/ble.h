@@ -9,6 +9,9 @@
 // Init BLE modules
 void ble_init(void);
 
+// Configure BLE
+void ble_config(float channel_freq, int mode);
+
 // Turn BLE On as receiver
 char ble_recv_on(void);
 
