@@ -22,27 +22,47 @@ int main() {
   ble_init();
 
   // Configure ADPLL
-  ble_config(FREQ_CHANNEL, TX);
+  ble_config(FREQ_CHANNEL, ADPLL_OPERATION);
 
-  adpll_on();
-
-  // Wait for results
-  while(adpll_lock() != 1);
-
-  while(timer_time_us() < SIM_TIME);
-  adpll_off();
-
+#if ID == 0
   // Configure BLE for send data
-  //ble_send_on();
+  ble_send_on();
 
   // Send data
-  //ble_send(buffer, size);
+  int i, size = 8;
+  char buffer[8];
+  for (i = 0; i < size; i++) {
+    buffer[i] = 2*(i+1);
+  }
 
+  // Print buffer
+  uart_printf("\nsend:\n");
+  for (i = 0; i < size; i++) {
+    uart_printf("buffer[%d] = %d\n", i, buffer[i]);
+  }
+
+  ble_send(buffer, size);
+
+  // Wait for transmisstion
+
+#else
   // Configure BLE for receive data
-  //ble_recv_on();
+  ble_recv_on();
 
   // Receive data
-  //nbytes = ble_receive(buffer);
+  for (i = 0; i < size; i++) {
+    buffer[i] = 0;
+  }
+  nbytes = ble_receive(buffer);
+
+  // Print buffer
+  uart_printf("\nreceived:\n");
+  for (i = 0; i < size; i++) {
+    uart_printf("buffer[%d] = %d\n", i, buffer[i]);
+  }
+#endif
+
+  ble_off();
 
   //read current timer count, compute elapsed time
   elapsed  = timer_get_count();
