@@ -1,5 +1,5 @@
 
-   wire mix_out;
+   real mix_out;
    wire mix_sampling_clk;
    wire mix_osc_in = dco_ckv;
    wire mix_rf_in = antena;
