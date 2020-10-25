@@ -5,16 +5,13 @@
 
 //PHEADER
 
-module system_tb;
-
-   parameter realtime clk_per = 1s/`FREQ;
-
-   //clock
-   reg clk = 1;
-   always #(clk_per/2) clk = ~clk;
-
-   //reset 
-   reg reset = 1;
+module soc_tb
+  (
+   input  clk,
+   input  reset,
+   inout  antena,
+   output trap
+   );
 
    //received by getchar
    reg [7:0] cpu_char = 0;
@@ -39,21 +36,12 @@ module system_tb;
    //
    initial begin
 
-`ifdef VCD
-      $dumpfile("system.vcd");
-      $dumpvars();
-`endif
-
       //init cpu bus signals
       uart_valid = 0;
       uart_wstrb = 0;
       
-      // deassert rst
-      repeat (100) @(posedge clk);
-      reset <= 0;
-
-      //wait an arbitray (10) number of cycles 
-      repeat (10) @(posedge clk) #1;
+      wait (~reset) #1;
+      
 
       // configure uart
       cpu_inituart();
@@ -69,9 +57,6 @@ module system_tb;
 `endif      
       //run firmware
       cpu_run();
-
-      $finish;
-
    end
 
    
@@ -250,11 +235,5 @@ module system_tb;
 
 
 `include "cpu_tasks.v"
-   
-   //finish simulation
-   //always @(posedge trap) begin
-   // #10 $display("Found CPU trap condition");
-   //$finish;
-   //end
 
 endmodule

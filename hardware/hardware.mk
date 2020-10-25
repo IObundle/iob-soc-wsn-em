@@ -67,7 +67,7 @@ noise_floor:
 	cp $(FSK_DEMOD_DIR)/noise_floor.txt $(MIXER_INC_DIR)
 
 hw-clean:
-	@rm -f *# *~ *.vcd *.dat *.hex *.bin $(SRC_DIR)/system.v $(TB_DIR)/system_tb.v
+	@rm -f *# *~ *.vcd *.dat *.hex *.bin $(SRC_DIR)/system.v $(TB_DIR)/soc_tb.v
 
 demod_coeffs:
 	mv $(FSK_DEMOD_DIR)/*.hex .
