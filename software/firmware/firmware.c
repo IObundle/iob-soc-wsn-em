@@ -24,43 +24,43 @@ int main() {
   // Configure ADPLL
   ble_config(FREQ_CHANNEL, ADPLL_OPERATION);
 
-#if ID == 0
-  // Configure BLE for send data
-  ble_send_on();
+  if (!id()) {
+    // Configure BLE for send data
+    ble_send_on();
 
-  // Send data
-  int i, size = 8;
-  char buffer[8];
-  for (i = 0; i < size; i++) {
-    buffer[i] = 2*(i+1);
+    // Send data
+    int i, size = 8;
+    char buffer[8];
+    for (i = 0; i < size; i++) {
+      buffer[i] = 2*(i+1);
+    }
+
+    // Print buffer
+    uart_printf("\nsend:\n");
+    for (i = 0; i < size; i++) {
+      uart_printf("buffer[%d] = %d\n", i, buffer[i]);
+    }
+
+    ble_send(buffer, size);
+
+    // Wait for transmisstion
+
+  } else {
+    // Configure BLE for receive data
+    ble_recv_on();
+
+    // Receive data
+    for (i = 0; i < size; i++) {
+      buffer[i] = 0;
+    }
+    nbytes = ble_receive(buffer);
+
+    // Print buffer
+    uart_printf("\nreceived:\n");
+    for (i = 0; i < size; i++) {
+      uart_printf("buffer[%d] = %d\n", i, buffer[i]);
+    }
   }
-
-  // Print buffer
-  uart_printf("\nsend:\n");
-  for (i = 0; i < size; i++) {
-    uart_printf("buffer[%d] = %d\n", i, buffer[i]);
-  }
-
-  ble_send(buffer, size);
-
-  // Wait for transmisstion
-
-#else
-  // Configure BLE for receive data
-  ble_recv_on();
-
-  // Receive data
-  for (i = 0; i < size; i++) {
-    buffer[i] = 0;
-  }
-  nbytes = ble_receive(buffer);
-
-  // Print buffer
-  uart_printf("\nreceived:\n");
-  for (i = 0; i < size; i++) {
-    uart_printf("buffer[%d] = %d\n", i, buffer[i]);
-  }
-#endif
 
   ble_off();
 

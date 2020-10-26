@@ -6,6 +6,9 @@
 //PHEADER
 
 module soc_tb
+  # (
+     parameter ID = 0
+     )
   (
    input  clk,
    input  reset,
@@ -116,7 +119,10 @@ module soc_tb
    //
    // UNIT UNDER TEST
    //
-   system uut (
+   system uut #(
+                .ID(ID)
+                )
+              (
                //PORTS
 `ifdef USE_DDR
                //address write
