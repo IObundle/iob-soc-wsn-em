@@ -1,5 +1,6 @@
 ROOT_DIR:=../..
 include ../software.mk
+include $(ID_DIR)/software/software.mk
 include $(BLE_DIR)/ble.mk
 
 #include peripherals

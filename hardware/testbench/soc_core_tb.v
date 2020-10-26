@@ -119,10 +119,10 @@ module soc_tb
    //
    // UNIT UNDER TEST
    //
-   system uut #(
-                .ID(ID)
-                )
-              (
+   system #(
+            .ID(ID)
+            )
+   uut (
                //PORTS
 `ifdef USE_DDR
                //address write

@@ -4,4 +4,4 @@
 void id_init(int base_address);
 
 // Get ID
-int id(void);
+int get_id(void);

@@ -5,11 +5,19 @@
 #include "iob-uart.h"
 #include "iob_timer.h"
 
+#include "id.h"
+
 #include "ble.h"
 
 int main() {
   unsigned long long elapsed;
   unsigned int elapsedu;
+
+  int i, size = 8;
+  char buffer[8];
+
+  // Init ID
+  id_init(ID_BASE);
 
   // Init Timer
   timer_init(TIMER_BASE);
@@ -24,13 +32,11 @@ int main() {
   // Configure ADPLL
   ble_config(FREQ_CHANNEL, ADPLL_OPERATION);
 
-  if (!id()) {
+  if (!get_id()) {
     // Configure BLE for send data
     ble_send_on();
 
     // Send data
-    int i, size = 8;
-    char buffer[8];
     for (i = 0; i < size; i++) {
       buffer[i] = 2*(i+1);
     }
@@ -53,10 +59,10 @@ int main() {
     for (i = 0; i < size; i++) {
       buffer[i] = 0;
     }
-    nbytes = ble_receive(buffer);
+    char nbytes = ble_receive(buffer);
 
     // Print buffer
-    uart_printf("\nreceived:\n");
+    uart_printf("\nreceived %d bytes:\n", nbytes);
     for (i = 0; i < size; i++) {
       uart_printf("buffer[%d] = %d\n", i, buffer[i]);
     }

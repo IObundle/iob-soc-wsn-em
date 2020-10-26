@@ -12,6 +12,6 @@ void id_init(int base_address) {
   id = base_address;
 }
 
-int id(void) {
+int get_id(void) {
   return (IO_GET(id, ID_VALUE));
 }
