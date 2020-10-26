@@ -112,9 +112,6 @@ module soc_tb
    wire                    ddr_rvalid;
    wire                    ddr_rready;
 `endif
-
-   //cpu trap signal
-   wire                    trap;
    
    //
    // UNIT UNDER TEST
