@@ -27,13 +27,10 @@ module id
    end
 
    always @* begin
-      rdata = {DATA_W{1'b0}};
-
-      if (valid & ~wstrb) begin
-         if (address == `ID_VALUE) begin
-            rdata = ID;
-         end
-      end
+      case (address)
+        `ID_VALUE: rdata = ID;
+        default: rdata = {DATA_W{1'b0}};
+      endcase
    end
 
 endmodule
