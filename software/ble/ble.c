@@ -2,6 +2,7 @@
 #include "periphs.h"
 
 #include "iob-uart.h"
+#include "iob_timer.h"
 
 #include "ble.h"
 
@@ -10,7 +11,7 @@
 //
 
 // Clock period in us
-#define CLK_PER (1e6)/(32.0e6)
+#define CLK_PER (1e6)/FREQ
 
 // Packet paylod bytes 
 #define N_PCKT_BYTE 8
@@ -60,6 +61,43 @@ void ble_init(void) {
   return;
 }
 
+void ble_config(float channel_freq, int mode) {
+
+  int fcw = (int)(channel_freq*16384);
+  uart_printf("freq_channel = %fMHz, FCW = %d, adpll_mode = %d\n", channel_freq, fcw, mode);
+
+  char alpha_l = 14;
+  char alpha_m = 8;
+  char alpha_s_rx = 7;
+  char alpha_s_tx = 4;
+  char beta = 0;
+  char lambda_rx = 2;
+  char lambda_tx = 2;
+  char iir_n_rx = 3;
+  char iir_n_tx = 2;
+  char FCW_mod = 0b01001; // 288kHz
+  char dco_c_l_word_test = 0;
+  char dco_c_m_word_test = 0;
+  char dco_c_s_word_test = 0;
+  char dco_pd_test = 1;
+  char tdc_pd_test = 1;
+  char tdc_pd_inj_test = 1;
+  char tdc_ctr_freq = 0b100;
+  char dco_osc_gain = 0b10;
+
+  adpll_config(fcw, mode,
+               alpha_l, alpha_m, alpha_s_rx, alpha_s_tx,
+               beta,
+               lambda_rx, lambda_tx,
+               iir_n_rx, iir_n_tx,
+               FCW_mod,
+               dco_c_l_word_test, dco_c_m_word_test, dco_c_s_word_test,
+               dco_pd_test, dco_osc_gain,
+               tdc_pd_test, tdc_pd_inj_test, tdc_ctr_freq);
+
+  return;
+}
+
 //
 // Receive
 //
@@ -79,6 +117,8 @@ void ble_init(void) {
 char ble_recv_on(void) {
 
   if (init) {
+    ble_off();
+
     iref_on();
 
     mixer_on();
@@ -156,11 +196,13 @@ char ble_receive(char *buffer) {
   if (on == RX) {
     nbytes = 0;
 
-    while (!rx_empty()) {
-      if (rx_crc_valid()) {
+    if (rx_crc_valid()) {
+      while (!rx_empty()) {
         buffer[nbytes++] = receive();
       }
     }
+
+    rx_start();
   }
 
   return nbytes;
@@ -172,10 +214,12 @@ char ble_send(char *buffer, char size) {
   if (on == TX) {
     nbytes = 0;
 
-    while (nbytes == size) {
-      if (tx_ready()) {
+    if (tx_ready()) {
+      while (nbytes != size) {
         send(buffer[nbytes++]);
       }
+
+      tx_start();
     }
   }
 

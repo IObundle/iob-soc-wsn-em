@@ -63,7 +63,7 @@ demod_coeffs:
 	echo "L=$(L3); L_W=$(L3_W); C_W=$(C_W); COEFF_FILE='fir3.hex';" > params.m
 	octave-cli $(IOB_FIR_M)
 
-noise_generator.txt: $(OCT_DIR)/noise_gen.m
+noise_floor.txt: $(OCT_DIR)/noise_gen.m
 	octave $(OCT_DIR)/noise_gen.m
 
 clean:

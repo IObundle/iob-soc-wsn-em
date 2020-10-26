@@ -1,6 +1,7 @@
 
    wire limiter_out;
-   wire limiter_in = lpf_out;
+   real limiter_in;
+   assign limiter_in = lpf_out;
    assign rx = limiter_out;
    limiter_tb limiter_tb0
      (

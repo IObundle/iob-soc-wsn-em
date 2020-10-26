@@ -3,10 +3,17 @@
 #include "periphs.h"
 
 #include "iob-uart.h"
+#include "iob_timer.h"
 
 #include "ble.h"
 
 int main() {
+  unsigned long long elapsed;
+  unsigned int elapsedu;
+
+  // Init Timer
+  timer_init(TIMER_BASE);
+
   // Init UART
   uart_init(UART_BASE,FREQ/BAUD);   
   uart_printf("\n\n\nHello world!\n\n\n");
@@ -15,67 +22,54 @@ int main() {
   ble_init();
 
   // Configure ADPLL
-  int mode = ADPLL_OPERATION;
-  int fcw = (int)(FREQ_CHANNEL*16384);
-  uart_printf("freq_channel = %fMHz, FCW = %d, adpll_mode = %d\n", FREQ_CHANNEL, fcw, ADPLL_OPERATION);
+  ble_config(FREQ_CHANNEL, ADPLL_OPERATION);
 
-  char alpha_l = 14;
-  char alpha_m = 8;
-  char alpha_s_rx = 7;
-  char alpha_s_tx = 4;
-  char beta = 0;
-  char lambda_rx = 2;
-  char lambda_tx = 2;
-  char iir_n_rx = 3;
-  char iir_n_tx = 2;
-  char FCW_mod = 0b01001; // 288kHz
-  char dco_c_l_word_test = 0;
-  char dco_c_m_word_test = 0;
-  char dco_c_s_word_test = 0;
-  char dco_pd_test = 1;
-  char tdc_pd_test = 1;
-  char tdc_pd_inj_test = 1;
-  char tdc_ctr_freq = 0b100;
-  char dco_osc_gain = 0b10;
-
-  adpll_config(fcw, mode,
-               alpha_l, alpha_m, alpha_s_rx, alpha_s_tx,
-               beta,
-               lambda_rx, lambda_tx,
-               iir_n_rx, iir_n_tx,
-               FCW_mod,
-               dco_c_l_word_test, dco_c_m_word_test, dco_c_s_word_test,
-               dco_pd_test, dco_osc_gain,
-               tdc_pd_test, tdc_pd_inj_test, tdc_ctr_freq);
-
-  adpll_on();
-
-  // Wait for results
-  while(adpll_lock() != 1);
-
-  unsigned int i;
-  unsigned int k = 0;
-  unsigned int end = SIM_TIME/2;
-  for (i = 0; i < end; i++) {
-    adpll_lock();
-    /*if (i == end*k/100) {
-      uart_printf("Loading progress: %d percent\n", k);
-      k += 10;
-      }*/
-  }
-  //uart_printf("Loading progress: %d percent\n", 100);
-
+#if ID == 0
   // Configure BLE for send data
-  //ble_send_on();
+  ble_send_on();
 
   // Send data
-  //ble_send(buffer, size);
+  int i, size = 8;
+  char buffer[8];
+  for (i = 0; i < size; i++) {
+    buffer[i] = 2*(i+1);
+  }
 
+  // Print buffer
+  uart_printf("\nsend:\n");
+  for (i = 0; i < size; i++) {
+    uart_printf("buffer[%d] = %d\n", i, buffer[i]);
+  }
+
+  ble_send(buffer, size);
+
+  // Wait for transmisstion
+
+#else
   // Configure BLE for receive data
-  //ble_recv_on();
+  ble_recv_on();
 
   // Receive data
-  //nbytes = ble_receive(buffer);
+  for (i = 0; i < size; i++) {
+    buffer[i] = 0;
+  }
+  nbytes = ble_receive(buffer);
+
+  // Print buffer
+  uart_printf("\nreceived:\n");
+  for (i = 0; i < size; i++) {
+    uart_printf("buffer[%d] = %d\n", i, buffer[i]);
+  }
+#endif
+
+  ble_off();
+
+  //read current timer count, compute elapsed time
+  elapsed  = timer_get_count();
+  elapsedu = timer_time_us();
+
+  uart_printf("\nExecution time: %d clocks in %dus @%dMHz\n\n",
+              (unsigned int)elapsed, elapsedu, FREQ/1000000);
 
   return 0;
 }
