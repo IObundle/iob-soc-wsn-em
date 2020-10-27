@@ -129,8 +129,9 @@ module mixer_tb
       scan = $fscanf(fp_noise,"%e ",noise_floor); 
       if (scan == -1)begin
          $display("Run out of Nnoise points from \"noise_floor.txt\""); //re-use points?
-	 $fclose(fp_noise);
-	 $finish;
+         $display("$WARNING: The Nnoise points will be re-used!");
+         $rewind(fp_noise);
+         scan = $fscanf(fp_noise,"%e ",noise_floor);
       end
 		out_noise <=  offset + Ampl * $cos(phase_inst) + noise_floor;
    end

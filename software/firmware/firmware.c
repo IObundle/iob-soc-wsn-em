@@ -29,10 +29,10 @@ int main() {
   // Init BLE
   ble_init();
 
-  // Configure ADPLL
-  ble_config(FREQ_CHANNEL, ADPLL_OPERATION);
-
   if (!get_id()) {
+    // Configure ADPLL
+    ble_config(FREQ_CHANNEL, ADPLL_OPERATION);
+
     // Configure BLE for send data
     ble_send_on();
 
@@ -50,10 +50,19 @@ int main() {
     ble_send(buffer, size);
 
     // Wait for transmisstion
+    unsigned int start_time = timer_time_us();
+    while ((timer_time_us() - start_time) < 10000);
 
   } else {
+    // Configure ADPLL
+    ble_config((FREQ_CHANNEL-1.0F), ADPLL_OPERATION);
+
     // Configure BLE for receive data
     ble_recv_on();
+
+    // Wait for transmission
+    unsigned int start_time = timer_time_us();
+    while ((timer_time_us() - start_time) < 10000);
 
     // Receive data
     for (i = 0; i < size; i++) {

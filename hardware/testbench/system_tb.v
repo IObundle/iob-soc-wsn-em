@@ -22,7 +22,7 @@ module system_tb;
 
 `ifdef VCD
       $dumpfile("system.vcd");
-      $dumpvars();
+      $dumpvars(3,system_tb);
 `endif
 
       // deassert rst
