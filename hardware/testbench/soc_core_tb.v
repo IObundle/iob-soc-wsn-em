@@ -6,6 +6,9 @@
 //PHEADER
 
 module soc_tb
+  # (
+     parameter ID = 0
+     )
   (
    input  clk,
    input  reset,
@@ -109,14 +112,14 @@ module soc_tb
    wire                    ddr_rvalid;
    wire                    ddr_rready;
 `endif
-
-   //cpu trap signal
-   wire                    trap;
    
    //
    // UNIT UNDER TEST
    //
-   system uut (
+   system #(
+            .ID(ID)
+            )
+   uut (
                //PORTS
 `ifdef USE_DDR
                //address write

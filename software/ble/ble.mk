@@ -1,6 +1,3 @@
-ROOT_DIR:=../..
-include $(ROOT_DIR)/system.mk
-
 include $(ADPLL_DIR)/adpll.mk
 include $(ADPLL_DIR)/software/software.mk
 include $(PA_DIR)/software/software.mk

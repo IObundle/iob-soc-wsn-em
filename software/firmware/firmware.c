@@ -5,11 +5,19 @@
 #include "iob-uart.h"
 #include "iob_timer.h"
 
+#include "id.h"
+
 #include "ble.h"
 
 int main() {
   unsigned long long elapsed;
   unsigned int elapsedu;
+
+  int i, size = 8;
+  char buffer[8];
+
+  // Init ID
+  id_init(ID_BASE);
 
   // Init Timer
   timer_init(TIMER_BASE);
@@ -21,46 +29,53 @@ int main() {
   // Init BLE
   ble_init();
 
-  // Configure ADPLL
-  ble_config(FREQ_CHANNEL, ADPLL_OPERATION);
+  if (!get_id()) {
+    // Configure ADPLL
+    ble_config(FREQ_CHANNEL, ADPLL_OPERATION);
 
-#if ID == 0
-  // Configure BLE for send data
-  ble_send_on();
+    // Configure BLE for send data
+    ble_send_on();
 
-  // Send data
-  int i, size = 8;
-  char buffer[8];
-  for (i = 0; i < size; i++) {
-    buffer[i] = 2*(i+1);
+    // Send data
+    for (i = 0; i < size; i++) {
+      buffer[i] = 2*(i+1);
+    }
+
+    // Print buffer
+    uart_printf("\nsend:\n");
+    for (i = 0; i < size; i++) {
+      uart_printf("buffer[%d] = %d\n", i, buffer[i]);
+    }
+
+    ble_send(buffer, size);
+
+    // Wait for transmisstion
+    unsigned int start_time = timer_time_us();
+    while ((timer_time_us() - start_time) < 10000);
+
+  } else {
+    // Configure ADPLL
+    ble_config((FREQ_CHANNEL-1.0F), ADPLL_OPERATION);
+
+    // Configure BLE for receive data
+    ble_recv_on();
+
+    // Wait for transmission
+    unsigned int start_time = timer_time_us();
+    while ((timer_time_us() - start_time) < 10000);
+
+    // Receive data
+    for (i = 0; i < size; i++) {
+      buffer[i] = 0;
+    }
+    char nbytes = ble_receive(buffer);
+
+    // Print buffer
+    uart_printf("\nreceived %d bytes:\n", nbytes);
+    for (i = 0; i < size; i++) {
+      uart_printf("buffer[%d] = %d\n", i, buffer[i]);
+    }
   }
-
-  // Print buffer
-  uart_printf("\nsend:\n");
-  for (i = 0; i < size; i++) {
-    uart_printf("buffer[%d] = %d\n", i, buffer[i]);
-  }
-
-  ble_send(buffer, size);
-
-  // Wait for transmisstion
-
-#else
-  // Configure BLE for receive data
-  ble_recv_on();
-
-  // Receive data
-  for (i = 0; i < size; i++) {
-    buffer[i] = 0;
-  }
-  nbytes = ble_receive(buffer);
-
-  // Print buffer
-  uart_printf("\nreceived:\n");
-  for (i = 0; i < size; i++) {
-    uart_printf("buffer[%d] = %d\n", i, buffer[i]);
-  }
-#endif
 
   ble_off();
 

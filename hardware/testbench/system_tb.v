@@ -22,7 +22,7 @@ module system_tb;
 
 `ifdef VCD
       $dumpfile("system.vcd");
-      $dumpvars();
+      $dumpvars(3,system_tb);
 `endif
 
       // deassert rst
@@ -44,19 +44,25 @@ module system_tb;
    //
    // UNITS UNDER TEST
    //
-   soc_tb soc0 (
-	            .clk    (clk),
-	            .reset  (reset),
-                .antena (antena),
-	            .trap   (trap0)
-	            );
+   soc_tb #(
+            .ID(0)
+            )
+   soc0 (
+         .clk    (clk),
+         .reset  (reset),
+         .antena (antena),
+         .trap   (trap0)
+         );
 
-   soc_tb soc1 (
-	            .clk    (clk),
-	            .reset  (reset),
-                .antena (antena),
-	            .trap   (trap1)
-	            );
+   soc_tb #(
+            .ID(1)
+            )
+   soc1 (
+         .clk    (clk),
+         .reset  (reset),
+         .antena (antena),
+         .trap   (trap1)
+         );
 
    // finish simulation
    always @(posedge trap0) begin

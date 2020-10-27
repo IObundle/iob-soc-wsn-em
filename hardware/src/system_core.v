@@ -5,7 +5,10 @@
 //do not remove line below
 //PHEADER
 
-module system 
+module system
+  # (
+     parameter ID = 0
+     )
   (
    //do not remove line below
    //PIO
