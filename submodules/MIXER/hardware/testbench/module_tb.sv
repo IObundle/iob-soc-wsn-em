@@ -37,7 +37,7 @@ module mixer_tb
    real     out_noise;
    real     intermediate_freq;
       
-   integer  scan,fp_noise;
+   integer  scan,fp_noise,print;
    real     noise_floor;
 
    initial sampling_clk = 0;
@@ -128,8 +128,11 @@ module mixer_tb
    always @(posedge sampling_clk) begin
       scan = $fscanf(fp_noise,"%e ",noise_floor); 
       if (scan == -1)begin
-         $display("Run out of Nnoise points from \"noise_floor.txt\""); //re-use points?
-         $display("$WARNING: The Nnoise points will be re-used!");
+         if (!print) begin
+            $display("Run out of Nnoise points from \"noise_floor.txt\""); //re-use points?
+            $display("$WARNING: The Nnoise points will be re-used!");
+            print = 1;
+         end
          $rewind(fp_noise);
          scan = $fscanf(fp_noise,"%e ",noise_floor);
       end
@@ -152,6 +155,8 @@ module mixer_tb
 	 $fclose(fp_noise);
 	 $finish;
       end
+
+      print = 0;
    end
    
 endmodule

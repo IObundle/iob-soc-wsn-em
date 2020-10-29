@@ -13,7 +13,8 @@ module system_tb;
    // reset
    reg reset = 1;
 
-   wire antena;
+   wire antena0;
+   wire antena1;
 
    /////////////////////////////////////////////
    // TEST PROCEDURE
@@ -22,7 +23,7 @@ module system_tb;
 
 `ifdef VCD
       $dumpfile("system.vcd");
-      $dumpvars(3,system_tb);
+      $dumpvars(2,soc0, soc1, soc0.uut.txrx0, soc1.uut.txrx0);
 `endif
 
       // deassert rst
@@ -41,6 +42,9 @@ module system_tb;
    wire                    trap0;
    wire                    trap1;
 
+   wire                    finish0;
+   wire                    finish1;
+
    //
    // UNITS UNDER TEST
    //
@@ -48,20 +52,24 @@ module system_tb;
             .ID(0)
             )
    soc0 (
-         .clk    (clk),
-         .reset  (reset),
-         .antena (antena),
-         .trap   (trap0)
+         .clk        (clk),
+         .reset      (reset),
+         .antena_in  (antena1),
+         .antena_out (antena0),
+         .trap       (trap0),
+         .finish     (finish0)
          );
 
    soc_tb #(
             .ID(1)
             )
    soc1 (
-         .clk    (clk),
-         .reset  (reset),
-         .antena (antena),
-         .trap   (trap1)
+         .clk        (clk),
+         .reset      (reset),
+         .antena_in  (antena0),
+         .antena_out (antena1),
+         .trap       (trap1),
+         .finish     (finish1)
          );
 
    // finish simulation
@@ -73,7 +81,11 @@ module system_tb;
    always @(posedge trap1) begin
       #10 $display("Found CPU trap condition in SoC 1");
       $finish;
-      
+   end
+
+   always @(posedge (finish0 & finish1)) begin
+      #10 $display("End simulation!");
+      $finish;
    end
 
 endmodule

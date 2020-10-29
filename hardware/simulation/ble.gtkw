@@ -1,0 +1,95 @@
+[*]
+[*] GTKWave Analyzer v3.3.106 (w)1999-2020 BSI
+[*] Thu Oct 29 00:06:07 2020
+[*]
+[dumpfile] "/home/jdlopes/git/iob-soc-wsn-em/hardware/simulation/ncsim/system.vcd"
+[dumpfile_mtime] "Wed Oct 28 23:45:54 2020"
+[dumpfile_size] 3057786352
+[savefile] "/home/jdlopes/git/iob-soc-wsn-em/hardware/simulation/ble.gtkw"
+[timestart] 1119890000000
+[size] 1920 1016
+[pos] -1 -1
+*-33.116467 1167343750000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] system_tb.
+[treeopen] system_tb.soc0.
+[treeopen] system_tb.soc0.uut.
+[treeopen] system_tb.soc0.uut.txrx0.
+[treeopen] system_tb.soc1.uut.
+[treeopen] system_tb.soc1.uut.txrx0.
+[sst_width] 229
+[signals_width] 142
+[sst_expanded] 1
+[sst_vpaned_height] 283
+@200
+-SoC 0
+-TX
+@28
+system_tb.soc0.uut.txrx0.tx0.en
+@22
+#{system_tb.soc0.uut.txrx0.tx0.txdata_in[7:0]} system_tb.soc0.uut.txrx0.tx0.txdata_in[7] system_tb.soc0.uut.txrx0.tx0.txdata_in[6] system_tb.soc0.uut.txrx0.tx0.txdata_in[5] system_tb.soc0.uut.txrx0.tx0.txdata_in[4] system_tb.soc0.uut.txrx0.tx0.txdata_in[3] system_tb.soc0.uut.txrx0.tx0.txdata_in[2] system_tb.soc0.uut.txrx0.tx0.txdata_in[1] system_tb.soc0.uut.txrx0.tx0.txdata_in[0]
+@28
+system_tb.soc0.uut.txrx0.tx0.wr_en
+system_tb.soc0.uut.txrx0.tx0.txready
+system_tb.soc0.uut.txrx0.tx0.txstart
+system_tb.soc0.uut.txrx0.tx0.tx
+system_tb.soc0.uut.txrx0.tx0.tx_valid
+@29
+system_tb.soc0.uut.txrx0.tx0.serial_en
+@200
+-ADPLL
+-PA
+@28
+system_tb.soc0.pa_tb0.pd
+system_tb.soc0.pa_tb0.mode[1:0]
+system_tb.soc0.pa_tb0.in
+system_tb.soc0.pa_tb0.out
+@200
+-
+-SoC 1
+-ADPLL
+-Mixer
+@28
+system_tb.soc1.mixer_tb0.pd
+system_tb.soc1.mixer_tb0.rf_in
+system_tb.soc1.mixer_tb0.osc_in
+system_tb.soc1.mixer_tb0.out
+system_tb.soc1.mixer_tb0.sampling_clk
+system_tb.soc1.mixer_tb0.ota
+system_tb.soc1.mixer_tb0.buff[1:0]
+@200
+-LPF
+@28
+system_tb.soc1.lpf_tb0.pd
+system_tb.soc1.lpf_tb0.sampling_clk
+@22
+system_tb.soc1.lpf_tb0.fc[7:0]
+@28
+system_tb.soc1.lpf_tb0.in
+system_tb.soc1.lpf_tb0.out
+@200
+-Limiter
+@28
+system_tb.soc1.limiter_tb0.limiter_pd
+system_tb.soc1.limiter_tb0.signal_in
+system_tb.soc1.limiter_tb0.square_out
+@200
+-FSK_DEMOD
+@28
+system_tb.soc1.uut.txrx0.fsk_demod0.en
+system_tb.soc1.uut.txrx0.fsk_demod0.data_in
+system_tb.soc1.uut.txrx0.fsk_demod0.data_out
+system_tb.soc1.uut.txrx0.fsk_demod0.data_out_valid
+@200
+-RX
+@28
+system_tb.soc1.uut.txrx0.rx0.start
+system_tb.soc1.uut.txrx0.rx0.empty
+system_tb.soc1.uut.txrx0.rx0.crc_valid
+system_tb.soc1.uut.txrx0.rx0.rx
+system_tb.soc1.uut.txrx0.rx0.rx_valid
+@22
+system_tb.soc1.uut.txrx0.rx0.data_out[7:0]
+@28
+system_tb.soc1.uut.txrx0.rx0.rd_en
+[pattern_trace] 1
+[pattern_trace] 0
