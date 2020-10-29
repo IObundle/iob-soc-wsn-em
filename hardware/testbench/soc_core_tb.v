@@ -10,10 +10,12 @@ module soc_tb
      parameter ID = 0
      )
   (
-   input  clk,
-   input  reset,
-   inout  antena,
-   output trap
+   input      clk,
+   input      reset,
+   input      antena_in,
+   output     antena_out,
+   output     trap,
+   output reg finish
    );
 
    //received by getchar
@@ -38,6 +40,7 @@ module soc_tb
    // TEST PROCEDURE
    //
    initial begin
+      finish = 0;
 
       //init cpu bus signals
       uart_valid = 0;
@@ -60,6 +63,8 @@ module soc_tb
 `endif      
       //run firmware
       cpu_run();
+
+      finish = 1;
    end
 
    

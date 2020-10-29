@@ -13,8 +13,8 @@ int main() {
   unsigned long long elapsed;
   unsigned int elapsedu;
 
-  int i, size = 8;
-  char buffer[8];
+  int i, size = 4;
+  char buffer[24];
 
   // Init ID
   id_init(ID_BASE);
@@ -29,7 +29,7 @@ int main() {
   // Init BLE
   ble_init();
 
-  if (!get_id()) {
+  if (!get_id()) { // Sender
     // Configure ADPLL
     ble_config(FREQ_CHANNEL, ADPLL_OPERATION);
 
@@ -41,19 +41,21 @@ int main() {
       buffer[i] = 2*(i+1);
     }
 
+    ble_send(buffer, size);
+
+    // Wait for transmisstion
+    unsigned int start_time = timer_time_us();
+    while ((timer_time_us() - start_time) < (unsigned int)1000);
+
+    ble_off();
+
     // Print buffer
     uart_printf("\nsend:\n");
     for (i = 0; i < size; i++) {
       uart_printf("buffer[%d] = %d\n", i, buffer[i]);
     }
 
-    ble_send(buffer, size);
-
-    // Wait for transmisstion
-    unsigned int start_time = timer_time_us();
-    while ((timer_time_us() - start_time) < 10000);
-
-  } else {
+  } else { // Receiver
     // Configure ADPLL
     ble_config((FREQ_CHANNEL-1.0F), ADPLL_OPERATION);
 
@@ -62,13 +64,20 @@ int main() {
 
     // Wait for transmission
     unsigned int start_time = timer_time_us();
-    while ((timer_time_us() - start_time) < 10000);
+    while ((timer_time_us() - start_time) < (unsigned int)1000);
 
     // Receive data
+    size = 24;
     for (i = 0; i < size; i++) {
       buffer[i] = 0;
     }
     char nbytes = ble_receive(buffer);
+
+    ble_off();
+
+    // Wait for sender
+    start_time = timer_time_us();
+    while ((timer_time_us() - start_time) < (unsigned int)1000);
 
     // Print buffer
     uart_printf("\nreceived %d bytes:\n", nbytes);
@@ -76,8 +85,6 @@ int main() {
       uart_printf("buffer[%d] = %d\n", i, buffer[i]);
     }
   }
-
-  ble_off();
 
   //read current timer count, compute elapsed time
   elapsed  = timer_get_count();

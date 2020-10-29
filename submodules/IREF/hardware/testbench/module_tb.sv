@@ -17,9 +17,9 @@ module iref_tb (
 // goes low
    always @*
       if (pd)
-	    $display("$WARNING: RF IREF power mode is on!");
+	    $display("$WARNING: RF IREF power-down mode is on!");
       else
-        $display("$WARNING: RF IREF power mode is off!");
+        $display("$WARNING: RF IREF power-down mode is off!");
 
    always @*
       if (charge)

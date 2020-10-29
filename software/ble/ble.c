@@ -122,8 +122,8 @@ char ble_recv_on(void) {
     iref_on();
 
     mixer_on();
+    lpf_on();
     limiter_on();
-    pa_on();
 
     adpll_set_mode(RX);
     adpll_on();
