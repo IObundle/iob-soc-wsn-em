@@ -46,6 +46,7 @@ module txrx (
    reg 				      rx_en;
    reg 				      tx_en;
    reg 				      demod_en;
+   reg [`NB_PKG_W-1:0]    rx_nb_pkg;
 
    // Read
    always @*
@@ -67,6 +68,7 @@ module txrx (
         ch_idx <= `CH_IDX_W'd5;
         rx_start <= 1'b0;
         rx_en <= 1'b0;
+        rx_nb_pkg <= `NB_PKG;
         demod_en <= 1'b0;
      end else if (valid & wstrb)
        case (address)
@@ -76,9 +78,24 @@ module txrx (
          `TXRX_CH_IDX: ch_idx <= wdata[`CH_IDX_W-1:0];
          `RX_START: rx_start <= wdata[0];
          `RX_EN: rx_en <= wdata[0];
+         `RX_NB_PKG: rx_nb_pkg <= wdata[`NB_PKG_W-1:0];
          `DEMOD_EN: demod_en <= wdata[0];
          default: ;
        endcase
+
+   reg tx_start_reg;
+   reg rx_start_reg;
+   wire tx_start_int = tx_start & ~tx_start_reg;
+   wire rx_start_int = rx_start & ~rx_start_reg;
+   always @(posedge clk, posedge rst) begin
+      if (rst) begin
+         tx_start_reg <= 1'b0;
+         rx_start_reg <= 1'b0;
+      end else begin
+         tx_start_reg <= tx_start;
+         rx_start_reg <= rx_start;
+      end
+   end
 
    // Transmitter
    tx tx0 (
@@ -92,10 +109,10 @@ module txrx (
                              (address == `TX_DATA)),
 
            // Registers
-           .txready         (tx_ready), // read
-           .txstart         (tx_start), // write
-           .aa              (aa),       // write
-           .ch_idx          (ch_idx),   // write
+           .txready         (tx_ready),     // read
+           .txstart         (tx_start_int), // write
+           .aa              (aa),           // write
+           .ch_idx          (ch_idx),       // write
 
            // Serial interface
            .tx              (tx),
@@ -105,7 +122,7 @@ module txrx (
    // FSK demodulator
    fsk_demod fsk_demod0 (
                          .clk            (clk),
-                         .rst            (rst | rx_start),
+                         .rst            (rst | rx_start_int),
                          .en             (rx_en & demod_en), // write
                          .data_in        (rx),               // limiter output // DTEST OUTPUT
                          .data_out       (rx_in),            // DTEST OUTPUT
@@ -119,12 +136,14 @@ module txrx (
 
            // Data interface
            .data_out        (rx_data),
-           .rd_en           (valid & ~wstrb & ~ready), // read is same as (valid & ~wstrb)
+           .rd_en           (valid & ~wstrb & ~ready &&
+                             (address == `RX_DATA)),
 
            // Registers
-           .start           (rx_start),                // write
+           .start           (rx_start_int),            // write
            .ch_idx          (ch_idx),                  // write
            .aa              (aa),                      // write
+           .nb_pkg          (rx_nb_pkg),               // write
            .aa_found        (rx_aa_found),             // read
            .empty           (rx_empty),                // empty
            .crc_valid       (rx_crc_valid),

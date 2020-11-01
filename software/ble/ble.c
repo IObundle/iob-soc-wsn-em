@@ -4,6 +4,14 @@
 #include "iob-uart.h"
 #include "iob_timer.h"
 
+#include "adpll.h"
+#include "pa.h"
+#include "mixer.h"
+#include "lpf.h"
+#include "limiter.h"
+#include "txrx.h"
+#include "iref.h"
+
 #include "ble.h"
 
 //
@@ -61,40 +69,47 @@ void ble_init(void) {
   return;
 }
 
-void ble_config(float channel_freq, int mode) {
+char ble_config(float channel_freq, int mode) {
 
-  int fcw = (int)(channel_freq*16384);
-  uart_printf("freq_channel = %fMHz, FCW = %d, adpll_mode = %d\n", channel_freq, fcw, mode);
+  if (init) {
+    int fcw = (int)(channel_freq*16384);
+    uart_printf("freq_channel = %fMHz, FCW = %d, adpll_mode = %d\n", channel_freq, fcw, mode);
 
-  char alpha_l = 14;
-  char alpha_m = 8;
-  char alpha_s_rx = 7;
-  char alpha_s_tx = 4;
-  char beta = 0;
-  char lambda_rx = 2;
-  char lambda_tx = 2;
-  char iir_n_rx = 3;
-  char iir_n_tx = 2;
-  char FCW_mod = 0b01001; // 288kHz
-  char dco_c_l_word_test = 0;
-  char dco_c_m_word_test = 0;
-  char dco_c_s_word_test = 0;
-  char dco_pd_test = 1;
-  char tdc_pd_test = 1;
-  char tdc_pd_inj_test = 1;
-  char tdc_ctr_freq = 0b100;
-  char dco_osc_gain = 0b10;
+    char alpha_l = 14;
+    char alpha_m = 8;
+    char alpha_s_rx = 7;
+    char alpha_s_tx = 4;
+    char beta = 0;
+    char lambda_rx = 2;
+    char lambda_tx = 2;
+    char iir_n_rx = 3;
+    char iir_n_tx = 2;
+    char FCW_mod = 0b01001; // 288kHz
+    char dco_c_l_word_test = 0;
+    char dco_c_m_word_test = 0;
+    char dco_c_s_word_test = 0;
+    char dco_pd_test = 1;
+    char tdc_pd_test = 1;
+    char tdc_pd_inj_test = 1;
+    char tdc_ctr_freq = 0b100;
+    char dco_osc_gain = 0b10;
 
-  adpll_config(fcw, mode,
-               alpha_l, alpha_m, alpha_s_rx, alpha_s_tx,
-               beta,
-               lambda_rx, lambda_tx,
-               iir_n_rx, iir_n_tx,
-               FCW_mod,
-               dco_c_l_word_test, dco_c_m_word_test, dco_c_s_word_test,
-               dco_pd_test, dco_osc_gain,
-               tdc_pd_test, tdc_pd_inj_test, tdc_ctr_freq);
+    adpll_config(fcw, mode,
+                 alpha_l, alpha_m, alpha_s_rx, alpha_s_tx,
+                 beta,
+                 lambda_rx, lambda_tx,
+                 iir_n_rx, iir_n_tx,
+                 FCW_mod,
+                 dco_c_l_word_test, dco_c_m_word_test, dco_c_s_word_test,
+                 dco_pd_test, dco_osc_gain,
+                 tdc_pd_test, tdc_pd_inj_test, tdc_ctr_freq);
+  }
 
+  return init;
+}
+
+void ble_payload(char nbytes) {
+  payload(nbytes);
   return;
 }
 

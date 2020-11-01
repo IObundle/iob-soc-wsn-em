@@ -1,16 +1,11 @@
-#include "adpll.h"
-#include "pa.h"
-#include "mixer.h"
-#include "lpf.h"
-#include "limiter.h"
-#include "txrx.h"
-#include "iref.h"
-
 // Init BLE modules
 void ble_init(void);
 
 // Configure BLE
-void ble_config(float channel_freq, int mode);
+char ble_config(float channel_freq, int mode);
+
+// Set Payload
+void ble_payload(char nbytes);
 
 // Turn BLE On as receiver
 char ble_recv_on(void);

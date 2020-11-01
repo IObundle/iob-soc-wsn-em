@@ -16,7 +16,7 @@
 module rx (
            input                 clk, 
            input                 rst,
-	   input                 en,
+	       input                 en,
            
            //data interface 
            input                 rd_en, 
@@ -26,9 +26,10 @@ module rx (
            input                 start, 
            input [31:0]          aa, //access address to be found
            input [`CH_IDX_W-1:0] ch_idx, //channel id to init the whitening register
+           input [`NB_PKG_W-1:0] nb_pkg,
            output                aa_found, //access address found
            output                empty,
-	   output reg            crc_valid,
+	       output reg            crc_valid,
 
            //serial interface
            input                 rx, 
@@ -48,11 +49,11 @@ module rx (
    wire [23:0]			crc_out;
    
 
-   
+   wire                 rst_aa;
    
    aa_find aa_find0 (
 		     .clk               (clk),
-		     .rst               (rst | start),
+		     .rst               (rst | start | rst_aa),
 
 		     .aa                (aa),
 		     .data_in           (rx),
@@ -115,7 +116,28 @@ module rx (
        crc_valid = 1'b0;
      else
        crc_valid = 1'b1;
-   
+
+   reg [`NB_PKG_W-1:0] counter;
+   wire en_cnt = (counter == 0)? 1'b0 : 1'b1;
+   always @(posedge clk, posedge rst) begin
+      if (rst) begin
+         counter <= {`NB_PKG_W{1'b0}};
+      end else if (start) begin
+         counter <= nb_pkg;
+      end else if (en_cnt & wr_en) begin
+         counter <= counter - 1'b1;
+      end
+   end
+
+   reg en_cnt_reg;
+   assign rst_aa = ~en_cnt & en_cnt_reg;
+   always @(posedge clk, posedge rst) begin
+      if (rst) begin
+         en_cnt_reg <= 1'b0;
+      end else begin
+         en_cnt_reg <= en_cnt;
+      end
+   end
 
 endmodule // rx
 

@@ -44,6 +44,11 @@ void rx_set_en(char value) {
   IO_SET(txrx, RX_EN, (int)value);
 }
 
+void rx_set_nb_pkg(char value) {
+  value += 3; // add 3 bytes for CRC
+  IO_SET(txrx, RX_NB_PKG, (int)value);
+}
+
 int rx_aa_found(void) {
   return (IO_GET(txrx, RX_AA_FOUND));
 }
