@@ -27,6 +27,7 @@ soc_tb.v:
 VSRC+=$(foreach p, $(PERIPHERALS), $(shell if test -f $(SUBMODULES_DIR)/$p/hardware/testbench/module_tb.sv; then echo $(SUBMODULES_DIR)/$p/hardware/testbench/module_tb.sv; fi;)) #add test cores to list of sources
 
 self-checker:
-	python3 $(ADPLL_PY_DIR)/self-checker.py 0 $(FREQ_CHANNEL)
+	python3 $(ADPLL_PY_DIR)/self-checker.py 0 $(FREQ_CHANNEL) SoC0
+	python3 $(ADPLL_PY_DIR)/self-checker.py 0 $(FREQ_CHANNEL)-1 SoC1
 
 .PHONY: run self-checker
