@@ -13,8 +13,9 @@ int main() {
   unsigned long long elapsed;
   unsigned int elapsedu;
 
-  int i, size = 4;
-  char buffer[24];
+  int i;
+  int size = 4; // Payload
+  char buffer[7]; // Payload + CRC
 
   // Init ID
   id_init(ID_BASE);
@@ -23,7 +24,7 @@ int main() {
   timer_init(TIMER_BASE);
 
   // Init UART
-  uart_init(UART_BASE,FREQ/BAUD);   
+  uart_init(UART_BASE,FREQ/BAUD);
   uart_printf("\n\n\nHello world!\n\n\n");
 
   // Init BLE
@@ -56,6 +57,9 @@ int main() {
     }
 
   } else { // Receiver
+    // Payload
+    ble_payload(size);
+
     // Configure ADPLL
     ble_config((FREQ_CHANNEL-1.0F), ADPLL_OPERATION);
 
@@ -67,7 +71,7 @@ int main() {
     while ((timer_time_us() - start_time) < (unsigned int)1000);
 
     // Receive data
-    size = 24;
+    size = 7;
     for (i = 0; i < size; i++) {
       buffer[i] = 0;
     }

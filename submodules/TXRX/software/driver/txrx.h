@@ -27,6 +27,9 @@ void rx_set_start(char value);
 // Set RX enable
 void rx_set_en(char value);
 
+// Set RX number of bytes per package (payload)
+void rx_set_nb_pkg(char value);
+
 // Get Access Address found
 int rx_aa_found(void);
 
@@ -59,6 +62,9 @@ void demod_set_en(char value);
 
 // Disable RX
 #define rx_disable() rx_set_en(0)
+
+// Payload
+#define payload(value) rx_set_nb_pkg(value)
 
 // Enable DEMOD
 #define demod_enable() demod_set_en(1)
