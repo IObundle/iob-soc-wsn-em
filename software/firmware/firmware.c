@@ -9,13 +9,15 @@
 
 #include "ble.h"
 
+#define N_BYTES 4
+
 int main() {
   unsigned long long elapsed;
   unsigned int elapsedu;
 
   int i;
-  int size = 4; // Payload
-  char buffer[7]; // Payload + CRC
+  int size = N_BYTES; // Payload
+  char buffer[N_BYTES+3]; // Payload + CRC
 
   // Init ID
   id_init(ID_BASE);
@@ -71,7 +73,7 @@ int main() {
     while ((timer_time_us() - start_time) < (unsigned int)1000);
 
     // Receive data
-    size = 7;
+    size = N_BYTES+3;
     for (i = 0; i < size; i++) {
       buffer[i] = 0;
     }
