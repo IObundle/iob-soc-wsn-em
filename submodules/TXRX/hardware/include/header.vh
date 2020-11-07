@@ -24,5 +24,5 @@
 
 `define ACCESSADDRESS 32'h8E89BED6 // advertising channel AA
 
-`define NB_PKG_W $clog2(128) // Max number of bytes per package width - CRC included
+`define NB_PKG_W $clog2(64) // Max number of bytes per package width - CRC included
 `define NB_PKG 11 // Default number of bytes per package - CRC included
