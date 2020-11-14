@@ -47,4 +47,4 @@ clean:
 	@rm -rf top_system.bld top_system_map.mrp top_system_pad.csv top_system.ptwx top_system.unroutes
 	make -C ../../../software/firmware clean
 
-.PHONY: clean firmware FORCE
+.PHONY: clean FORCE

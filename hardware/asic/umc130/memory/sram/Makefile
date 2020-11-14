@@ -16,4 +16,4 @@ run:
 clean:
 	@find . -type f -not -name Makefile -delete
 
-.PHONY: all clean
+.PHONY: run clean
