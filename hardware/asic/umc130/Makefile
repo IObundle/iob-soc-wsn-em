@@ -1,6 +1,6 @@
 all:
-	make -C synth
-#	make -C pr
+	make -C synth run
+#	make -C pr run
 clean:
 	make -C synth clean
 #	make -C pr clean

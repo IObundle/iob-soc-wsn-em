@@ -3,7 +3,7 @@ ROOT_DIR:=../../../..
 include ../../asic.mk
 
 RTL_COMPILER:=source /opt/ic_tools/init/init-rc14_25_hf000
-	
+
 
 run: rom ram
 	# in the future, this DEFINE process needs to be automated, system.mk may need to be changed
@@ -36,4 +36,4 @@ clean:
 	make -C ../memory clean
 	@rm -rf $(MEMW_DIR) *~ *.txt rc.cmd* rc.* fv libscore_work *.sdc *.v *.h *.lib
 
-.PHONY: all clean
+.PHONY: run rom ram gen_mem clean
