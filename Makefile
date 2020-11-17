@@ -81,16 +81,26 @@ ifneq ($(TEST_LOG),)
 endif
 endif
 
-asic: bootloader
+asic: firmware bootloader
+ifeq ($(HOSTNAME),$(filter $(HOSTNAME), $(LOCAL_ASIC_LIST)))
 	make -C $(ASIC_DIR)
+else
+	ssh $(ASIC_USER)@$(ASIC_SERVER) "if [ ! -d $(REMOTE_ROOT_DIR) ]; then mkdir -p $(REMOTE_ROOT_DIR); fi"
+	rsync -avz --exclude .git $(ROOT_DIR) $(ASIC_USER)@$(ASIC_SERVER):$(REMOTE_ROOT_DIR)
+	ssh $(ASIC_USER)@$(ASIC_SERVER) 'cd $(REMOTE_ROOT_DIR); make -C $(ASIC_DIR)'
+endif
 
-asic-clean:
+asic-clean: sw-clean
 	make -C $(ASIC_DIR) clean
+ifneq ($(HOSTNAME),$(filter $(HOSTNAME), $(LOCAL_ASIC_LIST)))
+	rsync -avz --exclude .git $(ROOT_DIR) $(ASIC_USER)@$(ASIC_SERVER):$(REMOTE_ROOT_DIR)
+	ssh $(ASIC_USER)@$(ASIC_SERVER) 'if [ -d $(REMOTE_ROOT_DIR) ]; then cd $(REMOTE_ROOT_DIR); make -C $(ASIC_DIR) clean; fi'
+endif
 
 firmware:
 	make -C $(FIRM_DIR) run BAUD=$(BAUD)
 
-bootloader: firmware
+bootloader:
 	make -C $(BOOT_DIR) run BAUD=$(BAUD)
 
 sw-clean:

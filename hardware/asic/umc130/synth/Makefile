@@ -29,7 +29,7 @@ ram: gen_mem
 gen_mem:
 	make -C ../memory
 	cp $(SW_DIR)/system.h .
-	rm -R $(MEMW_DIR)
+	rm -fR $(MEMW_DIR)
 	mkdir $(MEMW_DIR)
 
 clean:
