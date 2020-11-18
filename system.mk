@@ -1,8 +1,8 @@
 #FIRMWARE
-FIRM_ADDR_W:=16
+FIRM_ADDR_W:=14
 
 #SRAM
-SRAM_ADDR_W=16
+SRAM_ADDR_W=14
 
 #DDR
 ifeq ($(USE_DDR),)
@@ -71,8 +71,19 @@ REMOTE_ROOT_DIR=./sandbox/iob-soc-wsn-em
 
 #ASIC
 ASIC_NODE:=umc130
-ASIC_COMPILE_SERVER=$(USER)@micro7.lx.it.pt
+ASIC_SERVER:=micro7.lx.it.pt
 ASIC_COMPILE_ROOT_DIR=$(ROOT_DIR)/sandbox/iob-soc-wsn-em
+LOCAL_ASIC_LIST=micro7.lx.it.pt #leave space in the end
+
+ifeq ($(HOSTNAME),)
+	HOSTNAME=$(ASIC_SERVER)
+endif
+
+ifeq ($(SIM_USER),)
+	ASIC_USER=user19
+else
+	ASIC_USER=$(SIM_USER)
+endif
 
 #DOC_TYPE
 #DOC_TYPE:=presentation
