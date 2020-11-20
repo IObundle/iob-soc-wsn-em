@@ -6,11 +6,12 @@ RTL_COMPILER:=source /opt/ic_tools/init/init-rc14_25_hf000
 
 
 run: rom ram
+	echo "set SRCH_PATH [list $()]" > spath.tcl
 	echo "set DEFINE [list $(DEFINE)]" > defs.tcl
 	echo "set VSRC [list $(VSRC)]" > vsrc.tcl
 	echo "set INCLUDE [list $(VHDR)]" > inc.tcl
 	cp $(ROM_DIR)/*$(CASE).lib $(RAM_DIR)/*$(CASE).lib .
-	$(RTL_COMPILER) && $(DISPLAY) && echo "quit" | rc -files defs.tcl -files vsrc.tcl -files inc.tcl -files synscript.tcl
+	$(RTL_COMPILER) $(DISPLAY_EXP) && echo "quit" | rc -files spath.tcl -files defs.tcl -files vsrc.tcl -files inc.tcl -files synscript.tcl
 	echo "quit"
 
 rom: gen_mem
