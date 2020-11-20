@@ -171,14 +171,14 @@ test-fpga:
 	diff -q test.log test/test-fpga.log
 	@echo FPGA TEST PASSED FOR $(BOARD_LIST)
 
-clean-all: sim-clean fpga-clean doc-clean
+clean-all: sim-clean fpga-clean asic-clean doc-clean
 
 .PHONY: sim sim-waves sim-clean \
 	firmware bootloader sw-clean \
-	demod_coeffs \
+	demod_coeffs hex-clean \
 	doc doc-clean \
 	fpga fpga-load fpga-clean fpga-clean-ip \
 	run-hw \
-	test test-sim test-fpga test-board run-board\
+	test test-sim test-fpga test-board run-board \
 	asic asic-clean \
 	clean-all
