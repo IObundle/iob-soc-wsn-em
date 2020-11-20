@@ -159,10 +159,6 @@ else
 BAUD:=$(SIM_BAUD)
 endif
 
-ifeq ($(word 1, $(MAKECMDGOALS)),asic)
-ASIC:=1
-endif
-
 DEFINE+=$(defmacro)BAUD=$(BAUD)
 
 ifeq ($(FREQ),) 

@@ -24,14 +24,14 @@ TB_DIR:=$(ROOT_DIR)/hardware/testbench
 
 #rom
 VSRC+=$(SRC_DIR)/boot_ctr.v
-ifeq ($(ASIC),1)
+ifneq ($(ASIC),1)
 VSRC+=$(MEM_DIR)/sp_rom/sp_rom.v
 endif
 
 #ram
 VSRC+=$(SRC_DIR)/int_mem.v \
 $(SRC_DIR)/sram.v
-ifeq ($(ASIC),1)
+ifneq ($(ASIC),1)
 VSRC+=$(MEM_DIR)/tdp_ram/iob_tdp_ram.v
 endif
 
