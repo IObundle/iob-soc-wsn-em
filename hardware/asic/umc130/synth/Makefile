@@ -5,13 +5,13 @@ include ../../asic.mk
 RTL_COMPILER:=source /opt/ic_tools/init/init-rc14_25_hf000
 
 
-run: rom ram
-	echo "set SRCH_PATH [list $()]" > spath.tcl
+run: rom ram $(VHDR) $(VSRC)
+	echo "set INCLUDE [list $(INCLUDE)]" > inc.tcl
 	echo "set DEFINE [list $(DEFINE)]" > defs.tcl
-	echo "set VSRC [list $(VSRC)]" > vsrc.tcl
-	echo "set INCLUDE [list $(VHDR)]" > inc.tcl
+	echo "set VHDR [glob $(VHDR)]" > vhdr.tcl
+	echo "set VSRC [glob $(VSRC)]" > vsrc.tcl
 	cp $(ROM_DIR)/*$(CASE).lib $(RAM_DIR)/*$(CASE).lib .
-	$(RTL_COMPILER) $(DISPLAY_EXP) && echo "quit" | rc -files spath.tcl -files defs.tcl -files vsrc.tcl -files inc.tcl -files synscript.tcl
+	$(RTL_COMPILER) && echo "quit" | rc -files inc.tcl -files defs.tcl -files vhdr.tcl -files vsrc.tcl -files synscript.tcl
 	echo "quit"
 
 rom: gen_mem
@@ -29,5 +29,6 @@ gen_mem:
 clean:
 	make -C ../memory clean
 	@rm -rf $(MEMW_DIR) *~ *.txt rc.cmd* rc.* fv libscore_work *.sdc *.v *.h *.lib
+	@find *.tcl -type f -not -name synscript.tcl -not -name powscript.tcl -delete
 
 .PHONY: run rom ram gen_mem clean

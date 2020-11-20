@@ -159,7 +159,6 @@ else
 BAUD:=$(SIM_BAUD)
 endif
 
-
 DEFINE+=$(defmacro)BAUD=$(BAUD)
 
 ifeq ($(FREQ),) 

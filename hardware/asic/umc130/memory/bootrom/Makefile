@@ -10,7 +10,7 @@ MEM_FLAGS:=-s fsc0l_d -type sp -words $(BOOTROM_WORDS) -bits 32 -mux 1 -rformat 
 
 # run memory compiler
 run: boot.hex
-	$(MEMAKER_SRC) $(DISPLAY_EXP) && memaker $(MEM_FLAGS)
+	$(MEMAKER_SRC) && memaker $(MEM_FLAGS)
 	sed  -i 's/ME\([0-9]\)/metal\1/g' *.lef
 
 clean:

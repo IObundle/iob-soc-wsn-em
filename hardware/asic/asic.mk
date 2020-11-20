@@ -9,7 +9,3 @@ CASE=TC
 # Memory sizes in log2
 MEM_SIZE_ROM:=$(shell echo '$(BOOTROM_ADDR_W)-2' | bc)
 MEM_SIZE_RAM:=$(shell echo '$(SRAM_ADDR_W)-2' | bc)
-
-ifeq ($(DISPLAY),)
-DISPLAY_EXP=&& export DISPLAY=localhost:31.0
-endif

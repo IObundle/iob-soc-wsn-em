@@ -10,7 +10,7 @@ MEM_FLAGS:=-s fsc0l_d -type sh -words $(SRAM_WORDS) -bits 8 -bytes 4 -mux 1 -ds 
 
 # run memory compiler
 run:
-	$(MEMAKER_SRC) $(DISPLAY_EXP) && memaker $(MEM_FLAGS)
+	$(MEMAKER_SRC) && memaker $(MEM_FLAGS)
 	sed  -i 's/ME\([0-9]\)/metal\1/g' *.lef
 
 clean:
