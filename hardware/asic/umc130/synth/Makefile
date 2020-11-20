@@ -29,5 +29,6 @@ gen_mem:
 clean:
 	make -C ../memory clean
 	@rm -rf $(MEMW_DIR) *~ *.txt rc.cmd* rc.* fv libscore_work *.sdc *.v *.h *.lib
+	@find *.tcl -type f -not -name synscript.tcl -not -name powscript.tcl -delete
 
 .PHONY: run rom ram gen_mem clean
