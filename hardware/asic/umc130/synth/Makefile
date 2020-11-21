@@ -5,7 +5,7 @@ include ../../asic.mk
 RTL_COMPILER:=source /opt/ic_tools/init/init-rc14_25_hf000
 
 
-run: rom ram $(VHDR) $(VSRC)
+run: rom ram $(VHDR) $(VSRC) periphs
 	echo "set INCLUDE [list $(INCLUDE)]" > inc.tcl
 	echo "set DEFINE [list $(DEFINE)]" > defs.tcl
 	echo "set VHDR [glob $(VHDR)]" > vhdr.tcl
