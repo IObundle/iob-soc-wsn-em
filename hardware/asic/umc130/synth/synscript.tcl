@@ -12,13 +12,11 @@ echo "INCLUDE=" $INCLUDE
 echo "\n\n"
 echo "DEFINE=" $DEFINE
 echo "\n\n"
-echo "VHDR=" $VHDR
-echo "\n\n"
 echo "VSRC=" $VSRC
 echo "\n\n"
 
 #verilog defines 
-read_hdl -v2001 -define $DEFINE $VHDR $VSRC
+read_hdl -v2001 -define $DEFINE $VSRC
 elaborate system
 define_clock -name clk -period 31250 [find / -port clk] 
 synthesize -to_mapped

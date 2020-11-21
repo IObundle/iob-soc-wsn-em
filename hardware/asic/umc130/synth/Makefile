@@ -8,10 +8,9 @@ RTL_COMPILER:=source /opt/ic_tools/init/init-rc14_25_hf000
 run: rom ram $(VHDR) $(VSRC) periphs
 	echo "set INCLUDE [list $(INCLUDE)]" > inc.tcl
 	echo "set DEFINE [list $(DEFINE)]" > defs.tcl
-	echo "set VHDR [glob $(VHDR)]" > vhdr.tcl
 	echo "set VSRC [glob $(VSRC)]" > vsrc.tcl
 	cp $(ROM_DIR)/*$(CASE).lib $(RAM_DIR)/*$(CASE).lib .
-	$(RTL_COMPILER) && echo "quit" | rc -files inc.tcl -files defs.tcl -files vhdr.tcl -files vsrc.tcl -files synscript.tcl
+	$(RTL_COMPILER) && echo "quit" | rc -files inc.tcl -files defs.tcl -files vsrc.tcl -files synscript.tcl
 	echo "quit"
 
 rom: gen_mem
