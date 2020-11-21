@@ -5,7 +5,7 @@ include ../../asic.mk
 RTL_COMPILER:=source /opt/ic_tools/init/init-rc14_25_hf000
 
 
-run: rom ram $(VHDR) $(VSRC) periphs
+run: rom ram $(VHDR) $(VSRC) periphs demod_coeffs
 	echo "set INCLUDE [list $(INCLUDE)]" > inc.tcl
 	echo "set DEFINE [list $(DEFINE)]" > defs.tcl
 	echo "set VSRC [glob $(VSRC)]" > vsrc.tcl
@@ -27,7 +27,7 @@ gen_mem:
 
 clean:
 	make -C ../memory clean
-	@rm -rf $(MEMW_DIR) *~ *.txt rc.cmd* rc.* fv libscore_work *.sdc *.v *.h *.lib
+	@rm -rf $(MEMW_DIR) *~ *.hex *.txt rc.cmd* rc.* fv libscore_work *.sdc *.v *.h *.lib
 	@find *.tcl -type f -not -name synscript.tcl -not -name powscript.tcl -delete
 
 .PHONY: run rom ram gen_mem clean
