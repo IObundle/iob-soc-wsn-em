@@ -7,7 +7,7 @@ include $(BLE_DIR)/ble.mk
 CFLAGS+=--specs=nano.specs -Wl,-Bstatic,-T,../template.lds,-Map,firmware.map,--strip-debug
 
 
-#DEFINE+=$(defmacro)LONGLONG
+DEFINE+=$(defmacro)LONGLONG
 DEFINE+=$(defmacro)FLOAT
 
 #SUBMODULES

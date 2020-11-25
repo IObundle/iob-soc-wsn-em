@@ -211,7 +211,7 @@ test-all-boards:
 # COMPILE ASIC (WIP)
 #
 
-asic:
+asic: asic-clean
 	make -C $(FIRM_DIR) run BAUD=$(HW_BAUD)
 	make -C $(BOOT_DIR) run BAUD=$(HW_BAUD)
 	make -C $(SUBMODULES_DIR)/FSK_DEMOD demod_coeffs
