@@ -187,16 +187,16 @@ module soc_tb
  `ifdef DDR_INIT
        .FILE("firmware.hex"),
  `endif
-       .FILE_SIZE(2**(`FIRM_ADDR_W-2)),
+       .FILE_SIZE(2**(`DDR_ADDR_W-2)),
        .DATA_WIDTH (`DATA_W),
-       .ADDR_WIDTH (`FIRM_ADDR_W)
+       .ADDR_WIDTH (`DDR_ADDR_W)
        )
    ddr_model_mem(
                  //address write
                  .clk            (clk),
                  .rst            (reset),
 		 .s_axi_awid     ({8{ddr_awid}}),
-		 .s_axi_awaddr   (ddr_awaddr[`FIRM_ADDR_W-1:0]),
+		 .s_axi_awaddr   (ddr_awaddr[`DDR_ADDR_W-1:0]),
                  .s_axi_awlen    (ddr_awlen),
                  .s_axi_awsize   (ddr_awsize),
                  .s_axi_awburst  (ddr_awburst),
@@ -221,7 +221,7 @@ module soc_tb
       
 		 //address read
 		 .s_axi_arid     ({8{ddr_arid}}),
-		 .s_axi_araddr   (ddr_araddr[`FIRM_ADDR_W-1:0]),
+		 .s_axi_araddr   (ddr_araddr[`DDR_ADDR_W-1:0]),
 		 .s_axi_arlen    (ddr_arlen), 
 		 .s_axi_arsize   (ddr_arsize),    
                  .s_axi_arburst  (ddr_arburst),
@@ -244,4 +244,25 @@ module soc_tb
 
 `include "cpu_tasks.v"
 
+   //sram monitor - use for debugging programs
+   /*
+   wire [`SRAM_ADDR_W-1:0] sram_daddr = uut.int_mem0.int_sram.d_addr;
+   wire sram_dwstrb = |uut.int_mem0.int_sram.d_wstrb & uut.int_mem0.int_sram.d_valid;
+   wire sram_drdstrb = !uut.int_mem0.int_sram.d_wstrb & uut.int_mem0.int_sram.d_valid;
+   wire [`DATA_W-1:0] sram_dwdata = uut.int_mem0.int_sram.d_wdata;
+
+
+   wire sram_iwstrb = |uut.int_mem0.int_sram.i_wstrb & uut.int_mem0.int_sram.i_valid;
+   wire sram_irdstrb = !uut.int_mem0.int_sram.i_wstrb & uut.int_mem0.int_sram.i_valid;
+   wire [`SRAM_ADDR_W-1:0] sram_iaddr = uut.int_mem0.int_sram.i_addr;
+   wire [`DATA_W-1:0] sram_irdata = uut.int_mem0.int_sram.i_rdata;
+
+   
+   always @(posedge sram_dwstrb)
+      if(sram_daddr == 13'h090d)  begin
+         #10 $display("Found CPU memory condition at %f : %x : %x", $time, sram_daddr, sram_dwdata );
+         //$finish;
+      end
+    */
+   
 endmodule
