@@ -8,7 +8,7 @@ CFLAGS+=--specs=nano.specs -Wl,-Bstatic,-T,../template.lds,-Map,firmware.map,--s
 
 
 #DEFINE+=$(defmacro)LONGLONG
-#DEFINE+=$(defmacro)FLOAT
+DEFINE+=$(defmacro)FLOAT
 
 #SUBMODULES
 

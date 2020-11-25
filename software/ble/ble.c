@@ -73,7 +73,7 @@ char ble_config(float channel_freq, int mode) {
 
   if (init) {
     int fcw = (int)(channel_freq*16384);
-    //uart_printf("freq_channel = %fMHz, FCW = %d, adpll_mode = %d\n", channel_freq, fcw, mode);
+    uart_printf("freq_channel = %fMHz, FCW = %d, adpll_mode = %d\n", channel_freq, fcw, mode);
 
     char alpha_l = 14;
     char alpha_m = 8;
