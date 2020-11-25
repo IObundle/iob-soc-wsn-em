@@ -1,5 +1,9 @@
-hardware/simulation/icarus/*.vcd
-hardware/simulation/ncim/*.vcd
+system.mk
+hardware/src/system.v
+hardware/testbench/system_tb.v
+
+hardware/simulation/icarus/*
+!hardware/simulation/icarus/Makefile
 
 hardware/fpga/CYCLONEV-GT-DK/synth_system.sof
 
@@ -34,6 +38,8 @@ document/presentation/*
 !document/presentation/main.pdf
 !document/presentation/main.tex
 !document/presentation/Makefile
+document/pb/xil_results.tex
+document/pb/alt_results.tex
 
 test.log
 noise_floor.txt
@@ -41,3 +47,13 @@ submodules/FSK_DEMOD/*.hex
 submodules/FSK_DEMOD/params.m
 submodules/FSK_DEMOD/noise_floor.txt
 submodules/MIXER/hardware/include/noise_floor.txt
+
+hardware/fpga/CYCLONEV-GT-DK/boot.hex
+hardware/fpga/CYCLONEV-GT-DK/firmware.hex
+hardware/fpga/CYCLONEV-GT-DK/firmware_0.hex
+hardware/fpga/CYCLONEV-GT-DK/firmware_1.hex
+hardware/fpga/CYCLONEV-GT-DK/firmware_2.hex
+hardware/fpga/CYCLONEV-GT-DK/firmware_3.hex
+hardware/fpga/CYCLONEV-GT-DK/system.v
+hardware/fpga/CYCLONEV-GT-DK/top_system.sof
+hardware/fpga/CYCLONEV-GT-DK/top_system.fit.summary

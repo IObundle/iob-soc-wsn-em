@@ -1,5 +1,5 @@
 `timescale 1ns/1ps
-`include "header.vh"
+`include "lpf.vh"
 
 module lpf (
 	    input                     clk,

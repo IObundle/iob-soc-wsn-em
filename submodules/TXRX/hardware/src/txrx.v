@@ -1,5 +1,5 @@
 `timescale 1ns/1ps
-`include "header.vh"
+`include "txrx.vh"
 
 module txrx (
              input                    clk,

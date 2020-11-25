@@ -1,5 +1,5 @@
 `timescale 1ns/1ps
-`include "header.vh"
+`include "iref.vh"
 
 module iref (
 	    input                    clk,
