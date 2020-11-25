@@ -30,8 +30,8 @@ OUTPUT_FILES:=*.txt
 run: sim self-checker
 
 self-checker:
-	python3 $(ADPLL_PY_DIR)/self-checker.py 0 $(FREQ_CHANNEL) SoC0
-	python3 $(ADPLL_PY_DIR)/self-checker.py 0 $(FREQ_CHANNEL)-1 SoC1
+	python3 $(ADPLL_PY_DIR)/self-checker.py 0 $(FREQ_CHANNEL) soc0
+	python3 $(ADPLL_PY_DIR)/self-checker.py 0 $(FREQ_CHANNEL)-1 soc1
 
 #RULES
 #create testbench
