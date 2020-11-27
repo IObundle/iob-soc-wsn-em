@@ -12,4 +12,4 @@ pa_mem_map.h
 SRC+=$(PA_SW_DIR)/*.c
 
 pa_mem_map.h:
-	sed -n 's/`PA_ADDR_W//p' $(PA_INC_DIR)/header.vh | sed 's/`/#/g' | sed "s/('d//g" | sed 's/)//g' > ./$@
+	sed -n 's/`PA_ADDR_W//p' $(PA_INC_DIR)/pa.vh | sed 's/`/#/g' | sed "s/('d//g" | sed 's/)//g' > ./$@

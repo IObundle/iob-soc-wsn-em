@@ -12,4 +12,4 @@ txrx_mem_map.h
 SRC+=$(TXRX_SW_DIR)/*.c
 
 txrx_mem_map.h:
-	sed -n 's/`TXRX_ADDR_W//p' $(TXRX_INC_DIR)/header.vh | sed 's/`/#/g' | sed "s/('d//g" | sed 's/)//g' > ./$@
+	sed -n 's/`TXRX_ADDR_W//p' $(TXRX_INC_DIR)/txrx.vh | sed 's/`/#/g' | sed "s/('d//g" | sed 's/)//g' > ./$@
