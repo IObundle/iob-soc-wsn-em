@@ -111,9 +111,6 @@ DOC_TYPE ?=pb
 ASIC_NODE:=umc130
 ASIC_SERVER:=micro7.lx.it.pt
 ASIC_COMPILE_ROOT_DIR=$(ROOT_DIR)/sandbox/iob-soc-wsn-em
-LOCAL_ASIC_LIST=micro7.lx.it.pt #leave space in the end
-
-HOSTNAME ?=$(ASIC_SERVER)
 
 ifeq ($(SIM_USER),)
 	ASIC_USER=user19

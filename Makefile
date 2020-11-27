@@ -215,7 +215,7 @@ asic: asic-clean
 	make -C $(FIRM_DIR) run BAUD=$(HW_BAUD)
 	make -C $(BOOT_DIR) run BAUD=$(HW_BAUD)
 	make -C $(SUBMODULES_DIR)/FSK_DEMOD demod_coeffs
-ifeq ($(HOSTNAME),$(filter $(HOSTNAME), $(LOCAL_ASIC_LIST)))
+ifeq ($(shell hostname), $(ASIC_SERVER))
 	make -C $(ASIC_DIR) INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) ASIC=1
 else
 	ssh $(ASIC_USER)@$(ASIC_SERVER) "if [ ! -d $(REMOTE_ROOT_DIR) ]; then mkdir -p $(REMOTE_ROOT_DIR); fi"
@@ -226,7 +226,7 @@ endif
 
 asic-clean: sw-clean hex-clean
 	make -C $(ASIC_DIR) clean
-ifneq ($(HOSTNAME),$(filter $(HOSTNAME), $(LOCAL_ASIC_LIST)))
+ifneq ($(shell hostname), $(ASIC_SERVER))
 	rsync -avz --exclude .git $(ROOT_DIR) $(ASIC_USER)@$(ASIC_SERVER):$(REMOTE_ROOT_DIR)
 	ssh $(ASIC_USER)@$(ASIC_SERVER) 'if [ -d $(REMOTE_ROOT_DIR) ]; then cd $(REMOTE_ROOT_DIR); make -C $(ASIC_DIR) clean; fi'
 endif
