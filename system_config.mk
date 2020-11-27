@@ -111,12 +111,7 @@ DOC_TYPE ?=pb
 ASIC_NODE:=umc130
 ASIC_SERVER:=micro7.lx.it.pt
 ASIC_COMPILE_ROOT_DIR=$(ROOT_DIR)/sandbox/iob-soc-wsn-em
-
-ifeq ($(SIM_USER),)
-	ASIC_USER=user19
-else
-	ASIC_USER=$(SIM_USER)
-endif
+#ASIC_USER=
 
 
 #############################################################
