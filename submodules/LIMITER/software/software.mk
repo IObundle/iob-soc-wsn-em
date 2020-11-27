@@ -12,4 +12,4 @@ limiter_mem_map.h
 SRC+=$(LIMITER_SW_DIR)/*.c
 
 limiter_mem_map.h:
-	sed -n 's/`LIMITER_ADDR_W//p' $(LIMITER_INC_DIR)/header.vh | sed 's/`/#/g' | sed "s/('d//g" | sed 's/)//g' > ./$@
+	sed -n 's/`LIMITER_ADDR_W//p' $(LIMITER_INC_DIR)/limiter.vh | sed 's/`/#/g' | sed "s/('d//g" | sed 's/)//g' > ./$@

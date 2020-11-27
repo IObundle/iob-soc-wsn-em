@@ -12,4 +12,4 @@ id_mem_map.h
 SRC+=$(ID_SW_DIR)/*.c
 
 id_mem_map.h:
-	sed -n 's/`ID_ADDR_W//p' $(ID_INC_DIR)/header.vh | sed 's/`/#/g' | sed "s/('d//g" | sed 's/)//g' > ./$@
+	sed -n 's/`ID_ADDR_W//p' $(ID_INC_DIR)/id.vh | sed 's/`/#/g' | sed "s/('d//g" | sed 's/)//g' > ./$@

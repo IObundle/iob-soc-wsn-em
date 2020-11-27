@@ -12,4 +12,4 @@ lpf_mem_map.h
 SRC+=$(LPF_SW_DIR)/*.c
 
 lpf_mem_map.h:
-	sed -n 's/`LPF_ADDR_W//p' $(LPF_INC_DIR)/header.vh | sed 's/`/#/g' | sed "s/('d//g" | sed 's/)//g' > ./$@
+	sed -n 's/`LPF_ADDR_W//p' $(LPF_INC_DIR)/lpf.vh | sed 's/`/#/g' | sed "s/('d//g" | sed 's/)//g' > ./$@

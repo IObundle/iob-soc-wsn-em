@@ -12,4 +12,4 @@ iref_mem_map.h
 SRC+=$(IREF_SW_DIR)/*.c
 
 iref_mem_map.h:
-	sed -n 's/`IREF_ADDR_W//p' $(IREF_INC_DIR)/header.vh | sed 's/`/#/g' | sed "s/('d//g" | sed 's/)//g' > ./$@
+	sed -n 's/`IREF_ADDR_W//p' $(IREF_INC_DIR)/iref.vh | sed 's/`/#/g' | sed "s/('d//g" | sed 's/)//g' > ./$@

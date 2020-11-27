@@ -12,4 +12,4 @@ mixer_mem_map.h
 SRC+=$(MIXER_SW_DIR)/*.c
 
 mixer_mem_map.h:
-	sed -n 's/`MIXER_ADDR_W//p' $(MIXER_INC_DIR)/header.vh | sed 's/`/#/g' | sed "s/('d//g" | sed 's/)//g' > ./$@
+	sed -n 's/`MIXER_ADDR_W//p' $(MIXER_INC_DIR)/mixer.vh | sed 's/`/#/g' | sed "s/('d//g" | sed 's/)//g' > ./$@
