@@ -140,7 +140,7 @@ TEX_DIR=$(UART_DIR)/submodules/TEX
 
 #submodule paths
 SUBMODULES_DIR:=$(ROOT_DIR)/submodules
-SUBMODULES=CPU CACHE $(PERIPHERALS)
+SUBMODULES=CPU MEM AXIMEM $(PERIPHERALS)
 $(foreach p, $(SUBMODULES), $(eval $p_DIR:=$(SUBMODULES_DIR)/$p))
 
 #defmacros

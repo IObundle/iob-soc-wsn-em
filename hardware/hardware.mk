@@ -13,14 +13,14 @@ endif
 #rom
 ifneq ($(ASIC),1)
 SUBMODULES+=SPROM
-SPROM_DIR:=$(CACHE_DIR)/submodules/MEM/sp_rom
+SPROM_DIR:=$(MEM_DIR)/sp_rom
 VSRC+=$(SPROM_DIR)/sp_rom.v
 endif
 
 #ram
 ifneq ($(ASIC),1)
 SUBMODULES+=TDPRAM
-TDPRAM_DIR:=$(CACHE_DIR)/submodules/MEM/tdp_ram
+TDPRAM_DIR:=$(MEM_DIR)/tdp_ram
 VSRC+=$(TDPRAM_DIR)/iob_tdp_ram.v
 endif
 
