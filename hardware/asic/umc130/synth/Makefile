@@ -14,19 +14,21 @@ run: rom ram $(VHDR) $(VSRC) demod_coeffs
 	$(RTL_COMPILER) && echo "quit" | rc -files inc.tcl -files defs.tcl -files vsrc.tcl -files synscript.tcl
 	echo "quit"
 
-rom: memw_dir
+rom: gen_mem
 	$(PYTHON_DIR)/memwrapper_make.py fsc0l_d sp $(MEM_SIZE_ROM) 32 1 > $(MEMW_DIR)/rom.v
 
-ram: memw_dir
+ram: gen_mem
 	$(PYTHON_DIR)/memwrapper_make.py fsc0l_d sh $(MEM_SIZE_RAM) 8 4 1 > $(MEMW_DIR)/ram.v
 
-memw_dir:
+gen_mem:
+	make -C ../memory
 	cp $(SW_DIR)/system.h .
 	rm -fR $(MEMW_DIR)
 	mkdir $(MEMW_DIR)
 
 clean:
-	@rm -rf $(MEMW_DIR) *~ *.hex *.txt rc.cmd* rc.* fv libscore_work *.sdc *.v *.h *.lib
+	make -C ../memory clean
+	@rm -rf $(MEMW_DIR) *~ *.hex *.txt rc.cmd* rc.* fv libscore_work *.sdc *.v *.h *.lib *.db
 	@find *.tcl -type f -not -name synscript.tcl -not -name powscript.tcl -delete
 
-.PHONY: run rom ram memw_dir clean
+.PHONY: run rom ram gen_mem clean
