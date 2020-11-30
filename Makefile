@@ -224,6 +224,28 @@ else
 	scp $(ASIC_USER)@$(ASIC_SERVER):$(REMOTE_ROOT_DIR)/$(ASIC_DIR)/synth/*.txt $(ASIC_DIR)/synth
 endif
 
+asic-mem:
+	make -C $(FIRM_DIR) run BAUD=$(HW_BAUD)
+	make -C $(BOOT_DIR) run BAUD=$(HW_BAUD)
+ifeq ($(shell hostname), $(ASIC_SERVER))
+	make -C $(ASIC_DIR) mem INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) ASIC=1
+else
+	ssh $(ASIC_USER)@$(ASIC_SERVER) "if [ ! -d $(REMOTE_ROOT_DIR) ]; then mkdir -p $(REMOTE_ROOT_DIR); fi"
+	rsync -avz --exclude .git $(ROOT_DIR) $(ASIC_USER)@$(ASIC_SERVER):$(REMOTE_ROOT_DIR)
+	ssh -Y -C $(ASIC_USER)@$(ASIC_SERVER) 'cd $(REMOTE_ROOT_DIR); make -C $(ASIC_DIR) mem INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) ASIC=1'
+endif
+
+asic-synth:
+	make -C $(SUBMODULES_DIR)/FSK_DEMOD demod_coeffs
+ifeq ($(shell hostname), $(ASIC_SERVER))
+	make -C $(ASIC_DIR) synth INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) ASIC=1
+else
+	ssh $(ASIC_USER)@$(ASIC_SERVER) "if [ ! -d $(REMOTE_ROOT_DIR) ]; then mkdir -p $(REMOTE_ROOT_DIR); fi"
+	rsync -avz --exclude .git $(ROOT_DIR) $(ASIC_USER)@$(ASIC_SERVER):$(REMOTE_ROOT_DIR)
+	ssh -Y -C $(ASIC_USER)@$(ASIC_SERVER) 'cd $(REMOTE_ROOT_DIR); make -C $(ASIC_DIR) synth INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) ASIC=1'
+	scp $(ASIC_USER)@$(ASIC_SERVER):$(REMOTE_ROOT_DIR)/$(ASIC_DIR)/synth/*.txt $(ASIC_DIR)/synth
+endif
+
 asic-clean: sw-clean hex-clean
 	make -C $(ASIC_DIR) clean
 ifneq ($(shell hostname), $(ASIC_SERVER))
@@ -236,12 +258,12 @@ endif
 clean-all: sim-clean fpga-clean asic-clean board-clean doc-clean
 
 .PHONY: sim sim-waves sim-clean \
-	fpga  fpga-clean fpga-clean-ip \
-	board-load board-run board-clean\
+	fpga fpga-clean fpga-clean-ip \
+	board-load board-run board-clean \
 	firmware firmware-clean bootloader bootloader-clean sw-clean \
 	console console-clean \
 	hex-clean \
-	doc doc-clean doc-pdfclean\
+	doc doc-clean doc-pdfclean \
 	test test-all-simulators test-simulator test-all-boards test-board test-board-config \
-	asic asic-clean \
+	asic asic-mem asic-synth asic-clean \
 	all clean-all
