@@ -9,9 +9,12 @@ synth:
 pr:
 	make -C pr run
 
+sim:
+	make -C sim run
+
 clean:
 	make -C memory clean
 	make -C synth clean
 #	make -C pr clean
 
-.PHONY: all mem synth pr clean
+.PHONY: all mem synth pr sim clean
