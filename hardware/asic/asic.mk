@@ -1,12 +1,12 @@
 include $(ROOT_DIR)/hardware/hardware.mk
 
-MEMORY_DIR=$(ASIC_DIR)/memory
+MEMORIES_DIR=$(ASIC_DIR)/memory
 SYNTH_DIR=$(ASIC_DIR)/synth
 PR_DIR=$(ASIC_DIR)/pr
 
 MEMW_DIR=$(HW_DIR)/src/wrapper
-ROM_DIR=$(MEMORY_DIR)/bootrom
-RAM_DIR=$(MEMORY_DIR)/sram
+ROM_DIR=$(MEMORIES_DIR)/bootrom
+RAM_DIR=$(MEMORIES_DIR)/sram
 
 CASE=TC
 

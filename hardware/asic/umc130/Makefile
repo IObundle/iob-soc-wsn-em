@@ -16,5 +16,6 @@ clean:
 	make -C memory clean
 	make -C synth clean
 #	make -C pr clean
+	make -C sim clean
 
 .PHONY: all mem synth pr sim clean
