@@ -80,7 +80,7 @@ demod_coeffs:
 	mv $(FSK_DEMOD_DIR)/*.hex .
 
 noise_floor:
-	cp $(FSK_DEMOD_DIR)/noise_floor.txt $(MIXER_INC_DIR)
+	cp $(FSK_DEMOD_DIR)/noise_floor.txt .
 
 #clean general hardware files
 hw-clean: gen-clean
