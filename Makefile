@@ -249,7 +249,7 @@ endif
 asic-sim-synth:
 	make -C $(FIRM_DIR) run BAUD=$(HW_BAUD)
 	make -C $(SUBMODULES_DIR)/FSK_DEMOD demod_coeffs
-	make -C $(FIRM_DIR) run BAUD=$(HW_BAUD)
+	make -C $(SUBMODULES_DIR)/FSK_DEMOD noise_floor.txt
 ifeq ($(shell hostname), $(ASIC_SERVER))
 	make -C $(ASIC_DIR) sim INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD) BAUD=$(HW_BAUD) SYNTH=1
 else
