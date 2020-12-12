@@ -91,9 +91,14 @@ if type == "SH":
     print "   wire ["+str(bits*bytes-1)+":0] wdata = i_valid? i_wdata: d_wdata;"
     print "   wire ["+str(bytes-1)+":0] wstrb = i_valid? i_wstrb: d_wstrb;"
     print "   wire ["+str(bits*bytes-1)+":0] rdata;"
+    print "   wire ["+str(bytes-1)+":0] wstrb_int = ~wstrb;"
+    print "   wire oe = 1'b1; //valid & ~(|wstrb);"
     print "   assign i_rdata = rdata;"
     print "   assign d_rdata = rdata;"
     print ""
+
+if type == "SP":
+    print "   wire oe = 1'b1; //r_en;"
 
 #
 # instantiate generated mem
@@ -113,14 +118,14 @@ if type == "SH":
     for i in range(bits*bytes):
         print "    .DI"+str(i)+"(wdata["+str(i)+"]),"
     for i in range(bytes):
-        print "    .WEB"+str(i)+"(wstrb["+str(i)+"]),"
+        print "    .WEB"+str(i)+"(wstrb_int["+str(i)+"]),"
     print "    .CS(valid),"
-    print "    .OE(valid & ~(|wstrb)),"
+    print "    .OE(oe),"
 elif type == "SP":
     for i in range(bits):
         print "    .DO"+str(i)+"(rdata["+str(i)+"]),"
     print "    .CS(r_en),"
-    print "    .OE(r_en),"
+    print "    .OE(oe),"
 
 for i in range(words):
     print "    .A"+str(i)+"(addr["+str(i)+"]),"
