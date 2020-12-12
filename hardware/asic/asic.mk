@@ -8,7 +8,7 @@ MEMW_DIR=$(HW_DIR)/src/wrapper
 ROM_DIR=$(MEMORIES_DIR)/bootrom
 RAM_DIR=$(MEMORIES_DIR)/sram
 
-CASE=TC
+CASE=WC
 
 # Memory sizes in log2
 MEM_SIZE_ROM:=$(shell echo '$(BOOTROM_ADDR_W)-2' | bc)

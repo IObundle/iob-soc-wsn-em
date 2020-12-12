@@ -5,6 +5,11 @@ incdir:=-incdir
 
 include ../../asic.mk
 
+#vcd dump
+ifeq ($(VCD),1)
+DEFINE+=$(defmacro)VCD
+endif
+
 ifeq ($(SYNTH),1)
 SYSTEM_FILE=$(SYNTH_DIR)/system_synth.v
 endif
@@ -93,7 +98,7 @@ SFLAGS = -errormax 15 -status -CMDFILE $(ROOT_DIR)/hardware/testbench
 export VSRC CFLAGS EFLAGS SFLAGS 
 
 #simulate
-sim: $(VSRC) $(VHDR) firmware demod_coeffs noise_floor
+sim: $(VSRC) $(VHDR) firmware boot.hex demod_coeffs noise_floor
 	./run_ncsim.sh
 	grep -v xcelium xmsim.log | grep -v xmsim $(LOG)
 
