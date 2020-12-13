@@ -149,7 +149,7 @@ module mixer_tb
      // $display("Power_signal_dBm = %f",Power_signal_dBm);
      // $display("Ampl = %f",Ampl);
       
-      fp_noise = $fopen("../../../submodules/MIXER/hardware/include/noise_floor.txt","r");
+      fp_noise = $fopen("noise_floor.txt","r");
       if (!fp_noise)begin
 	 $display("Could not open \"noise_floor.txt\"");
 	 $fclose(fp_noise);

@@ -111,11 +111,12 @@ module rx (
 
    //assign crc_valid = (crc_out == 24'd0 && aa_found) ? 1'b1: 1'b0;
 
-   always @*
-     if(rst|start)
-       crc_valid = 1'b0;
+   wire                 rst_crc_valid_reg = rst|start;
+   always @(posedge clk, posedge rst_crc_valid_reg)
+     if(rst_crc_valid_reg)
+       crc_valid <= 1'b0;
      else if (crc_out == 24'd0 && aa_found)
-       crc_valid = 1'b1;
+       crc_valid <= 1'b1;
 
    reg [`NB_PKG_W-1:0] counter;
    wire en_cnt = (counter == 0)? 1'b0 : 1'b1;

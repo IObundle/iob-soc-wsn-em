@@ -1,10 +1,14 @@
 include $(ROOT_DIR)/hardware/hardware.mk
 
-MEMW_DIR=$(HW_DIR)/src/wrapper
-ROM_DIR=$(ASIC_DIR)/memory/bootrom
-RAM_DIR=$(ASIC_DIR)/memory/sram
+MEMORIES_DIR=$(ASIC_DIR)/memory
+SYNTH_DIR=$(ASIC_DIR)/synth
+PR_DIR=$(ASIC_DIR)/pr
 
-CASE=TC
+MEMW_DIR=$(HW_DIR)/src/wrapper
+ROM_DIR=$(MEMORIES_DIR)/bootrom
+RAM_DIR=$(MEMORIES_DIR)/sram
+
+CASE=WC
 
 # Memory sizes in log2
 MEM_SIZE_ROM:=$(shell echo '$(BOOTROM_ADDR_W)-2' | bc)
