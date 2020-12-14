@@ -10,6 +10,10 @@ ifeq ($(VCD),1)
 DEFINE+=$(defmacro)VCD
 endif
 
+ifeq ($(DBG),1)
+DEFINE+=$(defmacro)DBG
+endif
+
 ifeq ($(SYNTH),1)
 SYSTEM_FILE=$(SYNTH_DIR)/system_synth.v
 endif
@@ -20,8 +24,8 @@ endif
 
 #SOURCES
 VSRC+=system_asic.v \
-$(wildcard $(ROM_DIR)/*.v) \
-$(wildcard $(RAM_DIR)/*.v)
+$(wildcard $(ROM_DIR)/SP*.v) \
+$(wildcard $(RAM_DIR)/SH*.v)
 #ddr memory
 VSRC+=$(AXIMEM_DIR)/rtl/axi_ram.v
 #testbench
@@ -33,8 +37,12 @@ $(ADPLL_TB_SVSRC)
 run: sim self-checker
 
 self-checker:
+ifeq ($(DBG),1)
 	python3 $(ADPLL_PY_DIR)/self-checker.py 0 $(FREQ_CHANNEL) soc0
 	python3 $(ADPLL_PY_DIR)/self-checker.py 0 $(FREQ_CHANNEL)-1 soc1
+else
+	@echo "Debug flag is disabled! To run self-checker, please enable DBG flag and re-run simulation."
+endif
 
 #RULES
 system_asic.v: $(SYSTEM_FILE)

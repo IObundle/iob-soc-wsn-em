@@ -10,6 +10,10 @@ ifeq ($(VCD),1)
 DEFINE+=$(defmacro)VCD
 endif
 
+ifeq ($(DBG),1)
+DEFINE+=$(defmacro)DBG
+endif
+
 
 include $(ROOT_DIR)/hardware/hardware.mk
 
@@ -30,8 +34,12 @@ OUTPUT_FILES:=*.txt
 run: sim self-checker
 
 self-checker:
+ifeq ($(DBG),1)
 	python3 $(ADPLL_PY_DIR)/self-checker.py 0 $(FREQ_CHANNEL) soc0
 	python3 $(ADPLL_PY_DIR)/self-checker.py 0 $(FREQ_CHANNEL)-1 soc1
+else
+	@echo "Debug flag is disabled! To run self-checker, please enable DBG flag and re-run simulation."
+endif
 
 #RULES
 #create testbench
