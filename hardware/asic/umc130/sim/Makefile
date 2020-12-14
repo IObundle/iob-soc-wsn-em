@@ -20,8 +20,8 @@ endif
 
 #SOURCES
 VSRC+=system_asic.v \
-$(wildcard $(ROM_DIR)/*.v) \
-$(wildcard $(RAM_DIR)/*.v)
+$(wildcard $(ROM_DIR)/SP*.v) \
+$(wildcard $(RAM_DIR)/SH*.v)
 #ddr memory
 VSRC+=$(AXIMEM_DIR)/rtl/axi_ram.v
 #testbench
