@@ -28,6 +28,11 @@ software/firmware/*
 !software/firmware/firmware.S
 !software/firmware/Makefile
 
+software/ble/*
+!software/ble/ble.c
+!software/ble/ble.h
+!software/ble/ble.mk
+
 software/console/*
 !software/console/console.c
 !software/console/console.h
