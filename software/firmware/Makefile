@@ -10,6 +10,12 @@ CFLAGS+=--specs=nano.specs -Wl,-Bstatic,-T,../template.lds,-Map,firmware.map,--s
 DEFINE+=$(defmacro)LONGLONG
 DEFINE+=$(defmacro)FLOAT
 
+ifeq ($(RX_MODE),1)
+DEFINE+=$(defmacro)BLE_MODE=$(RX)
+else
+DEFINE+=$(defmacro)BLE_MODE=$(TX)
+endif
+
 #SUBMODULES
 
 #cache

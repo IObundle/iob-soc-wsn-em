@@ -17,7 +17,7 @@ include ./system.mk
 
 pc-emul: system.mk
 	make -C software/pc-emul run
-	
+
 pc-clean:
 	make -C software/pc-emul clean
 
@@ -27,7 +27,7 @@ pc-clean:
 #
 
 sim: sim-clean
-	make -C $(FIRM_DIR) run BAUD=$(SIM_BAUD)
+	make -C $(FIRM_DIR) run BAUD=$(SIM_BAUD) RX_MODE=$(RX_MODE)
 	make -C $(BOOT_DIR) run BAUD=$(SIM_BAUD)
 	make -C $(SUBMODULES_DIR)/FSK_DEMOD demod_coeffs
 	make -C $(SUBMODULES_DIR)/FSK_DEMOD noise_floor.txt
@@ -236,7 +236,6 @@ else
 endif
 
 asic-mem:
-	make -C $(FIRM_DIR) run BAUD=$(HW_BAUD)
 	make -C $(BOOT_DIR) run BAUD=$(HW_BAUD)
 ifeq ($(shell hostname), $(ASIC_SERVER))
 	make -C $(ASIC_DIR) mem INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) ASIC=1
@@ -258,7 +257,7 @@ else
 endif
 
 asic-sim-synth:
-	make -C $(FIRM_DIR) run BAUD=$(HW_BAUD)
+	make -C $(FIRM_DIR) run BAUD=$(HW_BAUD) RX_MODE=$(RX_MODE)
 	make -C $(SUBMODULES_DIR)/FSK_DEMOD demod_coeffs
 	make -C $(SUBMODULES_DIR)/FSK_DEMOD noise_floor.txt
 ifeq ($(shell hostname), $(ASIC_SERVER))
