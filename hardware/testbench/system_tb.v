@@ -24,7 +24,7 @@ module system_tb;
 `ifdef VCD
       $dumpfile("system.vcd");
       //$dumpvars(2,soc0, soc1, soc0.uut.txrx0, soc1.uut.txrx0);
-      $dumpvars(2, soc0.uut.txrx0, soc0.uut.int_mem0, soc0.uut.cpu);
+      $dumpvars(2, soc0.uut.txrx0, soc0.uut.txrx0.fsk_demod0, soc0.uut.txrx0.rx0, soc0.uut.int_mem0, soc0.uut.cpu);
       //$dumpvars();
 `endif
 

@@ -56,17 +56,17 @@ fsk_demod: demod_coeffs noise_floor.txt
 	./a.out
 
 demod_coeffs:
-	echo "L=$(L1); L_W=$(L1_W); C_W=$(C_W); COEFF_FILE='fir1.hex';" > params.m
+	echo "L=$(L1); L_W=$(L1_W); C_W=$(C_W); COEFF_FILE='fir1coeffs.v';" > params.m
 	octave-cli $(IOB_FIR_M)
-	echo "L=$(L2); L_W=$(L2_W); C_W=$(C_W); COEFF_FILE='fir2.hex';" > params.m
+	echo "L=$(L2); L_W=$(L2_W); C_W=$(C_W); COEFF_FILE='fir2coeffs.v';" > params.m
 	octave-cli $(IOB_FIR_M)
-	echo "L=$(L3); L_W=$(L3_W); C_W=$(C_W); COEFF_FILE='fir3.hex';" > params.m
+	echo "L=$(L3); L_W=$(L3_W); C_W=$(C_W); COEFF_FILE='fir3coeffs.v';" > params.m
 	octave-cli $(IOB_FIR_M)
 
 noise_floor.txt: $(OCT_DIR)/noise_gen.m
 	octave $(OCT_DIR)/noise_gen.m
 
 clean:
-	@rm -f  *~ *.vcd \#*\# a.out params.m *.hex
+	@rm -f  *~ *.vcd \#*\# a.out params.m *.v
 
 .PHONY: fsk_demod demod_coeffs clean

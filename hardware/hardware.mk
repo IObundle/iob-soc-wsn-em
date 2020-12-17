@@ -77,7 +77,7 @@ boot.hex: $(BOOT_DIR)/boot.bin
 	$(PYTHON_DIR)/makehex.py $(BOOT_DIR)/boot.bin $(BOOTROM_ADDR_W) > boot.hex
 
 demod_coeffs:
-	mv $(FSK_DEMOD_DIR)/*.hex .
+	mv $(FSK_DEMOD_DIR)/*.v .
 
 noise_floor:
 	cp $(FSK_DEMOD_DIR)/noise_floor.txt .
