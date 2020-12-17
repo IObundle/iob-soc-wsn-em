@@ -31,7 +31,7 @@ module fsk_demod (
              .DATA_IN_W(`I1_W),
              .DATA_OUT_W(`O1_W),
              .COEFF_W(`C1_W),
-             .COEFF_FILE("fir1.hex"),
+             .COEFF_FILE("fir1coeffs.v"),
              .LENGTH(`L1),
              .LENGTH_W(`L1_W)
              )
@@ -53,7 +53,7 @@ module fsk_demod (
              .DATA_IN_W(`O1_W),
              .DATA_OUT_W(`O2_W),
              .COEFF_W(`C2_W),
-             .COEFF_FILE("fir2.hex"),
+             .COEFF_FILE("fir2coeffs.v"),
              .LENGTH(`L2),
              .LENGTH_W(`L2_W)
              )
@@ -73,7 +73,7 @@ module fsk_demod (
              .DATA_IN_W(`O2_W),
              .DATA_OUT_W(`O3_W),
              .COEFF_W(`C3_W),
-             .COEFF_FILE("fir3.hex"),
+             .COEFF_FILE("fir3coeffs.v"),
              .LENGTH(`L3),
              .LENGTH_W(`L3_W)
              )

@@ -17,7 +17,7 @@ char ble_send_on(void);
 char ble_off(void);
 
 // Receive data
-char ble_receive(char *buffer);
+char ble_receive(char *buffer, char size);
 
 // Send data
 char ble_send(char *buffer, char size);

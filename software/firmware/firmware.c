@@ -77,7 +77,7 @@ int main() {
     for (i = 0; i < size; i++) {
       buffer[i] = 0;
     }
-    char nbytes = ble_receive(buffer);
+    char nbytes = ble_receive(buffer, size);
 
     ble_off();
 
