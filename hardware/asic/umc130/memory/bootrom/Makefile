@@ -21,6 +21,7 @@ fix-lef:
 
 fix-sim-model:
 	sed -i -E 's/(parameter *ROMCODE *= \").*(\";)/\1boot.hex\2/g' *.v
+	sed -i -E "s/(readmemh\(ROMCODE,Memory)/\1,0,Words-1/g" *.v
 
 clean:
 	@find . -type f -not -name Makefile -delete

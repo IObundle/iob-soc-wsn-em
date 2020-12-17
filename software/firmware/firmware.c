@@ -32,7 +32,11 @@ int main() {
   // Init BLE
   ble_init();
 
+#if (MODE == RX)
+  if (get_id()) { // Sender
+#else // MODE == TX
   if (!get_id()) { // Sender
+#endif
     // Configure ADPLL
     ble_config(FREQ_CHANNEL, ADPLL_OPERATION);
 
