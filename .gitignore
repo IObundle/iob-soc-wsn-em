@@ -28,6 +28,11 @@ software/firmware/*
 !software/firmware/firmware.S
 !software/firmware/Makefile
 
+software/ble/*
+!software/ble/ble.c
+!software/ble/ble.h
+!software/ble/ble.mk
+
 software/console/*
 !software/console/console.c
 !software/console/console.h
@@ -44,7 +49,7 @@ document/pb/alt_results.tex
 
 test.log
 noise_floor.txt
-submodules/FSK_DEMOD/*.hex
+submodules/FSK_DEMOD/*.v
 submodules/FSK_DEMOD/params.m
 submodules/FSK_DEMOD/noise_floor.txt
 

@@ -32,7 +32,11 @@ int main() {
   // Init BLE
   ble_init();
 
+#if (MODE == RX)
+  if (get_id()) { // Sender
+#else // MODE == TX
   if (!get_id()) { // Sender
+#endif
     // Configure ADPLL
     ble_config(FREQ_CHANNEL, ADPLL_OPERATION);
 
@@ -77,7 +81,7 @@ int main() {
     for (i = 0; i < size; i++) {
       buffer[i] = 0;
     }
-    char nbytes = ble_receive(buffer);
+    char nbytes = ble_receive(buffer, size);
 
     ble_off();
 

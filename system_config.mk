@@ -46,7 +46,7 @@ VCD ?=0
 #set according to SIMULATOR
 ifeq ($(SIMULATOR),ncsim)
 	SIM_SERVER ?=micro7.lx.it.pt
-	SIM_USER ?=user19
+	SIM_USER ?=$(USER)
 endif
 
 #simulator used in testing
@@ -111,7 +111,7 @@ DOC_TYPE ?=pb
 ASIC_NODE:=umc130
 ASIC_SERVER:=micro7.lx.it.pt
 ASIC_COMPILE_ROOT_DIR=$(ROOT_DIR)/sandbox/iob-soc-wsn-em
-#ASIC_USER=
+ASIC_USER ?=$(USER)
 
 
 #############################################################

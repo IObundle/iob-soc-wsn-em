@@ -10,6 +10,10 @@ ifeq ($(VCD),1)
 DEFINE+=$(defmacro)VCD
 endif
 
+ifeq ($(DBG),1)
+DEFINE+=$(defmacro)DBG
+endif
+
 ifeq ($(SYNTH),1)
 SYSTEM_FILE=$(SYNTH_DIR)/system_synth.v
 endif
@@ -20,8 +24,8 @@ endif
 
 #SOURCES
 VSRC+=system_asic.v \
-$(wildcard $(ROM_DIR)/*.v) \
-$(wildcard $(RAM_DIR)/*.v)
+$(wildcard $(ROM_DIR)/SP*.v) \
+$(wildcard $(RAM_DIR)/SH*.v)
 #ddr memory
 VSRC+=$(AXIMEM_DIR)/rtl/axi_ram.v
 #testbench
@@ -33,8 +37,12 @@ $(ADPLL_TB_SVSRC)
 run: sim self-checker
 
 self-checker:
+ifeq ($(DBG),1)
 	python3 $(ADPLL_PY_DIR)/self-checker.py 0 $(FREQ_CHANNEL) soc0
 	python3 $(ADPLL_PY_DIR)/self-checker.py 0 $(FREQ_CHANNEL)-1 soc1
+else
+	@echo "Warning: DBG flag is disabled! To run self-checker, please re-run simulation with DBG flag enabled."
+endif
 
 #RULES
 system_asic.v: $(SYSTEM_FILE)
@@ -50,6 +58,7 @@ system_asic.v: $(SYSTEM_FILE)
 	sed -i 's/ lpf(/ lpf_asic(/g;s/ lpf / lpf_asic /g' $@
 	sed -i 's/ mixer(/ mixer_asic(/g;s/ mixer / mixer_asic /g' $@
 	sed -i 's/ pa(/ pa_asic(/g;s/ pa / pa_asic /g' $@
+	sed -i 's/ timer_core(/ timer_core_asic(/g;s/ timer_core / timer_core_asic /g' $@
 	sed -i 's/ iob_timer(/ iob_timer_asic(/g;s/ iob_timer / iob_timer_asic /g' $@
 	sed -i 's/ fsk_demod(/ fsk_demod_asic(/g;s/ fsk_demod / fsk_demod_asic /g' $@
 	sed -i 's/ aa_find(/ aa_find_asic(/g;s/ aa_find / aa_find_asic /g' $@

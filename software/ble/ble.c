@@ -205,15 +205,17 @@ char ble_off(void) {
   return ret;
 }
 
-char ble_receive(char *buffer) {
+char ble_receive(char *buffer, char size) {
   char nbytes = -1;
 
   if (on == RX) {
     nbytes = 0;
 
     if (rx_crc_valid()) {
-      while (!rx_empty()) {
-        buffer[nbytes++] = receive();
+      if (nbytes < size) {
+        while (!rx_empty()) {
+          buffer[nbytes++] = receive();
+        }
       }
     }
 

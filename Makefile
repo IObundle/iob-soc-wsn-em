@@ -12,11 +12,22 @@ system.mk: system_config.mk
 include ./system.mk
 
 #
+# PC
+#
+
+pc-emul: system.mk
+	make -C software/pc-emul run
+
+pc-clean:
+	make -C software/pc-emul clean
+
+
+#
 # SIMULATE
 #
 
 sim: sim-clean
-	make -C $(FIRM_DIR) run BAUD=$(SIM_BAUD)
+	make -C $(FIRM_DIR) run BAUD=$(SIM_BAUD) MODE=$(MODE)
 	make -C $(BOOT_DIR) run BAUD=$(SIM_BAUD)
 	make -C $(SUBMODULES_DIR)/FSK_DEMOD demod_coeffs
 	make -C $(SUBMODULES_DIR)/FSK_DEMOD noise_floor.txt
@@ -25,7 +36,7 @@ ifeq ($(SIMULATOR),$(filter $(SIMULATOR), $(LOCAL_SIM_LIST)))
 else
 	ssh $(SIM_USER)@$(SIM_SERVER) "if [ ! -d $(REMOTE_ROOT_DIR) ]; then mkdir -p $(REMOTE_ROOT_DIR); fi"
 	rsync -avz --exclude .git $(ROOT_DIR) $(SIM_USER)@$(SIM_SERVER):$(REMOTE_ROOT_DIR)
-	ssh $(SIM_USER)@$(SIM_SERVER) 'cd $(REMOTE_ROOT_DIR); make -C $(SIM_DIR) run INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD) BAUD=$(SIM_BAUD)'
+	ssh $(SIM_USER)@$(SIM_SERVER) 'cd $(REMOTE_ROOT_DIR); make -C $(SIM_DIR) run INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD) DBG=$(DBG) BAUD=$(SIM_BAUD)'
 ifeq ($(TEST_LOG),1)
 	scp $(SIM_USER)@$(SIM_SERVER):$(REMOTE_ROOT_DIR)/$(SIM_DIR)/test.log $(SIM_DIR)
 endif
@@ -225,7 +236,6 @@ else
 endif
 
 asic-mem:
-	make -C $(FIRM_DIR) run BAUD=$(HW_BAUD)
 	make -C $(BOOT_DIR) run BAUD=$(HW_BAUD)
 ifeq ($(shell hostname), $(ASIC_SERVER))
 	make -C $(ASIC_DIR) mem INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) ASIC=1
@@ -246,16 +256,17 @@ else
 	scp $(ASIC_USER)@$(ASIC_SERVER):$(REMOTE_ROOT_DIR)/$(ASIC_DIR)/synth/*.txt $(ASIC_DIR)/synth
 endif
 
-asic-sim-synth:
-	make -C $(FIRM_DIR) run BAUD=$(HW_BAUD)
+asic-sim-synth: sw-clean
+	make -C $(FIRM_DIR) run BAUD=$(SIM_BAUD) MODE=$(MODE)
+	make -C $(BOOT_DIR) run BAUD=$(SIM_BAUD)
 	make -C $(SUBMODULES_DIR)/FSK_DEMOD demod_coeffs
 	make -C $(SUBMODULES_DIR)/FSK_DEMOD noise_floor.txt
 ifeq ($(shell hostname), $(ASIC_SERVER))
-	make -C $(ASIC_DIR) sim INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD) BAUD=$(HW_BAUD) SYNTH=1
+	make -C $(ASIC_DIR) sim INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD) DBG=$(DBG) BAUD=$(SIM_BAUD) SYNTH=1
 else
 	ssh $(ASIC_USER)@$(ASIC_SERVER) "if [ ! -d $(REMOTE_ROOT_DIR) ]; then mkdir -p $(REMOTE_ROOT_DIR); fi"
 	rsync -avz --exclude .git $(ROOT_DIR) $(ASIC_USER)@$(ASIC_SERVER):$(REMOTE_ROOT_DIR)
-	ssh -Y -C $(ASIC_USER)@$(ASIC_SERVER) 'cd $(REMOTE_ROOT_DIR); make -C $(ASIC_DIR) sim INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD) BAUD=$(HW_BAUD) SYNTH=1'
+	ssh -Y -C $(ASIC_USER)@$(ASIC_SERVER) 'cd $(REMOTE_ROOT_DIR); make -C $(ASIC_DIR) sim INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD) DBG=$(DBG) BAUD=$(SIM_BAUD) SYNTH=1'
 ifeq ($(VCD),1)
 	scp $(ASIC_USER)@$(ASIC_SERVER):$(REMOTE_ROOT_DIR)/$(ASIC_DIR)/*.vcd $(ASIC_DIR)
 endif
@@ -272,7 +283,8 @@ endif
 # CLEAN ALL
 clean-all: sim-clean fpga-clean asic-clean board-clean doc-clean
 
-.PHONY: sim sim-waves sim-clean \
+.PHONY: pc-emul pc-clean \
+	sim sim-waves sim-clean \
 	fpga fpga-clean fpga-clean-ip \
 	board-load board-run board-clean \
 	firmware firmware-clean bootloader bootloader-clean sw-clean \
