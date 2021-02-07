@@ -20,10 +20,10 @@ USE_DDR ?=0
 RUN_DDR ?=0
 
 #CACHE DATA SIZE (LOG2)
-CACHE_ADDR_W:=24
+DCACHE_ADDR_W:=24
 
 #ROM SIZE (LOG2)
-BOOTROM_ADDR_W:=12
+BOOTROM_ADDR_W:=11
 
 #PRE-INIT MEMORY WITH PROGRAM AND DATA
 INIT_MEM ?=1
@@ -96,22 +96,18 @@ BOARD_LIST ?=CYCLONEV-GT-DK AES-KU040-DB-G
 REMOTE_ROOT_DIR ?=sandbox/iob-soc-wsn-em
 
 #
-# DOCUMENTATION
-#
-
-#DOC_TYPE
-#must match subdirectory name in directory document
-
-#DOC_TYPE:=presentation
-DOC_TYPE ?=pb
-
-#
 # ASIC COMPILE (WIP)
 #
 ASIC_NODE:=umc130
 ASIC_SERVER:=micro7.lx.it.pt
 ASIC_COMPILE_ROOT_DIR=$(ROOT_DIR)/sandbox/iob-soc-wsn-em
 ASIC_USER ?=$(USER)
+
+#
+#SOFTWARE COMPILATION
+#
+
+USE_COMPRESSED ?=1
 
 
 #############################################################
@@ -135,7 +131,6 @@ BOOT_DIR:=$(SW_DIR)/bootloader
 CONSOLE_DIR:=$(SW_DIR)/console
 PYTHON_DIR:=$(SW_DIR)/python
 
-DOC_DIR:=$(ROOT_DIR)/document/$(DOC_TYPE)
 TEX_DIR=$(UART_DIR)/submodules/TEX
 
 #submodule paths
@@ -147,7 +142,7 @@ $(foreach p, $(SUBMODULES), $(eval $p_DIR:=$(SUBMODULES_DIR)/$p))
 DEFINE+=$(defmacro)BOOTROM_ADDR_W=$(BOOTROM_ADDR_W)
 DEFINE+=$(defmacro)SRAM_ADDR_W=$(SRAM_ADDR_W)
 DEFINE+=$(defmacro)FIRM_ADDR_W=$(FIRM_ADDR_W)
-DEFINE+=$(defmacro)CACHE_ADDR_W=$(CACHE_ADDR_W)
+DEFINE+=$(defmacro)DCACHE_ADDR_W=$(DCACHE_ADDR_W)
 
 ifeq ($(USE_DDR),1)
 DEFINE+=$(defmacro)USE_DDR
@@ -185,6 +180,11 @@ ifeq ($(FREQ),)
 DEFINE+=$(defmacro)FREQ=32000000
 else
 DEFINE+=$(defmacro)FREQ=$(FREQ)
+endif
+
+#use compressed instructions
+ifeq ($(USE_COMPRESSED),1)
+DEFINE+=$(defmacro)USE_COMPRESSED
 endif
 
 #create periph serial number

@@ -5,7 +5,8 @@ include ../software.mk
 CFLAGS=-Os -Wl,--strip-debug
 
 
-DEFINE+=-DLONGLONG -DPC
+#DEFINE+=-DLONGLONG 
+DEFINE+=-DPC
 
 #SUBMODULES
 
@@ -16,7 +17,7 @@ $(foreach p, $(PERIPHERALS), $(eval include $(SUBMODULES_DIR)/$p/software/pc/pc.
 HDR+=periphs.h
 
 #SOURCES
-SRC+= $(FIRM_DIR)/firmware.c
+SRC+= $(FIRM_DIR)/firmware.c $(UART_DIR)/software/printf.c $(UART_DIR)/software/uart_io.c
 
 #RULES
 run: firmware.out
@@ -34,6 +35,6 @@ periphs_tmp.h:
 	$(foreach p, $(PERIPHERALS), $(shell echo "#define $p_BASE (1<<$P) |($p<<($P-N_SLAVES_W))" >> $@) )
 
 clean:
-	@rm -rf firmware.out ../periphs.h
+	@rm -rf firmware.out periphs.h
 
 .PHONY: run clean subs periphs_tmp.h

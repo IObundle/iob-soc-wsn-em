@@ -17,6 +17,7 @@ hardware/simulation/ncsim/*
 !hardware/simulation/ncsim/run_ncsim.sh
 
 software/periphs.h
+software/pc-emul/periphs.h
 
 software/bootloader/*
 !software/bootloader/boot.c
@@ -40,9 +41,9 @@ software/console/*
 
 document/presentation/*
 !document/presentation/figures
-!document/presentation/bibfile.bib
-!document/presentation/main.pdf
-!document/presentation/main.tex
+!document/presentation/presentation.bib
+!document/presentation/presentation.pdf
+!document/presentation/presentation.tex
 !document/presentation/Makefile
 document/pb/xil_results.tex
 document/pb/alt_results.tex

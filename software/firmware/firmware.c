@@ -4,6 +4,7 @@
 
 #include "iob-uart.h"
 #include "iob_timer.h"
+#include "printf.h"
 
 #include "id.h"
 
@@ -100,8 +101,8 @@ int main() {
   elapsed  = timer_get_count();
   elapsedu = timer_time_us();
 
-  uart_printf("\nExecution time: %d clocks in %dus @%dMHz\n\n",
-              (unsigned int)elapsed, elapsedu, FREQ/1000000);
+  printf_("\nExecution time: %d clocks in %dus @%dMHz\n\n",
+          (unsigned int)elapsed, elapsedu, FREQ/1000000);
 
   return 0;
 }
