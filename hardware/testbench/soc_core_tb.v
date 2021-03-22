@@ -175,7 +175,7 @@ module soc_tb
 	       .m_axi_rready  (ddr_rready),	
 `endif               
 	       .clk           (clk),
-	       .reset         (reset),
+	       .rst           (reset),
 	       .trap          (trap)
 	       );
 

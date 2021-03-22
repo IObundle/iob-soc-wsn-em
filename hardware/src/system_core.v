@@ -63,7 +63,7 @@ module system
    output                   m_axi_rready,
 `endif //  `ifdef USE_DDR
    input                    clk,
-   input                    reset,
+   input                    rst,
    output                   trap
    );
 
@@ -73,6 +73,19 @@ module system
    //
    // SYSTEM RESET
    //
+
+   // Sync reset
+   reg                      reset;
+   reg                      reset_int;
+   always @(posedge clk) begin
+      if (rst) begin
+         reset_int <= 1'b1;
+         reset <= 1'b1;
+      end else begin
+         reset_int <= 1'b0;
+         reset <= reset_int;
+      end
+   end
 
    wire                      boot;
    wire                      boot_reset;   
