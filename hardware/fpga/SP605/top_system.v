@@ -40,7 +40,7 @@ module top_system (
    //
    system system (
         	  .clk           (clk),
-		  .reset         (reset_int),
+		  .rst           (reset_int),
 		  .trap          (trap),
 
                   //UART

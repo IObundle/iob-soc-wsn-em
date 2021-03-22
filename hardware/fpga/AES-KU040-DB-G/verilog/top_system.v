@@ -393,7 +393,7 @@ module top_system(
    system system 
      (
       .clk           (sys_clk),
-      .reset         (sys_rst),
+      .rst           (sys_rst),
       .trap          (trap),
 
 `ifdef USE_DDR
