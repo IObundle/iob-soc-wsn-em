@@ -2,7 +2,7 @@ ROOT_DIR:=../../../../..
 include ../../../asic.mk
 
 # include Faraday memory compiler
-MEMAKER_SRC:=source /opt/ic_tools/init/init-memaker-20100111-130LL
+MEMAKER_SRC:=source /opt/ic_tools/init/init-memaker-20210111-130LL
 
 # memory compilation flags
 SRAM_WORDS:=$(shell echo '2^($(SRAM_ADDR_W)-2)' | bc)
