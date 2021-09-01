@@ -111,11 +111,16 @@ ifeq ($(BOARD),$(filter $(BOARD), $(LOCAL_BOARD_LIST)))
 else
 	ssh $(BOARD_USER)@$(BOARD_SERVER) 'if [ ! -d $(REMOTE_ROOT_DIR) ]; then mkdir -p $(REMOTE_ROOT_DIR); fi'
 	rsync -avz --exclude .git $(ROOT_DIR) $(BOARD_SERVER):$(REMOTE_ROOT_DIR)
-	ssh $(BOARD_USER)@$(BOARD_SERVER) 'cd $(REMOTE_ROOT_DIR); make -C $(CONSOLE_DIR) run INIT_MEM=$(INIT_MEM) TEST_LOG=$(TEST_LOG) BAUD=$(HW_BAUD)  BOARD=$(BOARD)'
+	bash -c "trap 'make kill-remote-console' EXIT; ssh $(BOARD_USER)@$(BOARD_SERVER) 'cd $(REMOTE_ROOT_DIR); make -C $(CONSOLE_DIR) run INIT_MEM=$(INIT_MEM) TEST_LOG=$(TEST_LOG) BAUD=$(HW_BAUD)  BOARD=$(BOARD)'"
 ifneq ($(TEST_LOG),)
 	scp $(BOARD_SERVER):$(REMOTE_ROOT_DIR)/$(CONSOLE_DIR)/test.log $(CONSOLE_DIR)/test.log
 endif
 endif
+
+kill-remote-console:
+	@echo "INFO: Remote console will be killed; ignore following errors"
+	ssh $(BOARD_USER)@$(BOARD_SERVER) 'cd $(REMOTE_ROOT_DIR); kill -9 `pgrep -a console`'
+
 
 board_clean: system.mk
 ifeq ($(BOARD),$(filter $(BOARD), $(LOCAL_BOARD_LIST)))
@@ -157,13 +162,16 @@ hex-clean:
 #
 
 doc: system.mk
-	make -C document/$(DOC_TYPE) $(DOC_TYPE).pdf
+	make -C document/pb pb.pdf
+	make -C document/presentation presentation.pdf
 
 doc-clean: system.mk
-	make -C document/$(DOC_TYPE) clean
+	make -C document/pb clean
+	make -C document/presentation clean
 
 doc-pdfclean: system.mk
-	make -C document/$(DOC_TYPE) pdfclean
+	make -C document/pb pdfclean
+	make -C document/presentation pdfclean
 
 
 #

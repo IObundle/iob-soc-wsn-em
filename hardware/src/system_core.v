@@ -63,7 +63,7 @@ module system
    output                   m_axi_rready,
 `endif //  `ifdef USE_DDR
    input                    clk,
-   input                    reset,
+   input                    rst,
    output                   trap
    );
 
@@ -73,6 +73,19 @@ module system
    //
    // SYSTEM RESET
    //
+
+   // Sync reset
+   reg                      reset;
+   reg                      reset_int;
+   always @(posedge clk) begin
+      if (rst) begin
+         reset_int <= 1'b1;
+         reset <= 1'b1;
+      end else begin
+         reset_int <= 1'b0;
+         reset <= reset_int;
+      end
+   end
 
    wire                      boot;
    wire                      boot_reset;   
@@ -256,7 +269,7 @@ module system
       .i_resp               (ext_mem_i_resp),
  `endif
       //data bus
-      .d_req                ({ext_mem_d_req[`valid(0)], ext_mem_d_req[`address(0, `CACHE_ADDR_W+1)-2], ext_mem_d_req[`write(0)]}),
+      .d_req                ({ext_mem_d_req[`valid(0)], ext_mem_d_req[`address(0, `DCACHE_ADDR_W+1)-2], ext_mem_d_req[`write(0)]}),
       .d_resp               (ext_mem_d_resp),
 
       //AXI INTERFACE 
