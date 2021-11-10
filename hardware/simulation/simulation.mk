@@ -53,8 +53,8 @@ run: sim self-checker
 
 self-checker:
 ifeq ($(DBG),1)
-	python3 $(ADPLL_PY_DIR)/self-checker.py 0 $(FREQ_CHANNEL) soc0
-	python3 $(ADPLL_PY_DIR)/self-checker.py 0 $(FREQ_CHANNEL)-1 soc1
+	$(ADPLL_PY_DIR)/self-checker.py -f $(FREQ_CHANNEL) -s soc0
+	$(ADPLL_PY_DIR)/self-checker.py -f $(FREQ_CHANNEL)-1 -s soc1
 else
 	@echo "Warning: DBG flag is disabled! To run self-checker, please re-run simulation with DBG flag enabled."
 endif
