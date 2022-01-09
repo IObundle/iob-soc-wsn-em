@@ -4,9 +4,6 @@
 [submodule "submodules/FIR"]
 	path = submodules/FIR
 	url = git@github.com:IObundle/iob-fir.git
-[submodule "submodules/ADPLL"]
-	path = submodules/ADPLL
-	url = git@bitbucket.org:Marco_P/adpll_rtl_wsn.git
 [submodule "submodules/CPU"]
 	path = submodules/CPU
 	url = git@github.com:IObundle/iob-picorv32.git
@@ -20,3 +17,6 @@
 [submodule "AXIMEM"]
 	path = submodules/AXIMEM
 	url = git@github.com:IObundle/verilog-axi.git
+[submodule "submodules/ADPLL"]
+	path = submodules/ADPLL
+	url = git@github.com:IObundle/adpll.git
