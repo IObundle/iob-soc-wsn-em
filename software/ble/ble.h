@@ -1,3 +1,31 @@
+//#include "stdlib.h"
+#include "system.h"
+#include "periphs.h"
+
+#include "iob-uart.h"
+#include "iob_timer.h"
+#include "printf.h"
+
+#include "adpll.h"
+#include "pa.h"
+#include "mixer.h"
+#include "lpf.h"
+#include "limiter.h"
+#include "txrx.h"
+#include "iref.h"
+
+// Access Address length is 4 bytes
+#define AA_LEN 4
+
+// PDU's Header length is 2 bytes
+#define PDU_H_LEN 2
+
+// CRC sequence length is 3 bytes
+#define CRC_LEN 3
+
+// Packet type 0b0000 - An SN is looking to connect with the BS for the first time
+#define ADV_IND 0
+
 // Init BLE modules
 void ble_init(void);
 
