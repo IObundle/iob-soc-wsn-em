@@ -6,6 +6,16 @@ pkg load signal
 pkg load statistics
 %% Creates a .txt file containing the noise floor
 
+% Enables plots
+show_plots = 0;
+
+arg_list = argv ();
+for i = 1:nargin
+  if (arg_list{i} == "-show-plots")
+    show_plots = 1;
+  end
+end
+
 % Sampling frequency
 fs = 100e6;
 
@@ -41,7 +51,9 @@ fclose(fileID);
 xout = Ampl;
 
 %--------------------- FFT --------------------------------
+if (show_plots == 1)
 figure
+end
 
 m = [2^(nextpow2(length(xout))-1)]; #vector with number of points
 
@@ -59,6 +71,7 @@ psdx(2:end-1) = 2*psdx(2:end-1);
 
 freq = 0:fs/N:fs/2;
 
+if (show_plots == 1)
 subplot(2,1,i)
 
 plot(freq,10*log10(psdx))
@@ -72,6 +85,7 @@ xlabel('Frequency [Hz]', 'FontSize', 24)
 ylabel('PSD [V**2/Hz]', 'FontSize', 24)
 
 grid on
+end
 
 %semilogx(freq,10*log10(psdx))
 
