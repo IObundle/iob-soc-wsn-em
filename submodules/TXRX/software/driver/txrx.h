@@ -45,6 +45,12 @@ int rx_data(void);
 // Set DEMOD enable
 void demod_set_en(char value);
 
+// Get Access Address status
+int get_status_aa(void);
+
+// Get busy/free status
+int get_status_busy(void);
+
 // Send data
 #define send(value) tx_set_data(value)
 

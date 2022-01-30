@@ -16,6 +16,8 @@
 `define RX_EMPTY     (`TXRX_ADDR_W'd11) // read
 `define RX_DATA      (`TXRX_ADDR_W'd12) // read
 `define DEMOD_EN     (`TXRX_ADDR_W'd13) // write
+`define STATUS_AA    (`TXRX_ADDR_W'd14) // read
+`define STATUS_BUSY  (`TXRX_ADDR_W'd15) // read
 
 `define CH_IDX_W 6
 

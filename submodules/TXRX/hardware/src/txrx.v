@@ -47,6 +47,7 @@ module txrx (
    reg 				      tx_en;
    reg 				      demod_en;
    reg [`NB_PKG_W-1:0]    rx_nb_pkg;
+   reg [7:0]	status_reg;	
 
    // Read
    always @*
@@ -56,6 +57,8 @@ module txrx (
        `RX_AA_FOUND: rdata = {31'b0, rx_aa_found};
        `RX_CRC_VALID: rdata = {31'b0, rx_crc_valid};
        `TX_READY: rdata = {31'b0,tx_ready};
+       `STATUS_AA: rdata = {31'b0,status_reg[0]}; 
+       `STATUS_BUSY: rdata = {27'b0,status_reg[4],4'b0};       
        default: rdata = 32'hFFFFFFFF;
      endcase
 
@@ -82,6 +85,19 @@ module txrx (
          `DEMOD_EN: demod_en <= wdata[0];
          default: ;
        endcase
+       
+   // Status register
+   // status_reg[0]: if AA==AA_init then 0 otherwise 1
+   // status_reg[4]: busy/free status
+   // other bits: reserved
+   always @(posedge clk, posedge rst)
+      if (rst) begin
+         status_reg[7:1] <= 7'b0;
+         if (aa == `ACCESSADDRESS) status_reg[0] <= 1'b0;
+	 else status_reg[0] <= 1'b1;			
+      end else 
+          if (aa == `ACCESSADDRESS) status_reg[0] <= 1'b0;
+	  else status_reg[0] <= 1'b1;  				    
 
    reg tx_start_reg;
    reg rx_start_reg;

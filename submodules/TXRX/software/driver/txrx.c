@@ -69,3 +69,12 @@ void demod_set_en(char value) {
   IO_SET(txrx, DEMOD_EN, (int)value);
 }
 
+// Get Access Address status
+int get_status_aa(void){
+  return (IO_GET(txrx, STATUS_AA));
+}
+
+// Get busy/free status
+int get_status_busy(void){
+   return (IO_GET(txrx, STATUS_BUSY));
+}

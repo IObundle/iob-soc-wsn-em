@@ -7,10 +7,13 @@ int main() {
   unsigned long long elapsed;
   unsigned int elapsedu;
 
-  int i, d=1, sn_connect=0, bs_connect=0;
-  int pdu_size=0; // PDU size
-  char buffer[PDU_H_LEN+N_BYTES+CRC_LEN]; // PDU + CRC
-
+  int sn_tx_connect=0, bs_rx_connect=0;
+  int pdu_size_1=PDU_H_LEN+AA_LEN;         	// PDU size - SN Advertising - First time connection
+  char buffer[PDU_H_LEN+N_BYTES+CRC_LEN]; 	// PDU + CRC
+  unsigned int aa_init=0x8E89BED6;         	// Initial Access Address
+   
+  //while (1) { // Run with non-stop - to be uncommented, its position might be changed 
+  
   // Init ID
   id_init(ID_BASE);
 
@@ -24,13 +27,18 @@ int main() {
   // Init BLE
   ble_init();
 
-  if(d==1) { // will be replaced by another condition
- 	sn_connect=1;   // SN Advertising - First time connection
-	bs_connect=1;   // BS Scanning - Connect with an SN for the first time
-	pdu_size=PDU_H_LEN+AA_LEN; 
-  } else { 
-  	sn_connect=0;	
-	bs_connect=0;
+  if (get_id()==0) { // SN
+	if(!get_status_aa()){ // The initial AA has not been changed
+		sn_tx_connect=1;   // Advertising - First time connection		
+	} else {
+		sn_tx_connect=0;
+	}			
+  } else if (get_id()==1){ // BS
+	if(!get_status_busy()){ // BS is free
+		bs_rx_connect=1;   // Scanning
+	} else {
+		bs_rx_connect=0;
+	}	
   }
 
   // Assumptions
@@ -41,7 +49,7 @@ int main() {
 #else // MODE == TX
   if (!get_id()) { // Sender
 #endif
-    	switch(sn_connect) {
+    	switch(sn_tx_connect) {
 		case 1: // SN Advertising - First time connection 	
 		    // Configure ADPLL
 		    ble_config(FREQ_CHANNEL, ADPLL_OPERATION);   // Frequency to be changed
@@ -50,16 +58,17 @@ int main() {
 		    ble_send_on();
 
 		    // Build PDU = Header + Payload
+		    // Sending Packet's type only might be enough - to be discussed
 		    // PDU's Header
-		    buffer[0] = ADV_IND;
-		    buffer[1] = AA_LEN; 
+		    buffer[0] = ADV_IND; buffer[1] = AA_LEN; 
 		    
-		    // PDU's Payload
-	            for (i = 2; i < pdu_size+2 ; i++) {  // will be replaced by AA
-	    	    	buffer[i] = 2*(i+1);
-		    }
+		    // PDU's Payload = Initial AA
+		    for (int i = pdu_size_1-1 ; i >= 2 ; i--) {  
+		        buffer[i] = aa_init & 0xff;
+			aa_init >>= 8;
+		    }	
 
-		    ble_send(buffer, pdu_size);
+		    ble_send(buffer, pdu_size_1);
 
 		    // Wait for transmisstion
 		    unsigned int start_time = timer_time_us();
@@ -69,17 +78,17 @@ int main() {
 
 		    // Print buffer
 		    uart_printf("\nsend:\n");
-		    for (i = 0; i < pdu_size; i++) {
+		    for (int i = 0; i < pdu_size_1; i++) {
 	            	uart_printf("buffer[%d] = %d\n", i, buffer[i]);
 		    }
 		    break;
 		default: printf("SN default"); // will be changed	    
 	}
   } else { // Receiver
-    	switch(bs_connect) { 
+    	switch(bs_rx_connect) { 
     		case 1: // BS Scanning - Connect with an SN for the first time
 		    // Payload
-    		    ble_payload(pdu_size);
+    		    ble_payload(pdu_size_1);
 
     		    // Configure ADPLL
        		    ble_config((FREQ_CHANNEL-1.0F), ADPLL_OPERATION);
@@ -92,11 +101,11 @@ int main() {
     		    while ((timer_time_us() - start_time) < (unsigned int)10000);
 
     		    // Receive data
-    		    pdu_size += CRC_LEN;
-    		    for (i = 0; i < pdu_size; i++) {
+    		    pdu_size_1 += CRC_LEN;
+    		    for (int i = 0; i < pdu_size_1; i++) {
       			buffer[i] = 0;
     		    }
-    		    char nbytes = ble_receive(buffer, pdu_size);
+    		    char nbytes = ble_receive(buffer, pdu_size_1);
 
     		    ble_off();
 
@@ -106,7 +115,7 @@ int main() {
 
     		    // Print buffer
     		    uart_printf("\nreceived %d bytes:\n", nbytes);
-    		    for (i = 0; i < pdu_size; i++) {
+    		    for (int i = 0; i < pdu_size_1; i++) {
       			uart_printf("buffer[%d] = %d\n", i, buffer[i]);
     		    }
 		    break;
@@ -121,5 +130,7 @@ int main() {
   printf_("\nExecution time: %d clocks in %dus @%dMHz\n\n",
           (unsigned int)elapsed, elapsedu, FREQ/1000000);
 
+  //} // End of while(1)
+  
   return 0;
 }
