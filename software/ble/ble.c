@@ -1,5 +1,10 @@
+#include "system.h"
+#include "periphs.h"
+
 #include "iob-uart.h"
 #include "iob_timer.h"
+#include "printf.h"
+
 #include "adpll.h"
 #include "pa.h"
 #include "mixer.h"
