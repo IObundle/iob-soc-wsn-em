@@ -32,6 +32,8 @@ software/firmware/*
 software/ble/*
 !software/ble/ble.c
 !software/ble/ble.h
+!software/ble/def.h
+!software/ble/fct.c
 !software/ble/ble.mk
 
 software/console/*
