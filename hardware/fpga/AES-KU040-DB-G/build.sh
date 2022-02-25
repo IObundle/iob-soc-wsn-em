@@ -1,4 +1,5 @@
 #!/usr/bin/bash
+set -e
 export XILINXPATH=/opt/Xilinx
 export LM_LICENSE_FILE=$LM_LICENSE_FILE:$XILINXPATH/Xilinx.lic
 source /opt/Xilinx/Vivado/settings64.sh
