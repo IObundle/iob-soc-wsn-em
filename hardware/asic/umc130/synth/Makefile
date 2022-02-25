@@ -9,6 +9,7 @@ VSRC+=$(MEMW_DIR)/rom.v $(MEMW_DIR)/ram.v
 run: memw_dir demod_coeffs system_synth.v
 
 system_synth.v: $(VHDR) $(VSRC)
+	@rm -f rc.*
 	echo "set INCLUDE [list $(INCLUDE)]" > inc.tcl
 	echo "set DEFINE [list $(DEFINE)]" > defs.tcl
 	echo "set VSRC [glob $(VSRC)]" > vsrc.tcl
@@ -28,7 +29,7 @@ memw_dir:
 	mkdir $(MEMW_DIR)
 
 clean:
-	@rm -rf $(MEMW_DIR) *~ *.hex *.txt rc.cmd* rc.* fv libscore_work *.sdc *.v *.h *.lib *.db
+	@rm -rf $(MEMW_DIR) *~ *.hex *.rpt rc.cmd* rc.* fv libscore_work *.sdc *.v *.h *.lib *.db
 	@find *.tcl -type f -not -name synscript.tcl -not -name powscript.tcl -delete
 
 .PHONY: run memw_dir clean
