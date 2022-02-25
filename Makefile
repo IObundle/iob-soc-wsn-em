@@ -36,7 +36,7 @@ ifeq ($(SIMULATOR),$(filter $(SIMULATOR), $(LOCAL_SIM_LIST)))
 else
 	ssh $(SIM_USER)@$(SIM_SERVER) "if [ ! -d $(REMOTE_ROOT_DIR) ]; then mkdir -p $(REMOTE_ROOT_DIR); fi"
 	rsync -avz --exclude .git $(ROOT_DIR) $(SIM_USER)@$(SIM_SERVER):$(REMOTE_ROOT_DIR)
-	ssh $(SIM_USER)@$(SIM_SERVER) 'cd $(REMOTE_ROOT_DIR); make -C $(SIM_DIR) run INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD) DBG=$(DBG) BAUD=$(SIM_BAUD)'
+	bash -c "trap 'make kill-remote-sim' INT TERM KILL; ssh $(SIM_USER)@$(SIM_SERVER) 'cd $(REMOTE_ROOT_DIR); make -C $(SIM_DIR) run INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD) DBG=$(DBG) BAUD=$(SIM_BAUD)'"
 ifeq ($(TEST_LOG),1)
 	scp $(SIM_USER)@$(SIM_SERVER):$(REMOTE_ROOT_DIR)/$(SIM_DIR)/test.log $(SIM_DIR)
 endif
@@ -47,6 +47,10 @@ endif
 
 sim-waves: $(SIM_DIR)/../waves.gtkw $(SIM_DIR)/system.vcd
 	gtkwave -a $^ &
+
+kill-remote-sim:
+	@echo "INFO: Remote simulator will be killed; ignore following errors"
+	ssh $(SIM_USER)@$(SIM_SERVER) 'cd $(REMOTE_ROOT_DIR); killall -q -u $(SIM_USER) -9 a.out; killall -q -u $(SIM_USER) -9 xmsim'
 
 $(SIM_DIR)/../waves.gtkw $(SIM_DIR)/system.vcd:
 	make sim INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) VCD=$(VCD)
@@ -111,7 +115,7 @@ ifeq ($(BOARD),$(filter $(BOARD), $(LOCAL_BOARD_LIST)))
 else
 	ssh $(BOARD_USER)@$(BOARD_SERVER) 'if [ ! -d $(REMOTE_ROOT_DIR) ]; then mkdir -p $(REMOTE_ROOT_DIR); fi'
 	rsync -avz --exclude .git $(ROOT_DIR) $(BOARD_SERVER):$(REMOTE_ROOT_DIR)
-	bash -c "trap 'make kill-remote-console' EXIT; ssh $(BOARD_USER)@$(BOARD_SERVER) 'cd $(REMOTE_ROOT_DIR); make -C $(CONSOLE_DIR) run INIT_MEM=$(INIT_MEM) TEST_LOG=$(TEST_LOG) BAUD=$(HW_BAUD)  BOARD=$(BOARD)'"
+	bash -c "trap 'make kill-remote-console' INT TERM KILL; ssh $(BOARD_USER)@$(BOARD_SERVER) 'cd $(REMOTE_ROOT_DIR); make -C $(CONSOLE_DIR) run INIT_MEM=$(INIT_MEM) TEST_LOG=$(TEST_LOG) BAUD=$(HW_BAUD)  BOARD=$(BOARD)'"
 ifneq ($(TEST_LOG),)
 	scp $(BOARD_SERVER):$(REMOTE_ROOT_DIR)/$(CONSOLE_DIR)/test.log $(CONSOLE_DIR)/test.log
 endif
@@ -119,7 +123,7 @@ endif
 
 kill-remote-console:
 	@echo "INFO: Remote console will be killed; ignore following errors"
-	ssh $(BOARD_USER)@$(BOARD_SERVER) 'cd $(REMOTE_ROOT_DIR); kill -9 `pgrep -a console`'
+	ssh $(BOARD_USER)@$(BOARD_SERVER) 'cd $(REMOTE_ROOT_DIR); killall -q -u $(BOARD_USER) -9 console'
 
 
 board_clean: system.mk
@@ -276,11 +280,15 @@ ifeq ($(shell hostname), $(ASIC_SERVER))
 else
 	ssh $(ASIC_USER)@$(ASIC_SERVER) "if [ ! -d $(REMOTE_ROOT_DIR) ]; then mkdir -p $(REMOTE_ROOT_DIR); fi"
 	rsync -avz --exclude .git $(ROOT_DIR) $(ASIC_USER)@$(ASIC_SERVER):$(REMOTE_ROOT_DIR)
-	ssh -Y -C $(ASIC_USER)@$(ASIC_SERVER) 'cd $(REMOTE_ROOT_DIR); make -C $(ASIC_DIR) sim INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD) DBG=$(DBG) BAUD=$(SIM_BAUD) SYNTH=1'
+	bash -c "trap 'make kill-remote-asic-sim' INT TERM KILL; ssh -Y -C $(ASIC_USER)@$(ASIC_SERVER) 'cd $(REMOTE_ROOT_DIR); make -C $(ASIC_DIR) sim INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD) DBG=$(DBG) BAUD=$(SIM_BAUD) SYNTH=1'"
 ifeq ($(VCD),1)
 	scp $(ASIC_USER)@$(ASIC_SERVER):$(REMOTE_ROOT_DIR)/$(ASIC_DIR)/*.vcd $(ASIC_DIR)
 endif
 endif
+
+kill-remote-asic-sim:
+	@echo "INFO: Remote simulator will be killed; ignore following errors"
+	ssh $(ASIC_USER)@$(ASIC_SERVER) 'cd $(REMOTE_ROOT_DIR); killall -q -u $(ASIC_USER) -9 xmsim'
 
 asic-clean: sw-clean hex-clean
 	make -C $(ASIC_DIR) clean
@@ -294,13 +302,13 @@ endif
 clean-all: sim-clean fpga-clean asic-clean board-clean doc-clean
 
 .PHONY: pc-emul pc-clean \
-	sim sim-waves sim-clean \
+	sim sim-waves kill-remote-sim sim-clean \
 	fpga fpga-clean fpga-clean-ip \
-	board-load board-run board-clean \
+	board-load board-run kill-remote-console board-clean \
 	firmware firmware-clean bootloader bootloader-clean sw-clean \
 	console console-clean \
 	hex-clean \
 	doc doc-clean doc-pdfclean \
 	test test-all-simulators test-simulator test-all-boards test-board test-board-config \
-	asic asic-mem asic-synth asic-sim-synth asic-clean \
+	asic asic-mem asic-synth asic-sim-synth kill-remote-asic-sim asic-clean \
 	all clean-all
