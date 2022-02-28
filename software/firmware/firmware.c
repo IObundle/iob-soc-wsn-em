@@ -159,12 +159,13 @@ int main() {
 
   	      ble_off();
       
-	      uart_printf("\nSN TX sent: %d bytes/ADV_IND on advertising channel (index, frequency) =(%d, %dMHz)\n", pdu_size, sn_adv_ch_idx, sn_ch_freq);		
-	      printf_("\nPDU_Type = %d\nRFU_1 = %d\nTxAdd = %d\nRxAdd = %d\nLength= %d\nRFU_2 = %d\nAdvA  = %#"PRIx64"\nAdvData = %#x\n", \
+	      uart_printf("\nSN TX sent: %d bytes/ADV_IND on advertising channel (index, frequency) =(%d, %dMHz)\n", pdu_size, sn_adv_ch_idx, sn_ch_freq);		  
+			
+	      printf_("\nPDU_Type = %d\nRFU_1 = %d\nTxAdd = %d\nRxAdd = %d\nLength= %d\nRFU_2 = %d\nAdvA  = %#llx\nAdvData = %#x\n", \
 			sn_tx_adv_ind_pdu.pdu_adv_ind_h.PDU_Type, sn_tx_adv_ind_pdu.pdu_adv_ind_h.RFU_1, \
 		   	sn_tx_adv_ind_pdu.pdu_adv_ind_h.TxAdd, sn_tx_adv_ind_pdu.pdu_adv_ind_h.RxAdd, \
 			sn_tx_adv_ind_pdu.pdu_adv_ind_h.Length, sn_tx_adv_ind_pdu.pdu_adv_ind_h.RFU_2, \
-			sn_tx_adv_ind_pdu.pdu_adv_ind_payload.AdvA, sn_tx_adv_ind_pdu.pdu_adv_ind_payload.AdvData);      
+			sn_tx_adv_ind_pdu.pdu_adv_ind_payload.AdvA, sn_tx_adv_ind_pdu.pdu_adv_ind_payload.AdvData);      			
 	      
 	      free(buffer_tx); pdu_size=0;
 	      sn.nextState=MODE_SN_RX_CONNECT_REQ; bs.nextState=0;  	      	       	      
@@ -310,13 +311,13 @@ int main() {
 	      if (nbytes == pdu_size) { // There is data in the rx buffer
   	      	   for (int i = 0; i < pdu_size - CRC_LEN; i++) {
 		  	((unsigned char *)&bs_rx_adv_ind_pdu)[i] = buffer_rx[i];
-  	      	   }           
-	           
-	           printf_("\nPDU_Type = %d\nRFU_1 = %d\nTxAdd = %d\nRxAdd = %d\nLength= %d\nRFU_2 = %d\nAdvA  = %#"PRIx64"\nAdvData = %#x\n", \
+  	      	   }           	           
+			
+	           printf_("\nPDU_Type = %d\nRFU_1 = %d\nTxAdd = %d\nRxAdd = %d\nLength= %d\nRFU_2 = %d\nAdvA  = %#llx\nAdvData = %#x\n", \
 			bs_rx_adv_ind_pdu.pdu_adv_ind_h.PDU_Type, bs_rx_adv_ind_pdu.pdu_adv_ind_h.RFU_1, \
 		   	bs_rx_adv_ind_pdu.pdu_adv_ind_h.TxAdd, bs_rx_adv_ind_pdu.pdu_adv_ind_h.RxAdd, \
 			bs_rx_adv_ind_pdu.pdu_adv_ind_h.Length, bs_rx_adv_ind_pdu.pdu_adv_ind_h.RFU_2, \
-			bs_rx_adv_ind_pdu.pdu_adv_ind_payload.AdvA, bs_rx_adv_ind_pdu.pdu_adv_ind_payload.AdvData);   
+			bs_rx_adv_ind_pdu.pdu_adv_ind_payload.AdvA, bs_rx_adv_ind_pdu.pdu_adv_ind_payload.AdvData);  			
 	   		   	    		   		         	      
 		   if ((unsigned short)bs_rx_adv_ind_pdu.pdu_adv_ind_h.PDU_Type == ADV_IND) {
 			bs.nextState=MODE_BS_TX_CONNECT_REQ; sn.nextState=0; 

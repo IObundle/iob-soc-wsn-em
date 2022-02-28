@@ -3,7 +3,6 @@
 
 #include <stdlib.h>
 #include <stdint.h>
-#include <inttypes.h>
 #include "printf.h"
 
 #define SN_ID 0
