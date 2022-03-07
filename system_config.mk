@@ -45,7 +45,7 @@ VCD ?=0
 
 #set according to SIMULATOR
 ifeq ($(SIMULATOR),ncsim)
-	SIM_SERVER ?=micro7.lx.it.pt
+	SIM_SERVER ?=micro5.lx.it.pt
 	SIM_USER ?=$(USER)
 endif
 

@@ -245,7 +245,7 @@ module soc_tb
 `include "cpu_tasks.v"
 
    //sram monitor - use for debugging programs
-   /*
+   
    wire [`SRAM_ADDR_W-1:0] sram_daddr = uut.int_mem0.int_sram.d_addr;
    wire sram_dwstrb = |uut.int_mem0.int_sram.d_wstrb & uut.int_mem0.int_sram.d_valid;
    wire sram_drdstrb = !uut.int_mem0.int_sram.d_wstrb & uut.int_mem0.int_sram.d_valid;
@@ -256,13 +256,14 @@ module soc_tb
    wire sram_irdstrb = !uut.int_mem0.int_sram.i_wstrb & uut.int_mem0.int_sram.i_valid;
    wire [`SRAM_ADDR_W-1:0] sram_iaddr = uut.int_mem0.int_sram.i_addr;
    wire [`DATA_W-1:0] sram_irdata = uut.int_mem0.int_sram.i_rdata;
-
    
+   integer k;	
+      
    always @(posedge sram_dwstrb)
-      if(sram_daddr == 13'h090d)  begin
-         #10 $display("Found CPU memory condition at %f : %x : %x", $time, sram_daddr, sram_dwdata );
-         //$finish;
-      end
-    */
+   	for (k=0; k<1000; k=k+1) begin
+	   if (sram_daddr == k) begin
+	      #10 $display("Found CPU trap condition at %f : %x : %x", $time, sram_daddr, sram_dwdata );		
+   	   end
+	end       
    
 endmodule

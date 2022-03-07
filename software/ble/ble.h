@@ -18,9 +18,11 @@ char ble_off(void);
 
 // Receive data
 char ble_receive(char *buffer, char size);
+char ble_receive_tempo(volatile int *buffer, char size);
 
 // Send data
 char ble_send(char *buffer, char size);
+char ble_send_tempo(const int *buffer, char size);
 
 // Configure ADPLL and configure BLE for data transmission
 void config_tx(float channel_freq);
