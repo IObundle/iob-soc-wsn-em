@@ -226,6 +226,28 @@ char ble_receive(char *buffer, char size) {
   return nbytes;
 }
 
+char ble_receive_tempo(volatile int *buffer, char size) {
+  char nbytes = -1;
+
+  if (on == RX) {
+    nbytes = 0;
+
+    if (rx_crc_valid()) {
+      if (nbytes < size) {
+        while (!rx_empty()) {
+          *((char*)buffer+nbytes) = receive();
+	  nbytes++;
+        }
+      }
+    }
+
+    rx_start();
+  }
+
+  return nbytes;
+}
+
+
 char ble_send(char *buffer, char size) {
   char nbytes = -1;
 
@@ -235,6 +257,25 @@ char ble_send(char *buffer, char size) {
     if (tx_ready()) {
       while (nbytes != size) {
         send(buffer[nbytes++]);
+      }
+
+      tx_start();
+    }
+  }
+
+  return nbytes;
+}
+
+char ble_send_tempo(const int *buffer, char size) {
+  char nbytes = -1;
+
+  if (on == TX) {
+    nbytes = 0;
+
+    if (tx_ready()) {
+      while (nbytes != size) {
+        send(*((char*)buffer+nbytes));
+	nbytes++;
       }
 
       tx_start();
