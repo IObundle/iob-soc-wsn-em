@@ -9,7 +9,7 @@
 
 int main() { 			
   int *sn_buffer_tx=(int*)0x400;
-  int *bs_buffer_tx=(int*)0x413;    
+  int *bs_buffer_tx=(int*)0x400;    
   volatile int *sn_buffer_rx=NULL;
   volatile int *bs_buffer_rx=NULL; 	
   uint16_t sn_adv_ch_idx=37, bs_adv_ch_idx=37, next_adv_ch = 0;					
@@ -132,8 +132,8 @@ int main() {
 	      free((void*)sn_buffer_tx); pdu_size=0;
 	      
 	      // Go to the next state
-	      //sn.nextState=MODE_SN_RX_CONNECT_REQ; bs.nextState=0;
-	      sn.nextState=0; bs.nextState=0;  	      	       	      
+	      sn.nextState=MODE_SN_RX_CONNECT_REQ; bs.nextState=0;
+	      //sn.nextState=0; bs.nextState=0;  	      	       	      
   	      break;
 	      
 	case MODE_SN_RX_CONNECT_REQ:
@@ -255,7 +255,6 @@ int main() {
 	     
 	     // Go to initiating state
 	     bs.nextState=MODE_BS_RX_ADV_IND; sn.nextState=0;
-	     //bs.nextState=MODE_BS_TX_CONNECT_REQ; sn.nextState=0;
 	     //bs.nextState=MODE_BS_TX_CONNECT_REQ; sn.nextState=0;
 	     break; 
      
