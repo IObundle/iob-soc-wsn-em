@@ -9,6 +9,7 @@
 #define BS_ID 1
 
 #define MAX_NUM_SN 6
+#define MAX_N_BYTES 39
 
 #define ADV_IND_H_LEN 2
 #define DATA_H_LEN 2
@@ -70,6 +71,8 @@ typedef struct SN {
     	uint32_t  nextState; 
     	uint8_t   id;   
     	uint8_t   adv_1;  
+	char      buffer_tx[MAX_N_BYTES];
+	char	  buffer_rx[MAX_N_BYTES];
 } sn_s_t;
   
 typedef struct BS {
@@ -77,6 +80,8 @@ typedef struct BS {
     	uint32_t nextState;
     	uint32_t isBusy;
     	uint8_t  id;
+	char     buffer_tx[MAX_N_BYTES];
+	char	 buffer_rx[MAX_N_BYTES];	
 } bs_s_t;
 
 #pragma pack (1)
@@ -146,7 +151,7 @@ typedef struct CONNECT_REQ_PAYLOAD {
 		 LLData_Timeout   : 16,     	//2 bytes
 		 LLData_ChM	  : 40,         //5 bytes
 		 LLData_Hop	  : 5,          //5 bits 
-	         LLData_SCA	  : 3;          //3 bits 		 		 		 	
+	         LLData_SCA	  : 3;          //3 bits		 		 		 	
 	//connect_req_lldata_s_t LLData;	
 } connect_req_payload_s_t;  
    
