@@ -206,7 +206,7 @@ char ble_off(void) {
   return ret;
 }
 
-char ble_receive(char *buffer, char size) {
+char ble_receive(char buffer[], unsigned char size) {
   char nbytes = -1;
 
   if (on == RX) {
@@ -226,7 +226,7 @@ char ble_receive(char *buffer, char size) {
   return nbytes;
 }
 
-char ble_send(char *buffer, char size) {
+char ble_send(char buffer[], unsigned char size) {
   char nbytes = -1;
 
   if (on == TX) {
@@ -242,25 +242,4 @@ char ble_send(char *buffer, char size) {
   }
 
   return nbytes;
-}
-
-// Configure ADPLL and configure BLE for data transmission
-void config_tx(float channel_freq) {
-  // Configure ADPLL
-  ble_config(channel_freq, ADPLL_OPERATION);
-
-  // Configure BLE for send data
-  ble_send_on();
-}
-
-// Configure payload size, configure ADPLL and configure BLE for data reception
-void config_rx(unsigned int pdu_size, float channel_freq){
-  // Payload
-  ble_payload(pdu_size);
-
-  // Configure ADPLL
-  ble_config((channel_freq-1.0F), ADPLL_OPERATION);
-
-  // Configure BLE for receive data
-  ble_recv_on();
 }

@@ -1,3 +1,5 @@
+#include "txrx.h"
+
 // Get the advertising channel frequency in MHz
 unsigned int get_adv_ch_freq(unsigned short adv_ch_idx) {   
    unsigned int freq;    
@@ -9,4 +11,9 @@ unsigned int get_adv_ch_freq(unsigned short adv_ch_idx) {
    	freq = 2480;
    }	
    return freq;  
+}
+
+// Set the whitener channel index
+void wp_set_ch_index(unsigned short ch_idx) {
+     txrx_set_ch_idx(ch_idx);
 }
