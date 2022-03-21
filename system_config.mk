@@ -10,10 +10,18 @@
 
 
 #FIRMWARE SIZE (LOG2)
-FIRM_ADDR_W ?=17
+ifeq ($(DBUG),1)
+FIRM_ADDR_W=17
+else
+FIRM_ADDR_W=15
+endif
 
 #SRAM SIZE (LOG2)
-SRAM_ADDR_W ?=17
+ifeq ($(DBUG),1)
+SRAM_ADDR_W=17
+else
+SRAM_ADDR_W=15
+endif
 
 #DDR 
 USE_DDR ?=0

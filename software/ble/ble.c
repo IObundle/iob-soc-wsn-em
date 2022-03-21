@@ -3,7 +3,6 @@
 
 #include "iob-uart.h"
 #include "iob_timer.h"
-#include "printf.h"
 
 #include "adpll.h"
 #include "pa.h"
@@ -14,6 +13,10 @@
 #include "iref.h"
 
 #include "ble.h"
+
+#ifdef DBUG
+#include "printf.h"
+#endif
 
 //
 // Macros
@@ -74,8 +77,9 @@ char ble_config(float channel_freq, int mode) {
 
   if (init) {
     int fcw = (int)(channel_freq*16384);
+#ifdef DBUG    
     printf_("freq_channel = %fMHz, FCW = %d, adpll_mode = %d\n", channel_freq, fcw, mode);
-
+#endif
     char alpha_l = 14;
     char alpha_m = 8;
     char alpha_s_rx = 7;

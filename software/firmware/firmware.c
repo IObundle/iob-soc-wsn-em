@@ -93,15 +93,15 @@ int main() {
 
   	      // Turn off BLE
 	      ble_off();
-      
+#ifdef DBUG      
 	      // Print data for debugging purpose
 	      uart_printf("\nSN TX sent %d bytes/ADV_IND on advertising channel (index, frequency) = (%d, %dMHz)\n", pdu_size, sn_adv_ch_idx, sn_ch_freq);		  
 	      printf_("\nPDU_Type = %d\nRFU_1 = %d\nTxAdd = %d\nRxAdd = %d\nLength= %d\nRFU_2 = %d\nAdvA  = %#llx\nAdvData = %#x\n\n", \
 			sn_tx_adv_ind_pdu.pdu_adv_ind_h.PDU_Type, sn_tx_adv_ind_pdu.pdu_adv_ind_h.RFU_1, \
 		   	sn_tx_adv_ind_pdu.pdu_adv_ind_h.TxAdd, sn_tx_adv_ind_pdu.pdu_adv_ind_h.RxAdd, \
 			sn_tx_adv_ind_pdu.pdu_adv_ind_h.Length, sn_tx_adv_ind_pdu.pdu_adv_ind_h.RFU_2, \
-			sn_tx_adv_ind_pdu.pdu_adv_ind_payload.AdvA, sn_tx_adv_ind_pdu.pdu_adv_ind_payload.AdvData);    			
-	      
+			sn_tx_adv_ind_pdu.pdu_adv_ind_payload.AdvA, sn_tx_adv_ind_pdu.pdu_adv_ind_payload.AdvData);    		
+#endif		      
 	      // Re-initialize pdu_size
 	      pdu_size=0;
 	      
@@ -138,15 +138,15 @@ int main() {
   	      // Wait for sender
   	      sn_start_time = timer_time_us();
   	      while ((timer_time_us() - sn_start_time) < (unsigned int)1200);
-    
+#ifdef DBUG    
 	      // Print data for debugging purpose
 	      uart_printf("\nSN RX received %d bytes/CONNECT_REQ on advertising channel (index, frequency) = (%d, %dMHz)\n\n", nbytes, sn_adv_ch_idx, sn_ch_freq);	
-
+#endif
 	      if (nbytes == pdu_size) { // There is data in the RX buffer
 	      	   for (int i = 0; i < (pdu_size - CRC_LEN); i++) {
 	       	  	((unsigned char *)&sn_rx_connect_request_pdu)[i] = sn.buffer_rx[i];
   	      	   } 
-		    
+#ifdef DBUG		    
 		    // Print data for debugging purpose  	      
   	      	    printf_("PDU_Type = %d\nRFU_1 = %d\nTxAdd = %d\nRxAdd = %d\nLength = %d\nRFU_2 = %d\n", \
 	      	    	sn_rx_connect_request_pdu.pdu_adv_ind_h.PDU_Type, sn_rx_connect_request_pdu.pdu_adv_ind_h.RFU_1, \
@@ -161,9 +161,11 @@ int main() {
 			sn_rx_connect_request_pdu.connect_req_payload.LLData.Timeout, sn_rx_connect_request_pdu.connect_req_payload.LLData.ChM);				
   	      	    printf_("LLData_Hop = %d\nLLData_SCA = %d\n\n", \
 			sn_rx_connect_request_pdu.connect_req_payload.LLData.Hop, sn_rx_connect_request_pdu.connect_req_payload.LLData.SCA);	
-	      	   		   				   
+#endif	      	   		   				   
 		   if (sn_rx_connect_request_pdu.pdu_adv_ind_h.PDU_Type == CONNECT_REQ) {  // If a connection request is received
+#ifdef DBUG
 		   	printf_("SN received a CONNECT_REQ packet\n\n");
+#endif
 			next_adv_ch = 0;  k=0;			
 			for (int i=0; i<MAX_N_DATA_CHANNELS; i++) {
 			   if (sn_rx_connect_request_pdu.connect_req_payload.LLData.ChM & mask_data_ch) {
@@ -174,11 +176,15 @@ int main() {
 			for (int i=k; i<MAX_N_DATA_CHANNELS; i++) {data_ch[i]=0;}
 			sn.nextState=0; bs.nextState=0;   // temporarily settings
 	            } else {
+#ifdef DBUG
 		        printf_("SN did not receive a CONNECT_REQ packet\n\n");
+#endif
 		        next_adv_ch = 1;
 		    }		
 	        } else {
+#ifdef DBUG
 		        printf_("SN received %d bytes instead of %d bytes!\n\n", nbytes, pdu_size);
+#endif
 			next_adv_ch = 1;
 	        }
 		 		 
@@ -247,7 +253,6 @@ int main() {
 
 	      for(int i=0; i<MAX_N_SN; i++) {
    	       	   if (bs_whitelist[i][0] == AA_FREE) { // Access Address not yet used
-		   	  printf_("There is a free address!\n"); 
    	       		  bs_tx_connect_request_pdu.connect_req_payload.LLData.AA=bs_whitelist[i][1];
 	      		  bs_whitelist[i][0]=GPS_WAIT;
 			  i=MAX_N_SN;
@@ -272,6 +277,7 @@ int main() {
   	      // Turn off BLE
 	      ble_off();
 
+#ifdef DBUG
   	      // Print data for debugging purpose	      	      	
 	      uart_printf("\nBS TX sent %d bytes/CONNECT_REQ on advertising channel (index, frequency) = (%d, %dMHz)\n", pdu_size, bs_adv_ch_idx, bs_ch_freq);	  	      			
   	      printf_("PDU_Type = %d\nRFU_1 = %d\nTxAdd = %d\nRxAdd = %d\nLength = %d\nRFU_2 = %d\n", \
@@ -287,7 +293,7 @@ int main() {
 			bs_tx_connect_request_pdu.connect_req_payload.LLData.Timeout, bs_tx_connect_request_pdu.connect_req_payload.LLData.ChM);			
 	      printf_("LLData_Hop = %d\nLLData_SCA = %d\n\n", \
 			bs_tx_connect_request_pdu.connect_req_payload.LLData.Hop, bs_tx_connect_request_pdu.connect_req_payload.LLData.SCA);			 
-		
+#endif		
 	      // Re-initialize pdu_size
 	      pdu_size=0;
 	      
@@ -327,30 +333,37 @@ int main() {
   	      bs_start_time = timer_time_us();
   	      while ((timer_time_us() - bs_start_time) < (unsigned int)1200);  	        	      
 
+#ifdef DBUG
   	      // Print data for debugging purpose	      	      
 	      uart_printf("\nBS RX received %d bytes/ADV_IND on advertising channel (index, frequency) = (%d, %dMHz)\n\n", nbytes, bs_adv_ch_idx, bs_ch_freq);	
-	      
+#endif	      
 	      if (nbytes == pdu_size) { // There is data in the RX buffer
   	      	   for (int i = 0; i < (pdu_size - CRC_LEN); i++) {
 		  	((unsigned char *)&bs_rx_adv_ind_pdu)[i] = bs.buffer_rx[i];
   	      	   }           	           
-
+#ifdef DBUG
   	           // Print data for debugging purpose	      	      				
 	           printf_("PDU_Type = %d\nRFU_1 = %d\nTxAdd = %d\nRxAdd = %d\nLength= %d\nRFU_2 = %d\nAdvA  = %#llx\nAdvData = %#x\n\n", \
 			bs_rx_adv_ind_pdu.pdu_adv_ind_h.PDU_Type, bs_rx_adv_ind_pdu.pdu_adv_ind_h.RFU_1, \
 		   	bs_rx_adv_ind_pdu.pdu_adv_ind_h.TxAdd, bs_rx_adv_ind_pdu.pdu_adv_ind_h.RxAdd, \
 			bs_rx_adv_ind_pdu.pdu_adv_ind_h.Length, bs_rx_adv_ind_pdu.pdu_adv_ind_h.RFU_2, \
 			bs_rx_adv_ind_pdu.pdu_adv_ind_payload.AdvA, bs_rx_adv_ind_pdu.pdu_adv_ind_payload.AdvData); 			
-	   		   	    		   		         	      
+#endif	   		   	    		   		         	      
 		   if (bs_rx_adv_ind_pdu.pdu_adv_ind_h.PDU_Type == ADV_IND) {
+#ifdef DBUG
 		   	printf_("BS received an ADV_IND packet\n\n");
+#endif
 			bs.nextState=MODE_BS_TX_CONNECT_REQ; sn.nextState=0;
               	   } else {
+#ifdef DBUG
 		   	printf_("BS did not receive an ADV_IND packet\n\n");
+#endif
 		        bs.nextState=MODE_BS_RX_ADV_IND; sn.nextState=0;
 		   }
 	      }	else {
+#ifdef DBUG
 	           printf_("BS received %d bytes instead of %d bytes!\n\n", nbytes, pdu_size);
+#endif
 	           bs.nextState=MODE_BS_RX_ADV_IND; sn.nextState=0;
 	      }	      	       
   	      
