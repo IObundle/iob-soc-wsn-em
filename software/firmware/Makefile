@@ -29,7 +29,10 @@ HDR+=periphs.h
 
 #SOURCES
 SRC+= firmware.S firmware.c $(UART_DIR)/software/uart_io.c
+ifeq ($(DBUG),1)
+DEFINE+=$(defmacro)DBUG
 SRC+= $(UART_DIR)/software/printf.c
+endif
 
 #RULES
 run: firmware.elf

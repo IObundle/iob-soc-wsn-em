@@ -3,7 +3,6 @@
 
 #include "iob-uart.h"
 #include "iob_timer.h"
-#include "printf.h"
 
 #include "adpll.h"
 #include "pa.h"
@@ -14,6 +13,10 @@
 #include "iref.h"
 
 #include "ble.h"
+
+#ifdef DBUG
+#include "printf.h"
+#endif
 
 //
 // Macros
@@ -74,8 +77,9 @@ char ble_config(float channel_freq, int mode) {
 
   if (init) {
     int fcw = (int)(channel_freq*16384);
+#ifdef DBUG    
     printf_("freq_channel = %fMHz, FCW = %d, adpll_mode = %d\n", channel_freq, fcw, mode);
-
+#endif
     char alpha_l = 14;
     char alpha_m = 8;
     char alpha_s_rx = 7;
@@ -206,7 +210,7 @@ char ble_off(void) {
   return ret;
 }
 
-char ble_receive(char *buffer, char size) {
+char ble_receive(char buffer[], unsigned char size) {
   char nbytes = -1;
 
   if (on == RX) {
@@ -226,7 +230,7 @@ char ble_receive(char *buffer, char size) {
   return nbytes;
 }
 
-char ble_send(char *buffer, char size) {
+char ble_send(char buffer[], unsigned char size) {
   char nbytes = -1;
 
   if (on == TX) {
@@ -242,25 +246,4 @@ char ble_send(char *buffer, char size) {
   }
 
   return nbytes;
-}
-
-// Configure ADPLL and configure BLE for data transmission
-void config_tx(float channel_freq) {
-  // Configure ADPLL
-  ble_config(channel_freq, ADPLL_OPERATION);
-
-  // Configure BLE for send data
-  ble_send_on();
-}
-
-// Configure payload size, configure ADPLL and configure BLE for data reception
-void config_rx(unsigned int pdu_size, float channel_freq){
-  // Payload
-  ble_payload(pdu_size);
-
-  // Configure ADPLL
-  ble_config((channel_freq-1.0F), ADPLL_OPERATION);
-
-  // Configure BLE for receive data
-  ble_recv_on();
 }
