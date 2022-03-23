@@ -35,6 +35,13 @@ software/ble/*
 !software/ble/def.h
 !software/ble/fct.c
 !software/ble/ble.mk
+!software/ble/sn
+
+software/ble/sn/*
+!software/ble/sn/sn_config.h      
+!software/ble/sn/sn_fct.c
+!software/ble/sn/sn_fct.h
+!software/ble/sn/sn_fct_print.c
 
 software/console/*
 !software/console/console.c
