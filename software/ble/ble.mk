@@ -12,3 +12,11 @@ INCLUDE+=$(incdir)$(BLE_DIR)
 #local sources
 HDR+=$(BLE_DIR)/*.h
 SRC+=$(BLE_DIR)/*.c
+
+#SN
+INCLUDE+=$(incdir)$(BLE_DIR)/sn
+HDR+=$(BLE_DIR)/sn/*.h
+SRC+=$(BLE_DIR)/sn/sn_fct.c
+ifeq ($(DBUG),1)
+SRC+=$(BLE_DIR)/sn/sn_fct_print.c
+endif

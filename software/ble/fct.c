@@ -1,6 +1,6 @@
 #include "txrx.h"
 
-// Get the advertising channel frequency in MHz
+// Get the advertising channel frequency in MHz - Advertising channels: 37, 38, 39
 unsigned int get_adv_ch_freq(unsigned short adv_ch_idx) {   
    unsigned int freq;    
    if (adv_ch_idx == 37) {
@@ -13,7 +13,23 @@ unsigned int get_adv_ch_freq(unsigned short adv_ch_idx) {
    return freq;  
 }
 
-// Set the whitener channel index
+// Get the data channel frequency in MHz - Data channels: 5, 22, 34
+unsigned int get_data_ch_freq(unsigned short data_ch_idx) {   
+   unsigned int freq;    
+   if (data_ch_idx == 5) {
+   	freq = 2414;		
+   } else if (data_ch_idx == 22) {
+   	freq = 2450;	
+   } else if (data_ch_idx == 34) {	
+   	freq = 2474;
+   }	
+   return freq;  
+}
+
 void wp_set_ch_index(unsigned short ch_idx) {
      txrx_set_ch_idx(ch_idx);
+}
+
+void wp_set_aa(unsigned int aa) {
+     txrx_set_aa(aa);
 }

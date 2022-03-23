@@ -247,3 +247,9 @@ char ble_send(char buffer[], unsigned char size) {
 
   return nbytes;
 }
+
+void sys_init(void){
+    ble_init(); 
+    uart_init(UART_BASE,FREQ/BAUD); 
+    timer_init(TIMER_BASE);		      
+}
