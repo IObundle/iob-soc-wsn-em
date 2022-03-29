@@ -1,4 +1,6 @@
 #include "iob_timer.h"
+#include "cm_def.h"
+#include "sn_def.h"
 #include "ble.h"
 
 #define CST 1
@@ -14,15 +16,11 @@ uint32_t sn_standby(uint8_t adv){
     ble_off();  		    
     
     //Delay
-    uint32_t  start_time = timer_time_us();
+    uint32_t start_time = timer_time_us();
     while ((timer_time_us() - start_time) < (unsigned int)t_standby);
 	     
     //Go to next state
-    if (adv == 1) {  		
-       return MODE_SN_TX_ADV_IND;
-    } else if (adv == 2) {
-       return MODE_SN_TX_ADV_DIRECT_IND;	
-    }    
+    return MODE_SN_TX_ADV_DIRECT_IND;	   
 }    	       
 
 sn_tx_adv_param_s_t sn_tx_adv_ind(uint16_t sn_adv_ch_idx){
@@ -41,16 +39,16 @@ sn_tx_adv_param_s_t sn_tx_adv_ind(uint16_t sn_adv_ch_idx){
     wp_set_ch_index(sn_adv_ch_idx);   
     
     //Configure PDU's size   
-    p.pdu_size_1 = ADV_IND_H_LEN + ADV_IND_P_LEN;
+    p.pdu_size = ADV_H_LEN + ADV_DIND_P_LEN;
 
     //Build PDU
-    p.sn_tx_adv_ind_pdu.pdu_adv_ind_h.PDU_Type=ADV_IND; p.sn_tx_adv_ind_pdu.pdu_adv_ind_h.RFU_1=ADV_IND_H_RFU_1;	   
-    p.sn_tx_adv_ind_pdu.pdu_adv_ind_h.TxAdd=ADV_IND_H_H_TxAdd; p.sn_tx_adv_ind_pdu.pdu_adv_ind_h.RxAdd=ADV_IND_H_RxAdd;
-    p.sn_tx_adv_ind_pdu.pdu_adv_ind_h.Length=ADV_IND_P_LEN; p.sn_tx_adv_ind_pdu.pdu_adv_ind_h.RFU_2=ADV_IND_H_RFU_2;    
-    p.sn_tx_adv_ind_pdu.pdu_adv_ind_payload.AdvA=SN_DEVIVCE_ADDR; p.sn_tx_adv_ind_pdu.pdu_adv_ind_payload.AdvData=0;	  	    
+    p.sn_tx_adv_ind_pdu.pdu_adv_ind_h.PDU_Type=ADV_DIRECT_IND; p.sn_tx_adv_ind_pdu.pdu_adv_ind_h.RFU_1=ADV_DIND_H_RFU_1;	   
+    p.sn_tx_adv_ind_pdu.pdu_adv_ind_h.TxAdd=ADV_DIND_H_TxAdd; p.sn_tx_adv_ind_pdu.pdu_adv_ind_h.RxAdd=ADV_DIND_H_RxAdd;
+    p.sn_tx_adv_ind_pdu.pdu_adv_ind_h.Length=ADV_DIND_P_LEN; p.sn_tx_adv_ind_pdu.pdu_adv_ind_h.RFU_2=ADV_DIND_H_RFU_2;    
+    p.sn_tx_adv_ind_pdu.pdu_adv_ind_payload.AdvA=SN_DEVIVCE_ADDR; p.sn_tx_adv_ind_pdu.pdu_adv_ind_payload.InitA=BS_DEVIVCE_ADDR_OP;	  	    
 					    
     //Write the PDU to the HW
-    ble_send((unsigned char *)&p.sn_tx_adv_ind_pdu, p.pdu_size_1);
+    ble_send((unsigned char *)&p.sn_tx_adv_ind_pdu, p.pdu_size);
 
     //Wait for transmisstion
     uint32_t start_time = timer_time_us();
@@ -72,8 +70,8 @@ sn_rx_cnt_req_param_s_t sn_rx_cnt_req(uint16_t sn_adv_ch_idx, uint32_t sn_ch_fre
     while ((timer_time_us() - start_time) < (unsigned int)5000);    //temporarily added delay
 
     //Configure PDU's size
-    p.pdu_size_1 = ADV_IND_H_LEN + CONNECT_REQ_P_LEN;
-    ble_payload(p.pdu_size_1);
+    p.pdu_size = ADV_H_LEN + CONNECT_REQ_P_LEN;
+    ble_payload(p.pdu_size);
 
     //Configure ADPLL
     ble_config((sn_ch_freq-1.0F), 2);   //2 for RX
@@ -89,15 +87,15 @@ sn_rx_cnt_req_param_s_t sn_rx_cnt_req(uint16_t sn_adv_ch_idx, uint32_t sn_ch_fre
     while ((timer_time_us() - start_time) < (unsigned int)advDelay);
 
     //Read the PDU from the HW
-    p.pdu_size_1 += CRC_LEN;
+    p.pdu_size += CRC_LEN;
     for (int i = 0; i < MAX_N_BYTES; i++) { sn.buffer_rx[i] = 0; }
-    p.nbytes = ble_receive(sn.buffer_rx, p.pdu_size_1);
+    p.nbytes = ble_receive(sn.buffer_rx, p.pdu_size);
 
     //Turn off BLE
     ble_off();
 
-    if (p.nbytes == p.pdu_size_1) { //There is data in the RX buffer
-        for (int i = 0; i < (p.pdu_size_1 - CRC_LEN); i++) {
+    if (p.nbytes == p.pdu_size) { //There is data in the RX buffer
+        for (int i = 0; i < (p.pdu_size - CRC_LEN); i++) {
 	     ((unsigned char *)&p.sn_rx_connect_request_pdu)[i] = sn.buffer_rx[i];
   	} 
 	if (p.sn_rx_connect_request_pdu.pdu_adv_ind_h.PDU_Type == CONNECT_REQ) {  //If a connection request is received
@@ -122,7 +120,7 @@ sn_rx_cnt_req_param_s_t sn_rx_cnt_req(uint16_t sn_adv_ch_idx, uint32_t sn_ch_fre
 	    //p.nextState=MODE_SN_STANDBY;    //temporarily settings
 	    p.nextState=0; 
 	} else {
-	   p.nextState=MODE_SN_TX_ADV_IND;
+	   p.nextState=MODE_SN_TX_ADV_DIRECT_IND;
 	   //p.nextState=0; 
 	}		  		  		      		 
      }

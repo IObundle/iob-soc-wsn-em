@@ -32,16 +32,25 @@ software/firmware/*
 software/ble/*
 !software/ble/ble.c
 !software/ble/ble.h
-!software/ble/def.h
-!software/ble/fct.c
+!software/ble/cm_def.h
+!software/ble/cm_fct.c
 !software/ble/ble.mk
 !software/ble/sn
+!software/ble/bs
 
 software/ble/sn/*
-!software/ble/sn/sn_config.h      
+!software/ble/sn/sn_config.h   
+!software/ble/sn/sn_def.h   
 !software/ble/sn/sn_fct.c
 !software/ble/sn/sn_fct.h
 !software/ble/sn/sn_fct_print.c
+
+software/ble/bs/*
+!software/ble/bs/bs_config.h   
+!software/ble/bs/bs_def.h 
+!software/ble/bs/bs_fct.c
+!software/ble/bs/bs_fct.h
+!software/ble/bs/bs_fct_print.c
 
 software/console/*
 !software/console/console.c

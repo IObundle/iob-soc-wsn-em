@@ -20,3 +20,11 @@ SRC+=$(BLE_DIR)/sn/sn_fct.c
 ifeq ($(DBUG),1)
 SRC+=$(BLE_DIR)/sn/sn_fct_print.c
 endif
+
+#BS
+INCLUDE+=$(incdir)$(BLE_DIR)/bs
+HDR+=$(BLE_DIR)/bs/*.h
+SRC+=$(BLE_DIR)/bs/bs_fct.c
+ifeq ($(DBUG),1)
+SRC+=$(BLE_DIR)/bs/bs_fct_print.c
+endif
