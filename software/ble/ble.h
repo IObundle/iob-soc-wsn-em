@@ -21,6 +21,3 @@ char ble_receive(char buffer[], unsigned char size);
 
 // Send data
 char ble_send(char buffer[], unsigned char size);
-
-//System Init
-void sys_init(void);

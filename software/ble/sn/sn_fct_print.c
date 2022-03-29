@@ -1,12 +1,13 @@
 #include "iob-uart.h"
-#include "def.h"
+#include "sn_def.h"
 
 void sn_tx_adv_ind_print(sn_tx_adv_param_s_t p_stv, sn_rx_cnt_req_param_s_t p_srq) {
-      uart_printf("\nSN TX sent %d bytes/ADV_IND packet on the advertising channel (index,frequency)=(%d,%dMHz)\n", p_stv.pdu_size_1, p_srq.sn_adv_ch_idx, p_stv.sn_ch_freq);	      printf_("PDU_Type=%d | RFU_1=%d | TxAdd=%d | RxAdd=%d | Length=%d | RFU_2=%d\nAdvA=%#llx | AdvData=%#x\n\n", \
+      uart_printf("\nSN TX sent %d bytes/ADV_DIRECT_IND packet on the advertising channel (index,frequency)=(%d,%dMHz)\n", p_stv.pdu_size, p_srq.sn_adv_ch_idx, p_stv.sn_ch_freq);
+      printf_("PDU_Type=%d | RFU_1=%d | TxAdd=%d | RxAdd=%d | Length=%d | RFU_2=%d\nAdvA=%#llx | InitA=%#llx\n\n", \
 	   p_stv.sn_tx_adv_ind_pdu.pdu_adv_ind_h.PDU_Type, p_stv.sn_tx_adv_ind_pdu.pdu_adv_ind_h.RFU_1, \
 	   p_stv.sn_tx_adv_ind_pdu.pdu_adv_ind_h.TxAdd, p_stv.sn_tx_adv_ind_pdu.pdu_adv_ind_h.RxAdd, \
 	   p_stv.sn_tx_adv_ind_pdu.pdu_adv_ind_h.Length, p_stv.sn_tx_adv_ind_pdu.pdu_adv_ind_h.RFU_2, \
-	   p_stv.sn_tx_adv_ind_pdu.pdu_adv_ind_payload.AdvA, p_stv.sn_tx_adv_ind_pdu.pdu_adv_ind_payload.AdvData);  
+	   p_stv.sn_tx_adv_ind_pdu.pdu_adv_ind_payload.AdvA, p_stv.sn_tx_adv_ind_pdu.pdu_adv_ind_payload.InitA);  
 }			
 
 void sn_rx_cnt_req_print(sn_rx_cnt_req_param_s_t p_srq, sn_tx_adv_param_s_t p_stv) {
@@ -28,7 +29,7 @@ void sn_rx_cnt_req_print(sn_rx_cnt_req_param_s_t p_srq, sn_tx_adv_param_s_t p_st
 
        if(p_srq.result==1) {printf_("SN received a CONNECT_REQ packet\n\n");}
        else if(p_srq.result==2){printf_("SN did not receive a CONNECT_REQ packet\n\n");}
-       else if(p_srq.result==3){printf_("SN received %d bytes instead of %d bytes!\n\n", p_srq.nbytes, p_srq.pdu_size_1);}
+       else if(p_srq.result==3){printf_("SN received %d bytes instead of %d bytes!\n\n", p_srq.nbytes, p_srq.pdu_size);}
 }       
 
 void sn_tx_data_gps_print(sn_tx_gps_param_s_t p_stgps) {
@@ -58,10 +59,10 @@ void sn_rx_llcontrol_print(sn_rx_llcontrol_param_s_t p_srack, sn_tx_gps_param_s_
 }
 
 void sn_tx_data_tmp_print(sn_tx_tmp_param_s_t p_sttmp, sn_tx_gps_param_s_t p_stgps) {
-	    uart_printf("\nSN TX sent %d bytes/DATA_TMP on the data channel (index,frequency)=(%d,%dMHz)\n", p_sttmp.pdu_size_1, p_stgps.sn_data_ch_idx, p_stgps.sn_ch_freq);		
-	    printf_("LLID=%d | NESN=%d | SN=%d | MD=%d | RFU=%d | Length=%d\nTemperature=%d\n\n", \
-	         p_sttmp.sn_tx_lldata_tmp_pdu.pdu_lldata_h.LLID, p_sttmp.sn_tx_lldata_tmp_pdu.pdu_lldata_h.NESN, \
-	         p_sttmp.sn_tx_lldata_tmp_pdu.pdu_lldata_h.SN, p_sttmp.sn_tx_lldata_tmp_pdu.pdu_lldata_h.MD, \
-	         p_sttmp.sn_tx_lldata_tmp_pdu.pdu_lldata_h.RFU, p_sttmp.sn_tx_lldata_tmp_pdu.pdu_lldata_h.Length, \
-	         p_sttmp.sn_tx_lldata_tmp_pdu.payload_tmp);   
+      uart_printf("\nSN TX sent %d bytes/DATA_TMP on the data channel (index,frequency)=(%d,%dMHz)\n", p_sttmp.pdu_size_1, p_stgps.sn_data_ch_idx, p_stgps.sn_ch_freq);		
+      printf_("LLID=%d | NESN=%d | SN=%d | MD=%d | RFU=%d | Length=%d\nTemperature=%d\n\n", \
+	    p_sttmp.sn_tx_lldata_tmp_pdu.pdu_lldata_h.LLID, p_sttmp.sn_tx_lldata_tmp_pdu.pdu_lldata_h.NESN, \
+	    p_sttmp.sn_tx_lldata_tmp_pdu.pdu_lldata_h.SN, p_sttmp.sn_tx_lldata_tmp_pdu.pdu_lldata_h.MD, \
+	    p_sttmp.sn_tx_lldata_tmp_pdu.pdu_lldata_h.RFU, p_sttmp.sn_tx_lldata_tmp_pdu.pdu_lldata_h.Length, \
+	    p_sttmp.sn_tx_lldata_tmp_pdu.payload_tmp);   
 }
