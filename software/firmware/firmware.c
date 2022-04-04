@@ -53,7 +53,7 @@ int main() {
 
     // Wait for transmisstion
     unsigned int start_time = timer_time_us();
-    while ((timer_time_us() - start_time) < (unsigned int)1000);
+    while ((timer_time_us() - start_time) < (unsigned int)100);
 
     ble_off();
 
@@ -75,7 +75,7 @@ int main() {
 
     // Wait for transmission
     unsigned int start_time = timer_time_us();
-    while ((timer_time_us() - start_time) < (unsigned int)10000);
+    while ((timer_time_us() - start_time) < (unsigned int)100);
 
     // Receive data
     size = N_BYTES+3;
@@ -85,10 +85,6 @@ int main() {
     char nbytes = ble_receive(buffer, size);
 
     ble_off();
-
-    // Wait for sender
-    start_time = timer_time_us();
-    while ((timer_time_us() - start_time) < (unsigned int)1000);
 
     // Print buffer
     uart_printf("\nreceived %d bytes:\n", nbytes);

@@ -32,11 +32,12 @@ sim: sim-clean
 	make -C $(SUBMODULES_DIR)/FSK_DEMOD demod_coeffs
 	make -C $(SUBMODULES_DIR)/FSK_DEMOD noise_floor.txt
 ifeq ($(SIMULATOR),$(filter $(SIMULATOR), $(LOCAL_SIM_LIST)))
-	make -C $(SIM_DIR) run BAUD=$(SIM_BAUD)
+	bash -c "trap 'make sim-display-output' INT TERM KILL; make -C $(SIM_DIR) run BAUD=$(SIM_BAUD)"
 else
 	ssh $(SIM_USER)@$(SIM_SERVER) "if [ ! -d $(REMOTE_ROOT_DIR) ]; then mkdir -p $(REMOTE_ROOT_DIR); fi"
 	rsync -avz --exclude .git $(ROOT_DIR) $(SIM_USER)@$(SIM_SERVER):$(REMOTE_ROOT_DIR)
 	bash -c "trap 'make kill-remote-sim' INT TERM KILL; ssh $(SIM_USER)@$(SIM_SERVER) 'cd $(REMOTE_ROOT_DIR); make -C $(SIM_DIR) run INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD) DBG=$(DBG) BAUD=$(SIM_BAUD)'"
+	scp $(SIM_USER)@$(SIM_SERVER):$(REMOTE_ROOT_DIR)/$(SIM_DIR)/soc*.txt $(SIM_DIR)
 ifeq ($(TEST_LOG),1)
 	scp $(SIM_USER)@$(SIM_SERVER):$(REMOTE_ROOT_DIR)/$(SIM_DIR)/test.log $(SIM_DIR)
 endif
@@ -44,6 +45,21 @@ ifeq ($(VCD),1)
 	scp $(SIM_USER)@$(SIM_SERVER):$(REMOTE_ROOT_DIR)/$(SIM_DIR)/*.vcd $(SIM_DIR)
 endif
 endif
+	make sim-display-output
+
+sim-display-output:
+	@echo ""
+	@echo "#"
+	@echo "# Soc 0"
+	@echo "#"
+	@echo ""
+	@cat $(SIM_DIR)/soc0.txt
+	@echo ""
+	@echo "#"
+	@echo "# Soc 1"
+	@echo "#"
+	@echo ""
+	@cat $(SIM_DIR)/soc1.txt
 
 sim-waves: $(SIM_DIR)/../waves.gtkw $(SIM_DIR)/system.vcd
 	gtkwave -a $^ &
@@ -51,6 +67,8 @@ sim-waves: $(SIM_DIR)/../waves.gtkw $(SIM_DIR)/system.vcd
 kill-remote-sim:
 	@echo "INFO: Remote simulator will be killed; ignore following errors"
 	ssh $(SIM_USER)@$(SIM_SERVER) 'cd $(REMOTE_ROOT_DIR); killall -q -u $(SIM_USER) -9 a.out; killall -q -u $(SIM_USER) -9 xmsim'
+	scp $(SIM_USER)@$(SIM_SERVER):$(REMOTE_ROOT_DIR)/$(SIM_DIR)/soc*.txt $(SIM_DIR)
+	make sim-display-output
 
 $(SIM_DIR)/../waves.gtkw $(SIM_DIR)/system.vcd:
 	make sim INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) VCD=$(VCD)
@@ -276,19 +294,37 @@ asic-sim-synth: sw-clean
 	make -C $(SUBMODULES_DIR)/FSK_DEMOD demod_coeffs
 	make -C $(SUBMODULES_DIR)/FSK_DEMOD noise_floor.txt
 ifeq ($(shell hostname), $(ASIC_SERVER))
-	make -C $(ASIC_DIR) sim INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD) DBG=$(DBG) BAUD=$(SIM_BAUD) SYNTH=1
+	bash -c "trap 'make asic-sim-display-output' INT TERM KILL; make -C $(ASIC_DIR) sim INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD) DBG=$(DBG) BAUD=$(SIM_BAUD) SYNTH=1"
 else
 	ssh $(ASIC_USER)@$(ASIC_SERVER) "if [ ! -d $(REMOTE_ROOT_DIR) ]; then mkdir -p $(REMOTE_ROOT_DIR); fi"
 	rsync -avz --exclude .git $(ROOT_DIR) $(ASIC_USER)@$(ASIC_SERVER):$(REMOTE_ROOT_DIR)
 	bash -c "trap 'make kill-remote-asic-sim' INT TERM KILL; ssh -Y -C $(ASIC_USER)@$(ASIC_SERVER) 'cd $(REMOTE_ROOT_DIR); make -C $(ASIC_DIR) sim INIT_MEM=$(INIT_MEM) USE_DDR=$(USE_DDR) RUN_DDR=$(RUN_DDR) TEST_LOG=$(TEST_LOG) VCD=$(VCD) DBG=$(DBG) BAUD=$(SIM_BAUD) SYNTH=1'"
+	scp $(ASIC_USER)@$(ASIC_SERVER):$(REMOTE_ROOT_DIR)/$(ASIC_DIR)/sim/soc*.txt $(ASIC_DIR)/sim
 ifeq ($(VCD),1)
 	scp $(ASIC_USER)@$(ASIC_SERVER):$(REMOTE_ROOT_DIR)/$(ASIC_DIR)/*.vcd $(ASIC_DIR)
 endif
 endif
+	make asic-sim-display-output
+
+asic-sim-display-output:
+	@echo ""
+	@echo "#"
+	@echo "# Soc 0"
+	@echo "#"
+	@echo ""
+	@cat $(ASIC_DIR)/sim/soc0.txt
+	@echo ""
+	@echo "#"
+	@echo "# Soc 1"
+	@echo "#"
+	@echo ""
+	@cat $(ASIC_DIR)/sim/soc1.txt
 
 kill-remote-asic-sim:
 	@echo "INFO: Remote simulator will be killed; ignore following errors"
 	ssh $(ASIC_USER)@$(ASIC_SERVER) 'cd $(REMOTE_ROOT_DIR); killall -q -u $(ASIC_USER) -9 xmsim'
+	scp $(ASIC_USER)@$(ASIC_SERVER):$(REMOTE_ROOT_DIR)/$(ASIC_DIR)/sim/soc*.txt $(ASIC_DIR)/sim
+	make asic-sim-display-output
 
 asic-clean: sw-clean hex-clean
 	make -C $(ASIC_DIR) clean
@@ -302,7 +338,7 @@ endif
 clean-all: sim-clean fpga-clean asic-clean board-clean doc-clean
 
 .PHONY: pc-emul pc-clean \
-	sim sim-waves kill-remote-sim sim-clean \
+	sim sim-waves sim-display-output kill-remote-sim sim-clean \
 	fpga fpga-clean fpga-clean-ip \
 	board-load board-run kill-remote-console board-clean \
 	firmware firmware-clean bootloader bootloader-clean sw-clean \
@@ -310,5 +346,5 @@ clean-all: sim-clean fpga-clean asic-clean board-clean doc-clean
 	hex-clean \
 	doc doc-clean doc-pdfclean \
 	test test-all-simulators test-simulator test-all-boards test-board test-board-config \
-	asic asic-mem asic-synth asic-sim-synth kill-remote-asic-sim asic-clean \
+	asic asic-mem asic-synth asic-sim-synth asic-sim-display-output kill-remote-asic-sim asic-clean \
 	all clean-all
