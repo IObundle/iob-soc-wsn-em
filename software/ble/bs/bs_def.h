@@ -3,6 +3,8 @@
 #include "cm_def.h"
 
 #define BS_ID 1
+#define N_SW 16
+#define N_SI 1
 
 typedef enum BS_MODES {
 	MODE_BS_STANDBY=11,	
@@ -36,18 +38,25 @@ typedef struct BS {
 } bs_s_t;
 
 typedef struct {
-     adv_direct_pdu_s_t bs_rx_adv_ind_pdu;                   //Connectable directed advertising PDU  
+     uint32_t    nextState;
+     uint16_t    adv_ch_start_idx;
+} bs_standby_param_s_t;
+
+typedef struct {
+     adv_direct_pdu_s_t bs_rx_adv_pdu;                       //Connectable directed advertising PDU  
      uint32_t           nextState;
      uint16_t           bs_adv_ch_idx;
-     uint32_t           bs_ch_freq;  
+     uint32_t           bs_ch_freq;  		             //for debugging purpose		
      uint32_t           pdu_size;	                     //for debugging purpose  
-     uint32_t           result;	  		             //for debugging purpose 
+     int32_t            error;	  		             //for debugging purpose 
      int8_t 	        nbytes;	   		             //for debugging purpose   
 } bs_rx_adv_param_s_t;
 
 typedef struct {
      connect_request_pdu_s_t bs_tx_connect_request_pdu;      //Connection request PDU
      uint32_t     nextState;  
+     uint16_t     bs_adv_ch_idx;		             //for debugging purpose
+     uint32_t     bs_ch_freq;  		                     //for debugging purpose	     
      uint32_t     pdu_size;				     //for debugging purpose
 } bs_tx_cnt_req_param_s_t;
 

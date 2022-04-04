@@ -1,8 +1,8 @@
 #include "iob-uart.h"
 #include "bs_def.h"
 
-void bs_tx_cnt_req_print(bs_tx_cnt_req_param_s_t p_btq, bs_rx_adv_param_s_t p_brv){
-    uart_printf("\nBS TX sent %d bytes/CONNECT_REQ packet on the advertising channel (index,frequency)=(%d,%dMHz)\n", p_btq.pdu_size, p_brv.bs_adv_ch_idx, p_brv.bs_ch_freq); 					  
+void bs_tx_cnt_req_print(bs_tx_cnt_req_param_s_t p_btq){    
+    uart_printf("\nBS TX sent %d bytes/CONNECT_REQ packet on the advertising channel (index,frequency)=(%d,%dMHz)\n", p_btq.pdu_size, p_btq.bs_adv_ch_idx, p_btq.bs_ch_freq); 					  
     printf_("PDU_Type=%d | RFU_1=%d | TxAdd=%d | RxAdd=%d | Length=%d | RFU_2=%d\n", \
 	  p_btq.bs_tx_connect_request_pdu.pdu_adv_ind_h.PDU_Type, p_btq.bs_tx_connect_request_pdu.pdu_adv_ind_h.RFU_1, \
 	  p_btq.bs_tx_connect_request_pdu.pdu_adv_ind_h.TxAdd, p_btq.bs_tx_connect_request_pdu.pdu_adv_ind_h.RxAdd, \
@@ -19,17 +19,21 @@ void bs_tx_cnt_req_print(bs_tx_cnt_req_param_s_t p_btq, bs_rx_adv_param_s_t p_br
   	  p_btq.bs_tx_connect_request_pdu.connect_req_payload.LLData_SCA);								   
 }
 
-void bs_rx_adv_ind_print(bs_rx_adv_param_s_t p_brv){
+void bs_rx_adv_print(bs_rx_adv_param_s_t p_brv){
     uart_printf("\nBS RX received %d bytes/ADV_DIRECT_IND expected on the advertising channel (index,frequency)=(%d,%dMHz)\n", p_brv.nbytes, p_brv.bs_adv_ch_idx, (p_brv.bs_ch_freq-1));      	      				
     printf_("PDU_Type=%d | RFU_1=%d | TxAdd=%d | RxAdd=%d | Length=%d | RFU_2=%d\nAdvA=%#llx | InitA=%#llx\n", \
-         p_brv.bs_rx_adv_ind_pdu.pdu_adv_ind_h.PDU_Type, p_brv.bs_rx_adv_ind_pdu.pdu_adv_ind_h.RFU_1, \
-         p_brv.bs_rx_adv_ind_pdu.pdu_adv_ind_h.TxAdd, p_brv.bs_rx_adv_ind_pdu.pdu_adv_ind_h.RxAdd, \
-         p_brv.bs_rx_adv_ind_pdu.pdu_adv_ind_h.Length, p_brv.bs_rx_adv_ind_pdu.pdu_adv_ind_h.RFU_2, \
-         p_brv.bs_rx_adv_ind_pdu.pdu_adv_ind_payload.AdvA, p_brv.bs_rx_adv_ind_pdu.pdu_adv_ind_payload.InitA);					    
+         p_brv.bs_rx_adv_pdu.pdu_adv_ind_h.PDU_Type, p_brv.bs_rx_adv_pdu.pdu_adv_ind_h.RFU_1, \
+         p_brv.bs_rx_adv_pdu.pdu_adv_ind_h.TxAdd, p_brv.bs_rx_adv_pdu.pdu_adv_ind_h.RxAdd, \
+         p_brv.bs_rx_adv_pdu.pdu_adv_ind_h.Length, p_brv.bs_rx_adv_pdu.pdu_adv_ind_h.RFU_2, \
+         p_brv.bs_rx_adv_pdu.pdu_adv_ind_payload.AdvA, p_brv.bs_rx_adv_pdu.pdu_adv_ind_payload.InitA);					
          
-    if(p_brv.result==1){printf_("BS received an ADV_DIRECT_IND packet\n\n");}	   
-    else if(p_brv.result==2){printf_("BS did not receive an ADV_IND packet\n\n");}
-    else if(p_brv.result==3){printf_("BS received %d bytes instead of %d bytes!\n\n", p_brv.nbytes, p_brv.pdu_size);}
+    if(p_brv.error==0){printf_("INFO: BS received an ADV_DIRECT_IND packet.\n\n");}	
+    else if(p_brv.error==1){printf_("ERROR - PDU size: %d bytes received instead of %d bytes. (BS-1)\n\n", p_brv.nbytes, p_brv.pdu_size);}
+    else if(p_brv.error==2){printf_("ERROR - Payload size: %d bytes received instead of %d bytes. (BS-2)\n\n", p_brv.bs_rx_adv_pdu.pdu_adv_ind_h.Length, ADV_DIND_P_LEN);}
+    else if(p_brv.error==3){printf_("ERROR - Device address: Wrong initiator device address. (BS-3)\n\n");}
+    else if(p_brv.error==4){printf_("ERROR - Device address: Advertiser device address not found. (BS-4)\n\n");}
+    else if(p_brv.error==5){printf_("ERROR - Packet type: Does not match a connectable directed advertising packet type. (BS-5)\n\n");} 
+    else if(p_brv.error==-1){printf_("ERROR - Initiator filter: Something went wrong, the initiator filter did not run. (BS-6)\n\n");}
 }    
 
 void bs_rx_data_gps_print(bs_rx_gps_param_s_t p_brgps) {

@@ -8,6 +8,7 @@
 extern sn_s_t sn;  
 extern bs_s_t bs;
 
+sn_standby_param_s_t p_sstd={0}; bs_standby_param_s_t p_bstd={0};
 sn_tx_adv_param_s_t p_stv={0}; sn_rx_cnt_req_param_s_t p_srq={0};
 sn_tx_gps_param_s_t p_stgps={0}; sn_rx_llcontrol_param_s_t p_srack_gps={0};
 sn_tx_tmp_param_s_t p_sttmp={0}; sn_rx_llcontrol_param_s_t p_srack_tmp={0}; 
@@ -16,12 +17,9 @@ bs_tx_cnt_req_param_s_t p_btq={0}; bs_rx_adv_param_s_t p_brv={0};
 bs_rx_gps_param_s_t p_brgps={0}; bs_tx_llcontrol_param_s_t p_btack_gps={0};
 bs_rx_tmp_param_s_t p_brtmp={0}; bs_tx_llcontrol_param_s_t p_btack_tmp={0};
 
-int16_t sn_data_tmp=-15;   //temporarily setting for debugging purpose
+int16_t sn_data_tmp=-15;   //temporary setting for debugging purpose
    
-int main() { 
-  p_srq.sn_adv_ch_idx=ADV_CH_FIRST; 
-  p_brv.bs_adv_ch_idx=ADV_CH_FIRST;
-  
+int main() {
   //Init ID
   id_init(ID_BASE);
   					
@@ -30,24 +28,26 @@ int main() {
     while(js<ITER) { //will be replaced by while(1) to run with non-stop
       switch(sn.nextState) {
       	case MODE_SN_STANDBY:  	  
-	     sn.nextState=sn_standby(sn.adv);
+	     p_sstd=sn_standby(sn.adv);
+	     p_srq.sn_adv_ch_idx=p_sstd.adv_ch_start_idx;
+	     sn.nextState=p_sstd.nextState;	     
 	     bs.nextState=0; break; 
 	      		
 	case MODE_SN_TX_ADV_DIRECT_IND:	      
-	     p_stv=sn_tx_adv_ind(p_srq.sn_adv_ch_idx);
+	     p_stv=sn_tx_adv(p_srq.sn_adv_ch_idx);
 #ifdef DBUG      
-	     sn_tx_adv_ind_print(p_stv, p_srq); 	 
+	     sn_tx_adv_print(p_stv); 	 
 #endif	            	      
 	     sn.nextState=p_stv.nextState;	            	       	      
   	     bs.nextState=0; break;
 	      
 	case MODE_SN_RX_CONNECT_REQ:	      	
-	      p_srq=sn_rx_cnt_req(p_srq.sn_adv_ch_idx, p_stv.sn_ch_freq);	
+	      p_srq=sn_rx_cnt_req(p_srq.sn_adv_ch_idx);   //p_stv.sn_adv_ch_idx, p_stv.sn_ch_freq	
 #ifdef DBUG 
   	      uint32_t sn_start_time = timer_time_us();
   	      while ((timer_time_us() - sn_start_time) < (unsigned int)1000);    
 	         
-	      sn_rx_cnt_req_print(p_srq, p_stv);
+	      sn_rx_cnt_req_print(p_srq);
 #endif  	      
 	      sn.nextState=p_srq.nextState;
 	      bs.nextState=0; break;				
@@ -99,24 +99,26 @@ int main() {
     while(jb<ITER) {  //will be replaced by while(1) to run with non-stop
       switch(bs.nextState) {
       	case MODE_BS_STANDBY:
-	     bs.nextState=bs_standby();
+	     p_bstd=bs_standby();
+	     p_brv.bs_adv_ch_idx=p_bstd.adv_ch_start_idx;
+	     bs.nextState=p_bstd.nextState;
 	     sn.nextState=0; break; 
      
         case MODE_BS_TX_CONNECT_REQ:		             	  		       
-	      p_btq=bs_tx_cnt_req(p_brv.bs_adv_ch_idx, p_brv.bs_ch_freq, p_brv.bs_rx_adv_ind_pdu.pdu_adv_ind_payload.AdvA);	      
+	      p_btq=bs_tx_cnt_req(p_brv.bs_adv_ch_idx, p_brv.bs_rx_adv_pdu.pdu_adv_ind_payload.AdvA);	      
 #ifdef DBUG
-	      bs_tx_cnt_req_print(p_btq, p_brv);
+	      bs_tx_cnt_req_print(p_btq);
 #endif	      
 	      bs.nextState=p_btq.nextState; 
 	      sn.nextState=0; break;
 	      
   	case MODE_BS_RX_ADV_DIRECT_IND:  		      
-	      p_brv=bs_rx_adv_ind(p_brv.bs_adv_ch_idx);
+	      p_brv=bs_rx_adv(p_brv.bs_adv_ch_idx);
 #ifdef DBUG	      
               uint32_t bs_start_time = timer_time_us();
     	      while ((timer_time_us() - bs_start_time) < (unsigned int)1000);   
 	      
-	      bs_rx_adv_ind_print(p_brv);
+	      bs_rx_adv_print(p_brv);
 #endif	      	            
 	      bs.nextState=p_brv.nextState; 
 	      sn.nextState=0; break;  			      

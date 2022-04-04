@@ -1,17 +1,18 @@
 #include "iob-uart.h"
 #include "sn_def.h"
 
-void sn_tx_adv_ind_print(sn_tx_adv_param_s_t p_stv, sn_rx_cnt_req_param_s_t p_srq) {
-      uart_printf("\nSN TX sent %d bytes/ADV_DIRECT_IND packet on the advertising channel (index,frequency)=(%d,%dMHz)\n", p_stv.pdu_size, p_srq.sn_adv_ch_idx, p_stv.sn_ch_freq);
+void sn_tx_adv_print(sn_tx_adv_param_s_t p_stv) {
+      uart_printf("\nSN TX sent %d bytes/ADV_DIRECT_IND packet on the advertising channel (index,frequency)=(%d,%dMHz)\n", p_stv.pdu_size, p_stv.sn_adv_ch_idx, p_stv.sn_ch_freq);
       printf_("PDU_Type=%d | RFU_1=%d | TxAdd=%d | RxAdd=%d | Length=%d | RFU_2=%d\nAdvA=%#llx | InitA=%#llx\n\n", \
-	   p_stv.sn_tx_adv_ind_pdu.pdu_adv_ind_h.PDU_Type, p_stv.sn_tx_adv_ind_pdu.pdu_adv_ind_h.RFU_1, \
-	   p_stv.sn_tx_adv_ind_pdu.pdu_adv_ind_h.TxAdd, p_stv.sn_tx_adv_ind_pdu.pdu_adv_ind_h.RxAdd, \
-	   p_stv.sn_tx_adv_ind_pdu.pdu_adv_ind_h.Length, p_stv.sn_tx_adv_ind_pdu.pdu_adv_ind_h.RFU_2, \
-	   p_stv.sn_tx_adv_ind_pdu.pdu_adv_ind_payload.AdvA, p_stv.sn_tx_adv_ind_pdu.pdu_adv_ind_payload.InitA);  
+	   p_stv.sn_tx_adv_pdu.pdu_adv_ind_h.PDU_Type, p_stv.sn_tx_adv_pdu.pdu_adv_ind_h.RFU_1, \
+	   p_stv.sn_tx_adv_pdu.pdu_adv_ind_h.TxAdd, p_stv.sn_tx_adv_pdu.pdu_adv_ind_h.RxAdd, \
+	   p_stv.sn_tx_adv_pdu.pdu_adv_ind_h.Length, p_stv.sn_tx_adv_pdu.pdu_adv_ind_h.RFU_2, \
+	   p_stv.sn_tx_adv_pdu.pdu_adv_ind_payload.AdvA, p_stv.sn_tx_adv_pdu.pdu_adv_ind_payload.InitA);  
 }			
 
-void sn_rx_cnt_req_print(sn_rx_cnt_req_param_s_t p_srq, sn_tx_adv_param_s_t p_stv) {
-       uart_printf("\nSN RX received %d bytes/CONNECT_REQ expected on the advertising channel (index,frequency)=(%d,%dMHz)\n", p_srq.nbytes, p_srq.sn_adv_ch_idx, (p_stv.sn_ch_freq - 1));		        
+void sn_rx_cnt_req_print(sn_rx_cnt_req_param_s_t p_srq) {
+       uint16_t adv_ch_idx=p_srq.sn_adv_ch_idx; if(p_srq.error) {adv_ch_idx--;}
+       uart_printf("\nSN RX received %d bytes/CONNECT_REQ expected on the advertising channel (index,frequency)=(%d,%dMHz)\n", p_srq.nbytes, adv_ch_idx, (p_srq.sn_ch_freq - 1));		        
        printf_("PDU_Type=%d | RFU_1=%d | TxAdd=%d | RxAdd=%d | Length=%d | RFU_2=%d\n", \
 	    p_srq.sn_rx_connect_request_pdu.pdu_adv_ind_h.PDU_Type, p_srq.sn_rx_connect_request_pdu.pdu_adv_ind_h.RFU_1, \
 	    p_srq.sn_rx_connect_request_pdu.pdu_adv_ind_h.TxAdd, p_srq.sn_rx_connect_request_pdu.pdu_adv_ind_h.RxAdd, \
@@ -27,9 +28,13 @@ void sn_rx_cnt_req_print(sn_rx_cnt_req_param_s_t p_srq, sn_tx_adv_param_s_t p_st
 	    p_srq.sn_rx_connect_request_pdu.connect_req_payload.LLData_ChM, p_srq.sn_rx_connect_request_pdu.connect_req_payload.LLData_Hop, \
 	    p_srq.sn_rx_connect_request_pdu.connect_req_payload.LLData_SCA);		    
 
-       if(p_srq.result==1) {printf_("SN received a CONNECT_REQ packet\n\n");}
-       else if(p_srq.result==2){printf_("SN did not receive a CONNECT_REQ packet\n\n");}
-       else if(p_srq.result==3){printf_("SN received %d bytes instead of %d bytes!\n\n", p_srq.nbytes, p_srq.pdu_size);}
+       if(p_srq.error==0){printf_("INFO: SN received a CONNECT_REQ packet.\n\n");}	
+       else if(p_srq.error==1){printf_("ERROR - PDU size: %d bytes received instead of %d bytes. (SN-1)\n\n", p_srq.nbytes, p_srq.pdu_size);}
+       else if(p_srq.error==2){printf_("ERROR - Payload size: %d bytes received instead of %d bytes. (SN-2)\n\n", p_srq.sn_rx_connect_request_pdu.pdu_adv_ind_h.Length, CONNECT_REQ_P_LEN);}
+       else if(p_srq.error==3){printf_("ERROR - Device address: Wrong advertiser device address. (SN-3)\n\n");}
+       else if(p_srq.error==4){printf_("ERROR - Device address: Wrong initiator device address. (SN-4)\n\n");}
+       else if(p_srq.error==5){printf_("ERROR - Packet type: Does not match a connection request packet type. (SN-5)\n\n");} 
+       else if(p_srq.error==-1){printf_("ERROR - Adviser filter: Something went wrong, the adviser filter did not run. (SN-6)\n\n");}              
 }       
 
 void sn_tx_data_gps_print(sn_tx_gps_param_s_t p_stgps) {

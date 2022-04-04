@@ -17,6 +17,8 @@
 #define MAX_N_BYTES         39
 #define MAX_N_DATA_CHANNELS 37
 #define ADV_CH_FIRST        37
+#define ADV_CH_SECOND       38
+#define ADV_CH_LAST         39
 
 #define ADV_H_LEN          2
 #define LL_DATA_H_LEN      2
@@ -59,17 +61,28 @@
 #define POSITIVE_ACK 1
 #define END_CONNECTION 19
 
-//Standby delay in us - temporarily setting 
-#define t_standby 500
+//Time slot in us
+#define T_Slot 625
+
+//Standby delay in us - temporary setting 
+#define T_STANDBY 500
 
 //Inter Frame Space in us
 #define T_IFS 150
 
 //Advertising delay in us
 #define advDelay 10000
+ 
+//Scan window in us
+#define T_ScanWindow(N) N*T_Slot
 
-//Scan Window in us
-#define scanWindow 10000
+//Scan interval in us
+#define T_ScanInterval(M,N) M*T_ScanWindow(N)   
+
+typedef enum {
+	FALSE=0,
+	TRUE=1
+} boolean_e_t;		
 	
 #pragma pack (1)
 //-------------------------------------------------- 
