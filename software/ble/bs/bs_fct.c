@@ -16,8 +16,42 @@ uint64_t bs_whitelist[MAX_N_SN][4] = {{SN_DEVIVCE_ADDR_OP, DA_FREE, 0, 0}, {0xF2
 				      {0xF5FFFFFF, DA_FREE, 0, 0}, {0xF6FFFFFF, DA_FREE, 0, 0},
 				      {0xF5FFFFFF, DA_FREE, 0, 0}, {0xF6FFFFFF, DA_FREE, 0, 0},
 				      {0xF5FFFFFF, DA_FREE, 0, 0}, {0xF6FFFFFF, DA_FREE, 0, 0}};
-				      
-uint32_t bs_standby(){
+uint8_t enable_scan_all=FALSE;
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+int32_t bs_initiator_filter(bs_rx_adv_param_s_t p){
+    int32_t da_found=0, error=-1;    
+    if ((p.nbytes - CRC_LEN) == p.pdu_size) { //There is data in the RX buffer 		      								     
+	  if(p.bs_rx_adv_pdu.pdu_adv_ind_h.Length==ADV_DIND_P_LEN){
+	    if(p.bs_rx_adv_pdu.pdu_adv_ind_payload.InitA==BS_DEVIVCE_ADDR){ //The packet is addressed to the BS
+	      for(int i=0; i<MAX_N_SN; i++) {
+	           if (bs_whitelist[i][0] == p.bs_rx_adv_pdu.pdu_adv_ind_payload.AdvA) { //The advertiser device address is found
+	      		da_found=1;
+			if(bs_whitelist[i][1] == DA_FREE){ //This advertiser is new
+			    bs_whitelist[i][1]=AA_ATTR; 
+			 } 
+			 i=MAX_N_SN;  
+     	           }
+	      }
+            } else {error=3;} 	
+	  } else {error=2;}
+	  
+	  if(da_found==1){
+	     if (p.bs_rx_adv_pdu.pdu_adv_ind_h.PDU_Type == ADV_DIRECT_IND) { //It is a connectable directed advertising packet       
+    	         error=0;	         
+    	     } else {       
+    	         error=5;
+    	     }
+	  } else if(da_found==0){error=4;}   
+     } else {
+  	  error=1;    	  
+     }      
+     return error;
+}      		  
+//------------------------------------------------------------------------------------------------------------------------------------------
+bs_standby_param_s_t bs_standby(){
+    bs_standby_param_s_t p={0};
+    
     //System Init
     sys_init();							    
 
@@ -26,27 +60,36 @@ uint32_t bs_standby(){
  
     //Delay
     uint32_t start_time = timer_time_us();
-    while ((timer_time_us() - start_time) < (unsigned int)t_standby);				
+    while ((timer_time_us() - start_time) < (unsigned int)T_STANDBY);				
 
+    //Configure avdertising channels starting index
+    p.adv_ch_start_idx=ADV_CH_FIRST;  
+    
     //Go to next state
-    return MODE_BS_RX_ADV_DIRECT_IND; 
+    p.nextState=MODE_BS_RX_ADV_DIRECT_IND; 
+    
+    return p;
 }
 
-bs_tx_cnt_req_param_s_t bs_tx_cnt_req(uint16_t bs_adv_ch_idx, uint32_t bs_ch_freq, uint64_t AdvA){
+bs_tx_cnt_req_param_s_t bs_tx_cnt_req(uint16_t bs_adv_ch_idx, uint64_t AdvA){
     bs_tx_cnt_req_param_s_t p={0};
+    p.bs_adv_ch_idx=bs_adv_ch_idx;
     
     //Wait for inter frame space
     uint32_t start_time = timer_time_us();
     while ((timer_time_us() - start_time) < (unsigned int)T_IFS);			  
 
+    //Get the advertising channel frequency   
+    p.bs_ch_freq = get_adv_ch_freq(p.bs_adv_ch_idx);
+    
     //Configure ADPLL
-    ble_config(bs_ch_freq, 3);
+    ble_config(p.bs_ch_freq, 3);
 
     //Configure BLE for data transmission
     ble_send_on();
 
     //Configure the whitener channel index
-    wp_set_ch_index(bs_adv_ch_idx);  
+    wp_set_ch_index(p.bs_adv_ch_idx);  
 	
     //Configure PDU's size
     p.pdu_size = ADV_H_LEN + CONNECT_REQ_P_LEN;
@@ -62,14 +105,14 @@ bs_tx_cnt_req_param_s_t bs_tx_cnt_req(uint16_t bs_adv_ch_idx, uint32_t bs_ch_fre
     for(int i=0; i<MAX_N_SN; i++) {
 	if (aa_plist[i][0] == AA_FREE) { //Free access address 
 	       p.bs_tx_connect_request_pdu.connect_req_payload.LLData_AA=aa_plist[i][1];
-	       bs_whitelist[i][0]=AA_ATTR;
+	       bs_whitelist[i][0]=AA_ATTR;    //to get back to AA_FREE once finished
      	       i=MAX_N_SN;
 	}
     }			   
 	      
     p.bs_tx_connect_request_pdu.connect_req_payload.LLData_CRCInit=0x555555;    
     p.bs_tx_connect_request_pdu.connect_req_payload.LLData_WinSize=1; p.bs_tx_connect_request_pdu.connect_req_payload.LLData_WinOffset=2;	   
-    p.bs_tx_connect_request_pdu.connect_req_payload.LLData_Interval=3; p.bs_tx_connect_request_pdu.connect_req_payload.LLData_Latency=4;		 
+    p.bs_tx_connect_request_pdu.connect_req_payload.LLData_Interval=3; p.bs_tx_connect_request_pdu.connect_req_payload.LLData_Latency=0;		 
     p.bs_tx_connect_request_pdu.connect_req_payload.LLData_Timeout=5; p.bs_tx_connect_request_pdu.connect_req_payload.LLData_ChM=0x400400020;		  
     p.bs_tx_connect_request_pdu.connect_req_payload.LLData_Hop=2; p.bs_tx_connect_request_pdu.connect_req_payload.LLData_SCA=1; 	      
 	      	      			    	      	       	   	      	      
@@ -88,17 +131,16 @@ bs_tx_cnt_req_param_s_t bs_tx_cnt_req(uint16_t bs_adv_ch_idx, uint32_t bs_ch_fre
     return p;
 }     	      	     
 
-bs_rx_adv_param_s_t bs_rx_adv_ind(uint16_t bs_adv_ch_idx){
-    bs_rx_adv_param_s_t p={0}; int da_found=0; 		
-    p.bs_adv_ch_idx=bs_adv_ch_idx;
-
+bs_rx_adv_param_s_t bs_rx_adv(uint16_t bs_adv_ch_idx){
+    bs_rx_adv_param_s_t p={0}; 		
+    p.bs_adv_ch_idx=bs_adv_ch_idx; p.error=-1;    
           
     //Get the advertising channel frequency   
     p.bs_ch_freq = get_adv_ch_freq(p.bs_adv_ch_idx);
     
     //Configure PDU's size
     p.pdu_size = ADV_H_LEN + ADV_DIND_P_LEN;	    
-    ble_payload(p.pdu_size);
+    ble_payload(p.pdu_size);  //CRC length is added by ble_payload() - for debugging purpose when needed
 
     //Configure ADPLL	
     ble_config((p.bs_ch_freq-1.0F), 2);
@@ -107,52 +149,31 @@ bs_rx_adv_param_s_t bs_rx_adv_ind(uint16_t bs_adv_ch_idx){
     ble_recv_on();
 
     //Configure the dewhitener channel index
-    wp_set_ch_index(p.bs_adv_ch_idx);  
+    wp_set_ch_index(p.bs_adv_ch_idx);      
     
-    //Stay on the advertising channel to listen for a connectable undirected advertising event
+    //Stay on the advertising channel to listen, during the scan window, for a connectable directed advertising event
     uint32_t start_time = timer_time_us();
-    while ((timer_time_us() - start_time) < (unsigned int)scanWindow);     
-    
-    //Read the PDU from the HW
-    p.pdu_size += CRC_LEN;
-    for (int i = 0; i < MAX_N_BYTES; i++) { bs.buffer_rx[i] = 0; }
-    
-    p.nbytes = ble_receive(bs.buffer_rx, p.pdu_size);
-    
+    while ((timer_time_us() - start_time) < (unsigned int)T_ScanWindow(N_SW));
+        
+    //Read the PDU from the HW 
+    p.nbytes = ble_receive((unsigned char *)&p.bs_rx_adv_pdu, p.pdu_size);
+ 
     //Turn off BLE
-    ble_off();
-    		     
-    //Processing to be completed
-    if (p.nbytes == p.pdu_size) { //There is data in the RX buffer
-    	  for (int i = 0; i < (p.pdu_size - CRC_LEN); i++) {
-    	       ((unsigned char *)&p.bs_rx_adv_ind_pdu)[i] = bs.buffer_rx[i];
-    	  }			      								     
+    ble_off();    
 
-	  if(p.bs_rx_adv_ind_pdu.pdu_adv_ind_payload.InitA==BS_DEVIVCE_ADDR){ //The ADV packet is addressed to the BS
-	      for(int i=0; i<MAX_N_SN; i++) {
-	           if (bs_whitelist[i][0] == p.bs_rx_adv_ind_pdu.pdu_adv_ind_payload.AdvA) { //The advertiser device address is found
-	      		if(bs_whitelist[i][1] == DA_FREE){ //This advertiser is new
-			    bs_whitelist[i][1]=AA_ATTR; da_found=1; i=MAX_N_SN;
-			 }   
-     	           }
-	      }
-          } 	
-	  
-	  if(da_found==1){
-	     if (p.bs_rx_adv_ind_pdu.pdu_adv_ind_h.PDU_Type == ADV_DIRECT_IND) {       
-    	         p.result=1;
-	         p.nextState=MODE_BS_TX_CONNECT_REQ; 
-    	     } else {       
-    	         p.result=2;
-	         p.nextState=MODE_BS_RX_ADV_DIRECT_IND;
-    	     }
-	 }    
-     } else {
-  	  p.result=3;
-    	  p.nextState=MODE_BS_RX_ADV_DIRECT_IND; 
-     }  	      
-	      
-     return p;
+    //Run the initiator filter
+    p.error=bs_initiator_filter(p);
+    	
+    //Go to next state
+    if(p.error==0) {
+        p.nextState=MODE_BS_TX_CONNECT_REQ;
+    } else {
+	if(enable_scan_all==TRUE){p.bs_adv_ch_idx++; if(p.bs_adv_ch_idx>ADV_CH_LAST) {p.bs_adv_ch_idx=ADV_CH_FIRST;}}	
+	while ((timer_time_us() - start_time) < (unsigned int)T_ScanInterval(N_SI,N_SW));
+        p.nextState=MODE_BS_RX_ADV_DIRECT_IND;
+    }
+     	      
+    return p;
 }        
 
 bs_rx_gps_param_s_t bs_rx_data_gps(uint32_t LLData_AA){  	
@@ -181,7 +202,7 @@ bs_rx_gps_param_s_t bs_rx_data_gps(uint32_t LLData_AA){
     wp_set_aa(LLData_AA);  
 
     uint32_t start_time = timer_time_us();
-    while ((timer_time_us() - start_time) < (unsigned int)scanWindow);	//delay to be changed
+    while ((timer_time_us() - start_time) < (unsigned int)T_ScanWindow(N_SW));	//delay to be changed
 
     //Read the PDU from the HW
     p.pdu_size_1 += CRC_LEN;
@@ -269,7 +290,7 @@ bs_rx_tmp_param_s_t bs_rx_data_tmp(uint16_t bs_data_ch_idx, uint32_t bs_ch_freq)
     wp_set_ch_index(bs_data_ch_idx);  
 
     start_time = timer_time_us();
-    while ((timer_time_us() - start_time) < (unsigned int)scanWindow);   //delay to be changed
+    while ((timer_time_us() - start_time) < (unsigned int)T_ScanWindow(N_SW));   //delay to be changed
 
     //Read the PDU from the HW
     p.pdu_size_1 += CRC_LEN;
@@ -292,12 +313,4 @@ bs_rx_tmp_param_s_t bs_rx_data_tmp(uint16_t bs_data_ch_idx, uint32_t bs_ch_freq)
 	
     return p;
 } 
-
-
-
-
-
-
-
-
-	 
+	

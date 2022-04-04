@@ -24,10 +24,17 @@ typedef struct SN {
 } sn_s_t;
 
 typedef struct {
-     adv_direct_pdu_s_t sn_tx_adv_ind_pdu;                 //Connectable undirected advertising PDU
-     uint32_t           nextState;
-     uint32_t           sn_ch_freq;  
-     uint32_t           pdu_size;	                   //for debugging purpose   
+     uint32_t    nextState;
+     uint16_t    adv_ch_start_idx;
+     uint8_t     adv;
+} sn_standby_param_s_t;
+
+typedef struct {
+     adv_direct_pdu_s_t    sn_tx_adv_pdu;                 //Connectable undirected advertising PDU
+     uint32_t              nextState;
+     uint16_t              sn_adv_ch_idx;                 
+     uint32_t              sn_ch_freq;  		  //for debugging purpose
+     uint32_t              pdu_size;                      //for debugging purpose   
 } sn_tx_adv_param_s_t;
 
 typedef struct {
@@ -35,8 +42,9 @@ typedef struct {
      uint32_t                nextState;  
      uint16_t                sn_adv_ch_idx;
      uint8_t                 sn_adv;
+     uint32_t                sn_ch_freq;  		  //for debugging purpose
      uint32_t                pdu_size;	                   //for debugging purpose
-     uint32_t                result;			   //for debugging purpose     
+     uint32_t                error;			   //for debugging purpose     
      int8_t 	             nbytes;	                   //for debugging purpose    
 } sn_rx_cnt_req_param_s_t;
 
