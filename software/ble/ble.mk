@@ -17,6 +17,7 @@ SRC+=$(BLE_DIR)/*.c
 INCLUDE+=$(incdir)$(BLE_DIR)/sn
 HDR+=$(BLE_DIR)/sn/*.h
 SRC+=$(BLE_DIR)/sn/sn_fct.c
+SRC+=$(BLE_DIR)/sn/sn_as.c
 ifeq ($(DBUG),1)
 SRC+=$(BLE_DIR)/sn/sn_fct_print.c
 endif
@@ -25,6 +26,7 @@ endif
 INCLUDE+=$(incdir)$(BLE_DIR)/bs
 HDR+=$(BLE_DIR)/bs/*.h
 SRC+=$(BLE_DIR)/bs/bs_fct.c
+SRC+=$(BLE_DIR)/bs/bs_im.c
 ifeq ($(DBUG),1)
 SRC+=$(BLE_DIR)/bs/bs_fct_print.c
 endif

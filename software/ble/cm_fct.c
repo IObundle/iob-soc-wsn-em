@@ -4,6 +4,7 @@
 #include "ble.h"
 #include "cm_def.h"
 
+
 //System Init
 void sys_init(void){
     ble_init(); 
@@ -27,6 +28,7 @@ unsigned int get_adv_ch_freq(unsigned short adv_ch_idx) {
 //Get the data channel frequency in MHz - Data channels: 5, 22, 34
 unsigned int get_data_ch_freq(unsigned short data_ch_idx) {   
    unsigned int freq;    
+   
    if (data_ch_idx == 5) {
    	freq = 2414;		
    } else if (data_ch_idx == 22) {
@@ -46,3 +48,5 @@ void wp_set_ch_index(unsigned short ch_idx) {
 void wp_set_aa(unsigned int aa) {
      txrx_set_aa(aa);
 }
+
+
