@@ -30,6 +30,9 @@ module soc_tb
    reg [`DATA_W-1:0]      uart_rdata;
    wire                   uart_ready;
 
+   reg [80*8:1]           filename;
+   integer                fp_t;
+
    //iterator
    integer                i;
 
@@ -45,6 +48,13 @@ module soc_tb
       //init cpu bus signals
       uart_valid = 0;
       uart_wstrb = 0;
+
+      $sformat(filename, "soc%.0f.txt", ID);
+      fp_t = $fopen(filename, "w");
+      if (!fp_t) begin
+         $display("Could not open \"soc%.0f.txt\"", ID);
+         $finish;
+      end
       
       wait (~reset) #1;
       
@@ -63,6 +73,8 @@ module soc_tb
 `endif      
       //run firmware
       cpu_run();
+
+      $fclose(fp_t);
 
       finish = 1;
    end

@@ -58,7 +58,7 @@
 	  //Signal target ACK
 	  cpu_putchar(`ACK);
 
-      $display("File size: %d bytes", file_size);
+      $fwrite(fp_t, "File size: %d bytes", file_size);
 
       //Send file size
       cpu_putchar(file_size[7:0]);
@@ -72,11 +72,11 @@
          cpu_putchar($fgetc(fp));
 
          if(i/4 == (file_size/4*k/100)) begin
-            $write("%d%%\n", k);
+            $fwrite(fp_t, "%d%%\n", k);
             k=k+10;
          end
       end
-      $write("%d%%\n", 100);
+      $fwrite(fp_t, "%d%%\n", 100);
       $fclose(fp);
 
    endtask
@@ -99,7 +99,7 @@
       cpu_getchar(file_size[15:8]);
       cpu_getchar(file_size[23:16]);
       cpu_getchar(file_size[31:24]);
-      $display("File size: %d bytes", file_size);
+      $fwrite(fp_t, "File size: %d bytes", file_size);
 
       k = 0;
       for(i = 0; i < file_size; i++) begin
@@ -107,11 +107,11 @@
          $fwrite(fp,"%c", char);
 
          if(i/4 == (file_size/4*k/100)) begin
-            $write("%d%%\n", k);
+            $fwrite(fp_t, "%d%%\n", k);
             k=k+10;
          end
       end
-      $write("%d%%\n", 100);
+      $fwrite(fp_t, "%d%%\n", 100);
 
       $fclose(fp);
 
@@ -163,7 +163,7 @@
       reg [7:0] char;
       do begin
          cpu_getchar(char);
-         $write("%c", char);
+         $fwrite(fp_t, "%c", char);
       end while (char != "\n");
    endtask
 
@@ -187,7 +187,7 @@
 
       cpu_getchar(cpu_char);
       while(cpu_char != `ETX && cpu_char != `ENQ) begin
-         $write("%c", cpu_char);
+         $fwrite(fp_t, "%c", cpu_char);
          cpu_getchar(cpu_char);
       end
 
