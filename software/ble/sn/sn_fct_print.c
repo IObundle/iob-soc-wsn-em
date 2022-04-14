@@ -58,7 +58,7 @@ void sn_tx_data_gps_print(sn_tx_gps_param_s_t p){
 
 void sn_rx_llcontrol_print(sn_rx_llcontrol_param_s_t p, uint8_t gps_tmp){
       uart_printf("Runtime(sn_rx_llcontrol)=%dus", p.tt);
-      uart_printf("\nINFO: SN RX received %d bytes/LL_CONTROL expected on the data channel (index,frequency)=(%d,%dMHz)\n", p.nbytes, p.sn_data_ch_idx, (p.sn_ch_freq - 1));	      	     				
+      uart_printf("\nSN RX received %d bytes/LL_CONTROL expected on the data channel (index,frequency)=(%d,%dMHz)\n", p.nbytes, p.sn_data_ch_idx, (p.sn_ch_freq - 1));	      	     				
       printf_("LLID=%d | NESN=%d | SN=%d | MD=%d | RFU=%d | Length=%d\nOpcode=%d | CtrData=%d\n",
             p.sn_rx_pdu_llcontrol.h.LLID, p.sn_rx_pdu_llcontrol.h.NESN, \
 	    p.sn_rx_pdu_llcontrol.h.SN, p.sn_rx_pdu_llcontrol.h.MD, \

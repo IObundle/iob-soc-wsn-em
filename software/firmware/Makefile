@@ -34,6 +34,11 @@ DEFINE+=$(defmacro)DBUG
 SRC+= $(UART_DIR)/software/printf.c
 endif
 
+#Temporary setting
+ifeq ($(TMPO),1)
+DEFINE+=$(defmacro)TMPO
+endif
+
 #RULES
 run: firmware.elf
 

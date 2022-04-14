@@ -1,7 +1,9 @@
+#include "iob-uart.h"
 #include "iob_timer.h"
 #include "cm_def.h"
 #include "sn_def.h"
 #include "ble.h"
+#include "tmp.h"
 
 #define CST 1
 #include "sn_config.h"
@@ -32,7 +34,7 @@ int32_t sn_advertiser_filter(sn_rx_cnt_req_param_s_t p){
 sn_standby_param_s_t sn_standby(uint8_t ch_aa){
     sn_standby_param_s_t p={0};
             
-    sys_init();   //System Init 	    
+    sys_init(); //System Init	    
 #ifdef DBUG
     uint32_t start_time_debug = timer_time_us();   //for debugging purpose
 #endif        
@@ -267,7 +269,7 @@ sn_rx_llcontrol_param_s_t sn_rx_llcontrol(uint16_t sn_data_ch_idx, uint8_t gps_t
     return p;	      	       
 } 
 
-sn_tx_tmp_param_s_t sn_tx_data_tmp(uint16_t sn_data_ch_idx, int16_t sn_data_tmp){
+sn_tx_tmp_param_s_t sn_tx_data_tmp(uint16_t sn_data_ch_idx){
 #ifdef DBUG
     uint32_t start_time_debug = timer_time_us();   //for debugging purpose
 #endif   
@@ -296,7 +298,7 @@ sn_tx_tmp_param_s_t sn_tx_data_tmp(uint16_t sn_data_ch_idx, int16_t sn_data_tmp)
     p.sn_tx_lldata_tmp_pdu.h.MD=0; 
     p.sn_tx_lldata_tmp_pdu.h.RFU=0;
     p.sn_tx_lldata_tmp_pdu.h.Length=LL_DATA_TMP_P_LEN;    
-    p.sn_tx_lldata_tmp_pdu.payload=sn_data_tmp;  //temporarily for debugging purpose 				 
+    p.sn_tx_lldata_tmp_pdu.payload=get_tmp();	    
 				     
     ble_send((uint8_t *)&p.sn_tx_lldata_tmp_pdu, p.pdu_size);   //Write the PDU to the HW/TX fifo
 
@@ -311,7 +313,9 @@ sn_tx_tmp_param_s_t sn_tx_data_tmp(uint16_t sn_data_ch_idx, int16_t sn_data_tmp)
 #ifdef DBUG
     p.tt=timer_time_us() - start_time_debug;    //for debugging purpose
 #endif     
-
+#ifdef TMPO 
+    uart_printf("SN sent TMP: %d\n\n", p.sn_tx_lldata_tmp_pdu.payload);   //used temporarily to check tmp value when DBUG is not enabled		 
+#endif
     return p;
 }    
 
