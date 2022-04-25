@@ -3,13 +3,15 @@
 #include "txrx.h"
 #include "ble.h"
 #include "cm_def.h"
+#include "tmp.h"
 
 
 //System Init
 void sys_init(void){
     ble_init(); 
     uart_init(UART_BASE,FREQ/BAUD); 
-    timer_init(TIMER_BASE);		      
+    timer_init(TIMER_BASE);
+    tmp_init(TMP_BASE);		      
 }
 
 //Get the advertising channel frequency in MHz - Advertising channels: 37, 38, 39

@@ -1,3 +1,4 @@
+#include "iob-uart.h"
 #include "iob_timer.h"
 #include "cm_def.h"
 #include "bs_def.h"
@@ -317,11 +318,13 @@ bs_rx_tmp_param_s_t bs_rx_data_tmp(uint16_t bs_data_ch_idx){
         p.error=2;
         p.nextState=0; 
      }	    
-
+     
 #ifdef DBUG
      p.tt=timer_time_us() - start_time_debug;    //for debugging purpose
 #endif
-	
+#ifdef TMPO     
+     uart_printf("BS received TMP: %d\n\n", p.bs_rx_lldata_tmp_pdu.payload);   //used temporarily to check tmp value when DBUG is not enabled   		
+#endif	
      return p;
 } 
 	

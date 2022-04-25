@@ -15,12 +15,13 @@ module system_tb;
 
    wire antena0;
    wire antena1;
-
+   
+    
    /////////////////////////////////////////////
    // TEST PROCEDURE
    //
    initial begin
-
+ 
 `ifdef VCD
       $dumpfile("system.vcd");
       //$dumpvars(2,soc0, soc1, soc0.uut.txrx0, soc1.uut.txrx0);
@@ -33,7 +34,7 @@ module system_tb;
       reset <= 0;
 
       //wait an arbitray (10) number of cycles 
-      repeat (10) @(posedge clk) #1;
+      repeat (10) @(posedge clk) #1;        
    end
 
    //
@@ -47,6 +48,15 @@ module system_tb;
    wire                    finish0;
    wire                    finish1;
 
+   //temperature sensor adc output - temporary setting - to be removed once the ADC is connected
+   reg [9:0] adc_out_0;
+   reg [9:0] adc_out_1;  
+   initial begin   	 
+   	adc_out_0 = $urandom % 'h50;
+   	adc_out_1 = $urandom % 'h50;
+   	$display ("At time=%0t, adc_out_0=0x%0h and adc_out_1=0x%0h", $time, adc_out_0, adc_out_1);  
+   end
+
    //
    // UNITS UNDER TEST
    //
@@ -56,6 +66,7 @@ module system_tb;
    soc0 (
          .clk        (clk),
          .reset      (reset),
+	 .adc_out    (adc_out_0),		
          .antena_in  (antena1),
          .antena_out (antena0),
          .trap       (trap0),
@@ -67,7 +78,8 @@ module system_tb;
             )
    soc1 (
          .clk        (clk),
-         .reset      (reset),
+         .reset      (reset),	
+	 .adc_out    (adc_out_1), 	
          .antena_in  (antena0),
          .antena_out (antena1),
          .trap       (trap1),

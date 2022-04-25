@@ -64,6 +64,7 @@ module system
 `endif //  `ifdef USE_DDR
    input                    clk,
    input                    rst,
+   input [9:0]		    adc_out,	//Used temporarily - to be removed when the ADC is integrated
    output                   trap
    );
 

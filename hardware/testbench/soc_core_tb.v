@@ -10,12 +10,13 @@ module soc_tb
      parameter ID = 0
      )
   (
-   input      clk,
-   input      reset,
-   input      antena_in,
-   output     antena_out,
-   output     trap,
-   output reg finish
+   input      	clk,
+   input      	reset,
+   input [9:0]	adc_out,		//Used temporarily - to be removed when the ADC is integrated
+   input      	antena_in,
+   output     	antena_out,
+   output     	trap,
+   output reg 	finish
    );
 
    //received by getchar
@@ -36,6 +37,7 @@ module soc_tb
    //iterator
    integer                i;
 
+   
    //PWIRES
 
    
@@ -188,6 +190,7 @@ module soc_tb
 `endif               
 	       .clk           (clk),
 	       .rst           (reset),
+	       .adc_out	      (adc_out),	//Used temporarily - to be removed when the ADC is integrated	
 	       .trap          (trap)
 	       );
 

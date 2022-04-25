@@ -10,8 +10,6 @@ sn_tx_gps_param_s_t p_stgps={0};
 sn_rx_llcontrol_param_s_t p_srack_gps={0};
 sn_tx_tmp_param_s_t p_sttmp={0}; 
 sn_rx_llcontrol_param_s_t p_sr_cnt_end={0};
-
-int16_t sn_data_tmp=-15;   //temporary setting for debugging purpose
    
 void sensor_node(){
      uint32_t js=0;
@@ -61,7 +59,7 @@ void sensor_node(){
 	     break; 	
 	     	     
 	case SN_TX_DATA_TMP:
-	     p_sttmp=sn_tx_data_tmp(p_stgps.sn_data_ch_idx, sn_data_tmp);	
+	     p_sttmp=sn_tx_data_tmp(p_stgps.sn_data_ch_idx);	
 #ifdef DBUG
 	     sn_tx_data_tmp_print(p_sttmp);
 #endif	     
