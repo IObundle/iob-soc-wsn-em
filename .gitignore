@@ -44,6 +44,7 @@ software/ble/sn/*
 !software/ble/sn/sn_fct.c
 !software/ble/sn/sn_fct.h
 !software/ble/sn/sn_fct_print.c
+!software/ble/sn/sn_as.c
 
 software/ble/bs/*
 !software/ble/bs/bs_config.h   
@@ -51,6 +52,7 @@ software/ble/bs/*
 !software/ble/bs/bs_fct.c
 !software/ble/bs/bs_fct.h
 !software/ble/bs/bs_fct_print.c
+!software/ble/bs/bs_im.c
 
 software/console/*
 !software/console/console.c
