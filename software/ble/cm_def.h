@@ -11,7 +11,7 @@
 #include "printf.h"
 #endif
 
-#define ITER  12
+#define ITER  21
 
 #define MAX_N_SN            10
 #define MAX_N_BYTES         39
@@ -20,12 +20,15 @@
 #define ADV_CH_SECOND       38
 #define ADV_CH_LAST         39
 #define SAMPLING_RATE	     4
+#define MD_VAL_ONE	     1
+#define MD_VAL_ZERO	     0    
 
 #define ADV_H_LEN            2
 #define LL_DATA_H_LEN        2
 #define LL_DATA_GPS_P_LEN   18
 #define LL_DATA_TMP_P_LEN    4
 #define LL_CONTROL_P_LEN     4
+#define ZERO_PAYLOAD	     0
 
 #define PREAMBLE_LEN	     1  
 #define AA_LEN               4 
@@ -56,26 +59,14 @@
 //LLID - Continuation fragment of an L2CAP message or an Empty PDU
 #define LL_DATA_PDU_CE      1
 
-//Opcode - New - used to build the ACK packet
-#define LL_CONNECTION_ACK  23
-//Opcode - Remote User Terminated Connection
-#define LL_TERMINATE_IND    2
-
-//CtrlData
-#define POSITIVE_ACK        1
-#define END_CONNECTION     19
-
 //Time slot in us
 #define T_Slot            625
-
-//Standby delay in us - temporary setting 
-#define T_STANDBY         500
 
 //Inter Frame Space in us
 #define T_IFS             150
 
-//PDU Interval in us - max
-#define pduInterval     10000
+//Advertising time on one adv channel
+#define T_ADV           10000
 
 //Advertising delay in us - should be within the range of 0-10ms
 #define advDelay        10000
@@ -86,8 +77,12 @@
 //Scan interval in us
 #define T_ScanInterval(M,N) M*T_ScanWindow(N)   
 
-//Packet Time in us with bit rate is 1 Mbps - to be reviewed
-#define T_PACKET(H,P) (8*(PREAMBLE_LEN + AA_LEN + H + P + CRC_LEN) + T_IFS)  
+//Packet Time in us with bit rate is 1 Mbps - to be reviewed plus_T_IFS
+#define T_PACKET(H,P) 8*(PREAMBLE_LEN + AA_LEN + H + P + CRC_LEN)  
+
+//Connection timing 
+#define W_MIN   1250
+#define T_RX   10000 
 
 typedef enum {
 	FALSE=0,

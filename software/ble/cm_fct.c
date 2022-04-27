@@ -10,7 +10,7 @@
 void sys_init(void){
     ble_init(); 
     uart_init(UART_BASE,FREQ/BAUD); 
-    timer_init(TIMER_BASE);
+    //timer_init(TIMER_BASE);
     tmp_init(TMP_BASE);		      
 }
 
