@@ -7,9 +7,9 @@ bs_standby_param_s_t p_bstd={0};
 bs_tx_cnt_req_param_s_t p_btq={0}; 
 bs_rx_adv_param_s_t p_brv={0};
 bs_rx_gps_param_s_t p_brgps={0}; 
-bs_tx_llcontrol_param_s_t p_btack_gps={0};
 bs_rx_tmp_param_s_t p_brtmp={0}; 
-bs_tx_llcontrol_param_s_t p_bt_cnt_end={0};
+bs_tx_data_ack_param_s_t p_btack_gps={0};
+bs_tx_data_ack_param_s_t p_bt_cnt_end={0};
    
 void base_station(){
      uint32_t jb=0;
@@ -17,7 +17,7 @@ void base_station(){
      while(jb<ITER) {  //will be replaced by while(1) to run with non-stop
       switch(bs.nextState) {
       	case BS_STANDBY:
-	     p_bstd=bs_standby(bs.isCh_aa);
+	     p_bstd=bs_standby();
 	     p_brv.bs_adv_ch_idx=p_bstd.adv_ch_start_idx;
 #ifdef DBUG  	     
 	     bs_standby_print(p_bstd); 
@@ -50,9 +50,9 @@ void base_station(){
 	     break;	
 
 	case BS_TX_ACK_GPS:	
-	     p_btack_gps=bs_tx_llcontrol(p_brgps.bs_data_ch_idx, 1);
+	     p_btack_gps=bs_tx_data_ack(p_brgps.bs_data_ch_idx, 1);
 #ifdef DBUG
-             bs_tx_llcontrol_print(p_btack_gps, 1);
+             bs_tx_data_ack_print(p_btack_gps, 1);
 #endif	      
 	     bs.nextState=p_btack_gps.nextState;
 	     break;		      
@@ -66,9 +66,9 @@ void base_station(){
 	     break;
 	      	      	                  	 	 	 	      
 	case BS_TX_END_CONNECTION:	    	   	   		   	      	      	      	      
-	     p_bt_cnt_end=bs_tx_llcontrol(p_brgps.bs_data_ch_idx, 2); 	
+	     p_bt_cnt_end=bs_tx_data_ack(p_brgps.bs_data_ch_idx, 2); 	
 #ifdef DBUG
-	     bs_tx_llcontrol_print(p_bt_cnt_end, 2);
+	     bs_tx_data_ack_print(p_bt_cnt_end, 2);
 #endif
 	     bs.nextState=p_bt_cnt_end.nextState; 	      	       	      
   	     break;		      
