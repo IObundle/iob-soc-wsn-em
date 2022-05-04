@@ -6,7 +6,7 @@
 #define CST 1
 #include "bs_config.h"
 
-bs_s_t bs = {.id = BS_ID, .aa = 0x8E89BED6, .nextState = BS_STANDBY, .isBusy=FALSE, .transmitSeqNum=0, .nextExpectedSeqNum=0};   //By default, BS is in STANDBY state
+bs_s_t bs = {.id = BS_ID, .aa = 0x8E89BED6, .nextState = BS_STANDBY, .nRec=1, .isBusy=FALSE, .transmitSeqNum=0, .nextExpectedSeqNum=0};   //By default, BS is in STANDBY state
 
 //Temporary setting for debugging purpose
 uint32_t aa_plist[MAX_N_SN][2]={{FALSE, 0xA3B9C1E5}, {FALSE, 0x5E2C419D}, {FALSE, 0x3D5C8A2E}, {FALSE, 0xE1B79C3A}, {FALSE, 0xC85B3D1E}, 
@@ -36,7 +36,7 @@ init_filter_s_t bs_initiator_filter(bs_rx_adv_param_s_t p){
     return pk;
 }      		  
 //------------------------------------------------------------------------------------------------------------------------------------------
-bs_standby_param_s_t bs_standby(){   						    
+bs_standby_param_s_t bs_standby(){   //Will the BS be in standby a nth time, n>1   						    
     bs_standby_param_s_t p={0};
     timer_init(TIMER_BASE);
 #ifdef DBUG    
@@ -196,16 +196,31 @@ bs_rx_adv_param_s_t bs_rx_adv(uint16_t bs_adv_ch_idx){
     return p;
 }        
 
-bs_rx_gps_param_s_t bs_rx_data_gps(uint32_t LLData_AA){  	
-    bs_rx_gps_param_s_t p={0}; 
+bs_rx_gps_param_s_t bs_rx_data_gps(uint32_t LLData_AA, uint64_t LLData_ChM, uint16_t LLData_WinOffset){    //procesing might be optimized in case of ChM and retransmission - te be reviewed  	
+    bs_rx_gps_param_s_t p={0}; uint32_t start_time=0;  
 #ifdef DBUG
     p.start = timer_time_us();   //for debugging purpose
 #endif      
-    uint32_t start_time = timer_time_us();
-    while ((timer_time_us() - start_time) < (uint32_t)W_MIN);
-                 
-    p.bs_data_ch_idx=5;  //Set data channel index - temporary setting for debugging purpose
-    	
+    uint64_t mask_data_ch=0x01; uint32_t k=0;
+    
+    if(bs.nRec == 1){   //Delay inserted after the end of the CONNECT_REQ PDU
+       start_time = timer_time_us();
+       while ((timer_time_us() - start_time) < (uint32_t)startTransmitWindow(LLData_WinOffset));
+    }
+
+    for(int i=0; i<MAX_N_DATA_CHANNELS; i++){
+	if(LLData_ChM & mask_data_ch) {
+	     p.data_ch[k++]=i;
+	}
+	mask_data_ch <<= 1; 					
+    }
+                     
+    if(bs.nRec == 1){   //PDU reception for a first time
+       p.bs_data_ch_idx = p.data_ch[0];    //Set the data channel index - data ch=5
+    } else if(bs.nRec == 2){   //Second reception of the same previous PDU
+       p.bs_data_ch_idx = p.data_ch[1];    //Set the data channel index - data ch=22
+    }	
+    
     p.bs_ch_freq = get_data_ch_freq(p.bs_data_ch_idx);   //Get the data channel frequency
 
     //Configure PDU's size
@@ -239,19 +254,22 @@ bs_rx_gps_param_s_t bs_rx_data_gps(uint32_t LLData_AA){
     if(p.nbytes == (p.pdu_size + CRC_LEN)) {   //There is data in the RX buffer (pdu +crc)  
        if(bs.nextExpectedSeqNum == p.bs_rx_data_gps_pdu.h.SN) {   //A new packet is received 
           if(p.bs_rx_data_gps_pdu.h.MD == MD_VAL_ONE) {   //The SN continues to listen          	           	
-	      p.error=0;	  	      
+	      if(bs.nRec == 1){p.error=10;}else{p.error=0;}	  	      
 	  } else {p.error=3;}	  
        } else {p.error=2;}   //The previous packet has been resent - bs.nextExpectedSeqNum should not be changed   	   
      } else {	 
         p.error=1;  
      }
      
-     if(p.error==0) {        
-        bs.nextExpectedSeqNum++; p.nextState=BS_TX_ACK_GPS; 
-     } else {
-        p.nextState=0;   //temporary setting 
+     if(p.error==0) {bs.nextExpectedSeqNum++; bs.nRec=1;} else {bs.nRec++;}
+     
+     if(bs.nRec==1){p.nextState=BS_TX_ACK_GPS;}
+     else if(bs.nRec==2){p.nextState=BS_RX_DATA_GPS;}
+     else {   //In this case, data is unsuccessfully received for the second time
+        bs.nRec=1; bs.transmitSeqNum=0; bs.nextExpectedSeqNum=0;   //Reinitialize nRec, SN and NESN
+	p.nextState=BS_RX_ADV_DIRECT_IND;   //Close the connection event and restart scanning
      }	
-
+	
 #ifdef DBUG
     p.end = timer_time_us();   //for debugging purpose
 #endif 
@@ -310,8 +328,9 @@ bs_rx_tmp_param_s_t bs_rx_data_tmp(uint16_t bs_data_ch_idx){
      if(p.error==0) {
          bs.nextExpectedSeqNum=0;   //Re-initialize - no more data to expect   
          p.nextState=BS_TX_END_CONNECTION;
-     } else {
-         p.nextState=0;   //temporary setting 
+     } else {   //In this case, data is unsuccessfully received
+         bs.transmitSeqNum=0; bs.nextExpectedSeqNum=0;
+	 p.nextState=BS_RX_ADV_DIRECT_IND;   //Close the connection event and restart scanning 
      }	    
      
 #ifdef DBUG
@@ -377,9 +396,9 @@ bs_tx_data_ack_param_s_t bs_tx_data_ack(uint16_t bs_data_ch_idx, uint32_t gps_tm
    
     if(gps_tmp == 1) {
         p.nextState=BS_RX_DATA_TMP;
-    } else if(gps_tmp == 2) {
+    } else if(gps_tmp == 2) {   //In this case, data is successfully received
         bs.transmitSeqNum=0; bs.nextExpectedSeqNum=0;   //Reinitialize SN and NESN
-        p.nextState=0;   //Do not sent other packets - close the connection event - p.nextState=0 is a temporary setting
+        p.nextState=BS_RX_ADV_DIRECT_IND;   //Close the connection event - BS_RX_ADV_DIRECT_IND is a temporary setting, it will be replaced by sendind data to the ext MCU
     } 	
 
 #ifdef DBUG

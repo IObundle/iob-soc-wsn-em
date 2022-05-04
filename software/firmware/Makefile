@@ -31,7 +31,11 @@ HDR+=periphs.h
 SRC+= firmware.S firmware.c $(UART_DIR)/software/uart_io.c
 ifeq ($(DBUG),1)
 DEFINE+=$(defmacro)DBUG
+ifeq ($(SIM_SYNTH),1)
+DEFINE+=$(defmacro)SIM_SYNTH
+else
 SRC+= $(UART_DIR)/software/printf.c
+endif
 endif
 
 #Temporary setting

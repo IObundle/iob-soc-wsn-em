@@ -51,4 +51,12 @@ void wp_set_aa(unsigned int aa) {
      txrx_set_aa(aa);
 }
 
-
+void print_data(uint64_t data_in, uint32_t size){
+     int buffer[size];      
+     for (int i=0; i<size; i++) {buffer[i]=0;}
+     uart_printf("0x"); for (int i=size-1; i>=0; i--){
+        buffer[i]=N_SHIFT(data_in, i);
+	if(!buffer[i]){uart_printf("00");}
+	else{uart_printf("%x", buffer[i]);}
+     } 
+}

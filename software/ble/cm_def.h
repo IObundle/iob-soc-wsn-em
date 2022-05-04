@@ -7,11 +7,13 @@
 #include "system.h"
 #include "periphs.h"
 
-#ifdef DBUG
+#ifndef SIM_SYNTH
 #include "printf.h"
 #endif
 
-#define ITER  21
+#define N_SHIFT(DATA_IN, N) ((DATA_IN >> 8*N) & 0xff) 
+
+#define ITER  29
 
 #define MAX_N_SN            10
 #define MAX_N_BYTES         39
@@ -83,6 +85,12 @@
 //Connection timing 
 #define W_MIN   1250
 #define T_RX   10000 
+
+//Transmit Window offset in us
+#define transmitWindowOffset(WinOffset) (WinOffset * W_MIN)
+
+//The transmit window starts at (transmitWindowOffset + 1.25ms) after the end of the CONNECT_REQ PDU
+#define startTransmitWindow(WinOffset) (transmitWindowOffset(WinOffset) + W_MIN)
 
 typedef enum {
 	FALSE=0,
@@ -196,3 +204,4 @@ void wp_set_ch_index(unsigned short ch_idx);
 void wp_set_aa(unsigned int aa);
 void sensor_node();
 void base_station();
+void print_data(uint64_t data_in, uint32_t size);

@@ -14,7 +14,7 @@
 
 #include "ble.h"
 
-#ifdef DBUG
+#ifndef SIM_SYNTH
 #include "printf.h"
 #endif
 
@@ -77,8 +77,12 @@ char ble_config(float channel_freq, int mode) {
 
   if (init) {
     int fcw = (int)(channel_freq*16384);
-#ifdef DBUG    
+#ifdef DBUG 
+#ifdef SIM_SYNTH
+    uart_printf("freq_channel = %dMHz, FCW = %d, adpll_mode = %d\n", (int)channel_freq, fcw, mode);	
+#else
     printf_("freq_channel = %fMHz, FCW = %d, adpll_mode = %d\n", channel_freq, fcw, mode);
+#endif    
 #endif
     char alpha_l = 14;
     char alpha_m = 8;

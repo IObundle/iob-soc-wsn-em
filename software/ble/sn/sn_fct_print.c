@@ -9,12 +9,18 @@ void sn_standby_print(sn_standby_param_s_t p){
 void sn_tx_adv_print(sn_tx_adv_param_s_t p){
       //start_time, pkt_tx_time, start_tx, ble_off, end_time
       uart_printf("SN - TX ADV timing: %dus, %dus, %dus, %dus, %dus\n", p.start, T_PACKET(ADV_H_LEN,ADV_DIND_P_LEN), p.start_tx, p.boff, p.end);
-      uart_printf("SN sent a PDU of %d bytes on the adv ch (idx,freq)=(%d,%dMHz)\n", p.pdu_size, p.sn_adv_ch_idx, p.sn_ch_freq);   
-      printf_("PDU_Type=%d | RFU_1=%d | TxAdd=%d | RxAdd=%d | Length=%d | RFU_2=%d\nAdvA=%#llx | InitA=%#llx\n", \
+      uart_printf("SN sent a PDU of %d bytes on the adv ch (idx,freq)=(%d,%dMHz)\n", p.pdu_size, p.sn_adv_ch_idx, p.sn_ch_freq);     
+      uart_printf("PDU_Type=%d | RFU_1=%d | TxAdd=%d | RxAdd=%d | Length=%d | RFU_2=%d\n", \
 	   p.sn_tx_adv_pdu.h.PDU_Type, p.sn_tx_adv_pdu.h.RFU_1, \
 	   p.sn_tx_adv_pdu.h.TxAdd, p.sn_tx_adv_pdu.h.RxAdd, \
-	   p.sn_tx_adv_pdu.h.Length, p.sn_tx_adv_pdu.h.RFU_2, \
-	   p.sn_tx_adv_pdu.payload.AdvA, p.sn_tx_adv_pdu.payload.InitA);  
+	   p.sn_tx_adv_pdu.h.Length, p.sn_tx_adv_pdu.h.RFU_2);
+#ifdef SIM_SYNTH
+      uart_printf("AdvA="); print_data(p.sn_tx_adv_pdu.payload.AdvA, 6);
+      uart_printf(" | InitA="); print_data(p.sn_tx_adv_pdu.payload.InitA, 6);
+      uart_printf("\n");
+#else 
+      printf_("AdvA=%#llx | InitA=%#llx\n", p.sn_tx_adv_pdu.payload.AdvA, p.sn_tx_adv_pdu.payload.InitA);
+#endif
       uart_printf("INFO: SN sent an ADV_DIRECT_IND PDU. (SN-I1)\n\n");
 }			
 
@@ -31,16 +37,27 @@ void sn_rx_cnt_req_print(sn_rx_cnt_req_param_s_t p){
 	    p.sn_rx_connect_request_pdu.h.PDU_Type, p.sn_rx_connect_request_pdu.h.RFU_1, \
 	    p.sn_rx_connect_request_pdu.h.TxAdd, p.sn_rx_connect_request_pdu.h.RxAdd, \
 	    p.sn_rx_connect_request_pdu.h.Length, p.sn_rx_connect_request_pdu.h.RFU_2);
+#ifdef SIM_SYNTH
+       uart_printf("InitA="); print_data(p.sn_rx_connect_request_pdu.payload.InitA, 6);	
+       uart_printf(" | AdvA="); print_data(p.sn_rx_connect_request_pdu.payload.AdvA, 6);
+       uart_printf(" | AA="); print_data(p.sn_rx_connect_request_pdu.payload.LLData_AA, 4);
+       uart_printf(" | CRCInit="); print_data(p.sn_rx_connect_request_pdu.payload.LLData_CRCInit, 3);
+       uart_printf("\n");
+#else
        printf_("InitA=%#llx | AdvA=%#llx | AA=%#x | CRCInit=%#x\n", \
 	    p.sn_rx_connect_request_pdu.payload.InitA, p.sn_rx_connect_request_pdu.payload.AdvA, \
 	    p.sn_rx_connect_request_pdu.payload.LLData_AA, p.sn_rx_connect_request_pdu.payload.LLData_CRCInit);	   
-       printf_("WinSize=%d | WinOffset=%d | Interval=%d | Latency=%d | Timeout=%d\n", \
+#endif
+       uart_printf("WinSize=%d | WinOffset=%d | Interval=%d | Latency=%d | Timeout=%d\n", \
 	    p.sn_rx_connect_request_pdu.payload.LLData_WinSize, p.sn_rx_connect_request_pdu.payload.LLData_WinOffset, \
 	    p.sn_rx_connect_request_pdu.payload.LLData_Interval, p.sn_rx_connect_request_pdu.payload.LLData_Latency, \
 	    p.sn_rx_connect_request_pdu.payload.LLData_Timeout); 		   
-       printf_("ChM=%#llx | Hop=%d | SCA=%d\n", \
-	    p.sn_rx_connect_request_pdu.payload.LLData_ChM, p.sn_rx_connect_request_pdu.payload.LLData_Hop, \
-	    p.sn_rx_connect_request_pdu.payload.LLData_SCA);		       
+#ifdef SIM_SYNTH
+       uart_printf("ChM="); print_data(p.sn_rx_connect_request_pdu.payload.LLData_ChM, 5);	
+#else
+       printf_("ChM=%#llx", p.sn_rx_connect_request_pdu.payload.LLData_ChM);
+#endif
+       uart_printf(" | Hop=%d | SCA=%d\n", p.sn_rx_connect_request_pdu.payload.LLData_Hop, p.sn_rx_connect_request_pdu.payload.LLData_SCA);		       
        if(p.error==0){uart_printf("INFO: SN received a CONNECT_REQ PDU. (SN-I2)\n\n");}	
        else if(p.error==1){uart_printf("ERROR - PDU_CRC size: %d bytes received instead of %d bytes. (SN-E1)\n\n", p.nbytes, (p.pdu_size + CRC_LEN));}
        else if(p.error==2){uart_printf("ERROR - Payload size in PDU's H config: %d bytes instead of %d bytes. (SN-E2)\n\n", p.sn_rx_connect_request_pdu.h.Length, CONNECT_REQ_P_LEN);}

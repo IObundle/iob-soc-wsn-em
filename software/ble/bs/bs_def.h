@@ -14,6 +14,7 @@ typedef struct BS {
      uint32_t  aa;
      uint32_t  nextState;
      uint32_t  isBusy;
+     uint32_t  nRec;
      uint8_t   id;	
      uint8_t   transmitSeqNum;       //used to identify packets sent by the Link Layer
      uint8_t   nextExpectedSeqNum;   //used by the peer to acknowledge the last data channel pdu sent or to request resending the last data channel pdu sent
@@ -26,7 +27,7 @@ typedef enum BS_STATES {
      BS_RX_DATA_GPS,
      BS_TX_ACK_GPS,
      BS_RX_DATA_TMP,
-     BS_TX_END_CONNECTION		   
+     BS_TX_END_CONNECTION	   
 } bs_states_e_t;
 
 typedef struct {
@@ -73,8 +74,8 @@ typedef struct {
      uint32_t     boff;				             //for debugging purpose
      uint32_t     end;				             //for debugging purpose
      uint32_t     error;	                             //for debugging purpose 
-     uint16_t     bs_data_ch_idx;
-     uint8_t      ch_aa;  
+     uint16_t     bs_data_ch_idx; 
+     uint8_t      data_ch[MAX_N_DATA_CHANNELS];
      int8_t 	  nbytes;	                             //for debugging purpose
 } bs_rx_gps_param_s_t;
 

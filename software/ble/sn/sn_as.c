@@ -42,7 +42,7 @@ void sensor_node(){
 	     break;				
 
 	case SN_TX_DATA_GPS:
-	     p_stgps=sn_tx_data_gps(p_srq.sn_rx_connect_request_pdu.payload.LLData_AA, p_srq.sn_rx_connect_request_pdu.payload.LLData_ChM);
+	     p_stgps=sn_tx_data_gps(p_srq.sn_rx_connect_request_pdu.payload.LLData_AA, p_srq.sn_rx_connect_request_pdu.payload.LLData_ChM, p_srq.sn_rx_connect_request_pdu.payload.LLData_WinOffset);
 #ifdef DBUG
 	     sn_tx_data_gps_print(p_stgps);
 #endif

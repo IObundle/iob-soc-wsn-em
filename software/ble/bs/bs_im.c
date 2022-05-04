@@ -42,7 +42,7 @@ void base_station(){
 	     break;  			      
 
   	case BS_RX_DATA_GPS:  	
-             p_brgps=bs_rx_data_gps(p_btq.bs_tx_connect_request_pdu.payload.LLData_AA);
+             p_brgps=bs_rx_data_gps(p_btq.bs_tx_connect_request_pdu.payload.LLData_AA, p_btq.bs_tx_connect_request_pdu.payload.LLData_ChM, p_btq.bs_tx_connect_request_pdu.payload.LLData_WinOffset);
 #ifdef DBUG
 	     bs_rx_data_gps_print(p_brgps);
 #endif    
