@@ -2,8 +2,8 @@
 #include "bs_def.h"
 
 void bs_standby_print(bs_standby_param_s_t p){
-      //start_time, end_time
-      uart_printf("\nBS - STANDBY timing: %dus, %dus\n\n", p.start, p.end);
+    //start_time, end_time
+    uart_printf("\nBS - STANDBY timing: %dus, %dus\n\n", p.start, p.end);
 }
 
 void bs_tx_cnt_req_print(bs_tx_cnt_req_param_s_t p){ 
@@ -13,17 +13,28 @@ void bs_tx_cnt_req_print(bs_tx_cnt_req_param_s_t p){
     uart_printf("PDU_Type=%d | RFU_1=%d | TxAdd=%d | RxAdd=%d | Length=%d | RFU_2=%d\n", \
 	  p.bs_tx_connect_request_pdu.h.PDU_Type, p.bs_tx_connect_request_pdu.h.RFU_1, \
 	  p.bs_tx_connect_request_pdu.h.TxAdd, p.bs_tx_connect_request_pdu.h.RxAdd, \
-  	  p.bs_tx_connect_request_pdu.h.Length, p.bs_tx_connect_request_pdu.h.RFU_2);		  
+  	  p.bs_tx_connect_request_pdu.h.Length, p.bs_tx_connect_request_pdu.h.RFU_2);	  		  
+#ifdef SIM_SYNTH
+    uart_printf("InitA="); print_data(p.bs_tx_connect_request_pdu.payload.InitA, 6);	
+    uart_printf(" | AdvA="); print_data(p.bs_tx_connect_request_pdu.payload.AdvA, 6);
+    uart_printf(" | AA="); print_data(p.bs_tx_connect_request_pdu.payload.LLData_AA, 4);
+    uart_printf(" | CRCInit="); print_data(p.bs_tx_connect_request_pdu.payload.LLData_CRCInit, 3);
+    uart_printf("\n");
+#else
     printf_("InitA=%#llx | AdvA=%#llx | AA=%#x | CRCInit=%#x\n", \
   	  p.bs_tx_connect_request_pdu.payload.InitA, p.bs_tx_connect_request_pdu.payload.AdvA, \
   	  p.bs_tx_connect_request_pdu.payload.LLData_AA, p.bs_tx_connect_request_pdu.payload.LLData_CRCInit);	  
-    printf_("WinSize=%d | WinOffset=%d | Interval=%d | Latency=%d | Timeout=%d\n", \
+#endif
+    uart_printf("WinSize=%d | WinOffset=%d | Interval=%d | Latency=%d | Timeout=%d\n", \
   	  p.bs_tx_connect_request_pdu.payload.LLData_WinSize, p.bs_tx_connect_request_pdu.payload.LLData_WinOffset, \
   	  p.bs_tx_connect_request_pdu.payload.LLData_Interval, p.bs_tx_connect_request_pdu.payload.LLData_Latency, \
   	  p.bs_tx_connect_request_pdu.payload.LLData_Timeout);  	  
-    printf_("ChM=%#llx | Hop=%d | SCA=%d\n", \
-  	  p.bs_tx_connect_request_pdu.payload.LLData_ChM, p.bs_tx_connect_request_pdu.payload.LLData_Hop, \
-  	  p.bs_tx_connect_request_pdu.payload.LLData_SCA);
+#ifdef SIM_SYNTH
+    uart_printf("ChM="); print_data(p.bs_tx_connect_request_pdu.payload.LLData_ChM, 5);	
+#else
+    printf_("ChM=%#llx", p.bs_tx_connect_request_pdu.payload.LLData_ChM);
+#endif
+    uart_printf(" | Hop=%d | SCA=%d\n", p.bs_tx_connect_request_pdu.payload.LLData_Hop, p.bs_tx_connect_request_pdu.payload.LLData_SCA);
     uart_printf("INFO: BS sent a CONNECT_REQ PDU. (BS-I2)\n\n");								   
 }
 
@@ -35,13 +46,18 @@ void bs_rx_adv_print(bs_rx_adv_param_s_t p){
     } 
     //start_time, rx_on, end_scan, ble_off, end_time
     uart_printf("BS - RX ADV timing: %dus, %dus, %dus, %dus, %dus\n", p.start, p.rx_on, p.end_scan, p.boff, p.end);  
-    uart_printf("BS received %d bytes on the adv ch (idx,freq)=(%d,%dMHz)\n", p.nbytes, adv_ch_idx, (p.bs_ch_freq-1));          	      				
-    printf_("PDU_Type=%d | RFU_1=%d | TxAdd=%d | RxAdd=%d | Length=%d | RFU_2=%d\nAdvA=%#llx | InitA=%#llx\n", \
+    uart_printf("BS received %d bytes on the adv ch (idx,freq)=(%d,%dMHz)\n", p.nbytes, adv_ch_idx, (p.bs_ch_freq-1));            	      				
+    uart_printf("PDU_Type=%d | RFU_1=%d | TxAdd=%d | RxAdd=%d | Length=%d | RFU_2=%d\n", \
          p.bs_rx_adv_pdu.h.PDU_Type, p.bs_rx_adv_pdu.h.RFU_1, \
          p.bs_rx_adv_pdu.h.TxAdd, p.bs_rx_adv_pdu.h.RxAdd, \
-         p.bs_rx_adv_pdu.h.Length, p.bs_rx_adv_pdu.h.RFU_2, \
-         p.bs_rx_adv_pdu.payload.AdvA, p.bs_rx_adv_pdu.payload.InitA);				
-         
+         p.bs_rx_adv_pdu.h.Length, p.bs_rx_adv_pdu.h.RFU_2);				
+#ifdef SIM_SYNTH
+    uart_printf("AdvA="); print_data(p.bs_rx_adv_pdu.payload.AdvA, 6);
+    uart_printf(" | InitA="); print_data(p.bs_rx_adv_pdu.payload.InitA, 6);
+    uart_printf("\n");
+#else 
+    printf_("AdvA=%#llx | InitA=%#llx\n", p.bs_rx_adv_pdu.payload.AdvA, p.bs_rx_adv_pdu.payload.InitA);
+#endif         
     if(p.error==0){uart_printf("INFO: BS received an ADV_DIRECT_IND PDU. (BS-I1)\n\n");} 
     else if(p.error==1){uart_printf("ERROR - PDU_CRC size: %d bytes received instead of %d bytes. (BS-E1)\n\n", p.nbytes, (p.pdu_size + CRC_LEN));}
     else if(p.error==2){uart_printf("ERROR - Payload size in PDU's H config: %d bytes instead of %d bytes. (BS-E2)\n\n", p.bs_rx_adv_pdu.h.Length, ADV_DIND_P_LEN);}

@@ -11,6 +11,7 @@
 typedef struct SN {    	  
      uint32_t  aa;     
      uint32_t  nextState; 
+     uint32_t  nSend;
      uint8_t   id;   
      uint8_t   transmitSeqNum;       //used to identify packets sent by the Link Layer
      uint8_t   nextExpectedSeqNum;   //used by the peer to acknowledge the last data channel pdu sent or to request resending the last data channel pdu sent     

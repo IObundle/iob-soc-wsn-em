@@ -7,7 +7,7 @@
 #define CST 1
 #include "sn_config.h"
 
-sn_s_t sn = {.id = SN_ID, .aa = 0x8E89BED6, .nextState = SN_STANDBY, .transmitSeqNum=0, .nextExpectedSeqNum=0};    //By default, SN is in STANDBY state
+sn_s_t sn = {.id = SN_ID, .aa = 0x8E89BED6, .nextState = SN_STANDBY, .nSend=1, .transmitSeqNum=0, .nextExpectedSeqNum=0};
    
 //------------------------------------------------------------------------------------------------------------------------------------------
 int32_t sn_advertiser_filter(sn_rx_cnt_req_param_s_t p){
@@ -52,7 +52,7 @@ int32_t sn_rx_ack_check(sn_rx_data_ack_param_s_t p){
     return error;
 }
 //------------------------------------------------------------------------------------------------------------------------------------------
-sn_standby_param_s_t sn_standby(){
+sn_standby_param_s_t sn_standby(){   //review the settings to be done when the SN is in standby state for the nth time, n>1  
     sn_standby_param_s_t p={0};
     timer_init(TIMER_BASE);
 #ifdef DBUG
@@ -91,7 +91,7 @@ sn_tx_adv_param_s_t sn_tx_adv(uint16_t sn_adv_ch_idx){
       
     wp_set_ch_index(p.sn_adv_ch_idx);   //Configure the whitener channel index   
     
-    wp_set_aa(sn.aa);   //Set the adv ch access address
+    wp_set_aa(sn.aa);   //Set the advertising channel access address
           
     p.pdu_size = ADV_H_LEN + ADV_DIND_P_LEN;   //Configure PDU's size
 
@@ -179,7 +179,7 @@ sn_rx_cnt_req_param_s_t sn_rx_cnt_req(uint16_t sn_adv_ch_idx){
     if(next_adv_ch == 1) {
 	p.sn_adv_ch_idx++;
 	if(p.sn_adv_ch_idx > ADV_CH_LAST) {
-           //Delay to be reviewed
+           //Delay
 	   start_time = timer_time_us();
            while((timer_time_us() - start_time) < (uint32_t)advDelay);
     	 	
@@ -194,16 +194,18 @@ sn_rx_cnt_req_param_s_t sn_rx_cnt_req(uint16_t sn_adv_ch_idx){
     return p;
 }	      
 
-sn_tx_gps_param_s_t sn_tx_data_gps(uint32_t LLData_AA, uint64_t LLData_ChM){
-    sn_tx_gps_param_s_t p={0}; 
+sn_tx_gps_param_s_t sn_tx_data_gps(uint32_t LLData_AA, uint64_t LLData_ChM, uint16_t LLData_WinOffset){   //procesing might be optimized in case of retransmission - te be reviewed
+    sn_tx_gps_param_s_t p={0}; uint32_t start_time=0; 
 #ifdef DBUG
     p.start = timer_time_us();   //for debugging purpose
 #endif
     uint64_t mask_data_ch=0x01; uint32_t k=0;  	
 
-    uint32_t start_time = timer_time_us();
-    while ((timer_time_us() - start_time) < (uint32_t)W_MIN);
- 	          				
+    if(sn.nSend == 1){   //Delay inserted after the end of the CONNECT_REQ PDU
+       start_time = timer_time_us();
+       while ((timer_time_us() - start_time) < (uint32_t)startTransmitWindow(LLData_WinOffset));
+    }
+     	          				
     for(int i=0; i<MAX_N_DATA_CHANNELS; i++){
 	if(LLData_ChM & mask_data_ch) {
 	     p.data_ch[k++]=i;
@@ -211,8 +213,12 @@ sn_tx_gps_param_s_t sn_tx_data_gps(uint32_t LLData_AA, uint64_t LLData_ChM){
 	mask_data_ch <<= 1; 					
     }
    	       
-    p.sn_data_ch_idx = p.data_ch[0];   //Set the data channel index - temporary setting 	 
-       	
+    if(sn.nSend == 1){   //First transmission
+       p.sn_data_ch_idx = p.data_ch[0];    //Set the data channel index - data ch=5 	 
+    } else if(sn.nSend == 2){   //Retransmission   
+       p.sn_data_ch_idx = p.data_ch[1];    //Set the data channel index - data ch=22
+    }
+    	
     p.sn_ch_freq = get_data_ch_freq(p.sn_data_ch_idx);   //Get the data channel frequency				    
                 
     ble_config(p.sn_ch_freq, 3);   //Configure ADPLL	  
@@ -360,13 +366,28 @@ sn_rx_data_ack_param_s_t sn_rx_data_ack(uint16_t sn_data_ch_idx, uint32_t gps_tm
   
     p.error=sn_rx_ack_check(p);
     
-    if((p.error == 0) && (gps_tmp == 1)) {   
-       sn.transmitSeqNum++; sn.nextExpectedSeqNum++; p.nextState=SN_TX_DATA_TMP;
-    } else if ((p.error == 5) && (gps_tmp == 2)) {
-       sn.transmitSeqNum=0; sn.nextExpectedSeqNum=0;   //Reinitialize SN and NESN
-       p.nextState=0;   //stop the current connection event - p.nextState=0 is a temporary setting   
-    } else {
-       p.nextState=0;   //temporary setting 
+    //Retransmission
+    if(gps_tmp == 1){
+       if(p.error == 0){   //ACK - No retransmission needed
+          sn.transmitSeqNum++; sn.nextExpectedSeqNum++; 
+	  sn.nSend=1;
+       } else {   //Retransmission needed
+          sn.nSend++;         	  
+       }       
+       if(sn.nSend==1){p.nextState=SN_TX_DATA_TMP;}       //Go to next state
+       else if(sn.nSend==2){p.nextState=SN_TX_DATA_GPS;}  //Retransmit previous PDU - LLID, SN, payload should be the same as the previous ones. 
+       else {   //Stop sending data
+          sn.nSend=1; sn.transmitSeqNum=0; sn.nextExpectedSeqNum=0;   //Reinitialize sn.nSend, SN and NESN      
+          p.nextState=SN_STANDBY;                         //Go to standby state 
+       }	  
+    } else if(gps_tmp == 2){
+       if(p.error == 5){   //ACK - END_CONNECTION
+          sn.transmitSeqNum=0; sn.nextExpectedSeqNum=0;   //Reinitialize SN and NESN
+          p.nextState=SN_STANDBY;                               
+       } else {   //End connection anyway - to be reviewed
+          sn.transmitSeqNum=0; sn.nextExpectedSeqNum=0;   //Reinitialize SN and NESN
+          p.nextState=SN_STANDBY;  
+       }
     }
   
 #ifdef DBUG
