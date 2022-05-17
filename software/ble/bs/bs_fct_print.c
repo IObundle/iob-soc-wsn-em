@@ -65,25 +65,8 @@ void bs_rx_adv_print(bs_rx_adv_param_s_t p){
     else if(p.error==4){uart_printf("ERROR - Device address: Wrong advertiser device address. (BS-E4)\n\n");}
     else if(p.error==5){uart_printf("ERROR - Packet type: Does not match a connectable directed advertising packet type. (BS-E5)\n\n");} 
     else if(p.error==-1){uart_printf("ERROR - Initiator filter: Something went wrong, the initiator filter did not run. (BS-E6)\n\n");}
+    else {uart_printf("ERROR: refer to BS-E10\n\n");}
 }    
-
-void bs_rx_data_gps_print(bs_rx_gps_param_s_t p) {
-    //start_time, rx_on, ble_off, end_time
-    uart_printf("BS - RX DATA GPS timing: %dus, %dus, %dus, %dus\n", p.start, p.rx_on, p.boff, p.end); 
-    uart_printf("BS received %d bytes on the data ch (idx,freq)=(%d,%dMHz)\n", p.nbytes, p.bs_data_ch_idx, (p.bs_ch_freq - 1));		
-    uart_printf("LLID=%d | NESN=%d | SN=%d | MD=%d | RFU=%d | Length=%d\nGPS coordinates\n\tLatitude : %ddeg %dmin %ds %c\n\tLongitude: %ddeg %dmin %ds %c\n", \
-	 p.bs_rx_data_gps_pdu.h.LLID, p.bs_rx_data_gps_pdu.h.NESN, \
-	 p.bs_rx_data_gps_pdu.h.SN, p.bs_rx_data_gps_pdu.h.MD, \
-	 p.bs_rx_data_gps_pdu.h.RFU, p.bs_rx_data_gps_pdu.h.Length, \
-	 p.bs_rx_data_gps_pdu.payload.DMS_Lat_D, p.bs_rx_data_gps_pdu.payload.DMS_Lat_M, \
-	 p.bs_rx_data_gps_pdu.payload.DMS_Lat_S, p.bs_rx_data_gps_pdu.payload.DMS_Lat_C, \
-	 p.bs_rx_data_gps_pdu.payload.DMS_Lng_D, p.bs_rx_data_gps_pdu.payload.DMS_Lng_M, \
-	 p.bs_rx_data_gps_pdu.payload.DMS_Lng_S, p.bs_rx_data_gps_pdu.payload.DMS_Lng_C); 
-    if(p.error==0){uart_printf("INFO: BS received a DATA_GPS PDU. (BS-I3)\n\n");}					
-    else if(p.error==1){uart_printf("Error - PDU size: %d bytes received instead of %d bytes!\n\n", p.nbytes, p.pdu_size);}
-    else if(p.error==2){uart_printf("Error - Sequence number: An old packet has been resent!\n\n");}
-    else if(p.error==3){uart_printf("Error - MD: Something went wrong - The SN is not listening to new packets!\n\n");}
-}
 
 void bs_rx_data_tmp_print(bs_rx_tmp_param_s_t p){
      //start_time, rx_on, ble_off, end_time
@@ -95,26 +78,27 @@ void bs_rx_data_tmp_print(bs_rx_tmp_param_s_t p){
            p.bs_rx_lldata_tmp_pdu.h.RFU, p.bs_rx_lldata_tmp_pdu.h.Length, \
            p.bs_rx_lldata_tmp_pdu.payload);
      
-     if(p.error==0){uart_printf("INFO: BS received a DATA_TMP PDU. (BS-I5)\n\n");}			       
+     if(p.error==0){uart_printf("INFO: BS received a DATA_TMP PDU. (BS-I3)\n\n");}			       
      else if(p.error==1){uart_printf("Error - PDU size: %d bytes received instead of %d bytes!\n\n", p.nbytes, p.pdu_size);}
      else if(p.error==2){uart_printf("Error - Sequence number: The expected sequence number is different from the received one!\n\n");}
      else if(p.error==3){uart_printf("Error - MD: The SN is not listening to new packets!\n\n");}
+     else {uart_printf("ERROR: refer to BS-E10\n\n");}
 }	      
 
-void bs_tx_data_ack_print(bs_tx_data_ack_param_s_t p, uint32_t gps_tmp){
-    if(gps_tmp == 1) {
-       //start_time, pkt_tx_time, start_tx, ble_off, end_time
-       uart_printf("BS - TX DATA_ACK timing: %dus, %dus, %dus, %dus, %dus\n", p.start, T_PACKET(LL_DATA_H_LEN,ZERO_PAYLOAD), p.start_tx, p.boff, p.end); 
-       uart_printf("BS sent a PDU of %d bytes on the data ch (idx,freq)=(%d,%dMHz)\n", p.pdu_size, p.bs_data_ch_idx, p.bs_ch_freq);
-    } else if (gps_tmp == 2) {
-       //start_time, pkt_tx_time, start_tx ble_off, end_time
-       uart_printf("BS - TX END_CONNECTION timing: %dus, %dus, %dus, %dus, %dus\n", p.start, T_PACKET(LL_DATA_H_LEN,ZERO_PAYLOAD), p.start_tx, p.boff, p.end); 
-       uart_printf("BS sent a PDU of %d bytes on the data ch (idx,freq)=(%d,%dMHz)\n", p.pdu_size, p.bs_data_ch_idx, p.bs_ch_freq); 
-    }		
+void bs_tx_data_ack_print(bs_tx_data_ack_param_s_t p){
+    //start_time, pkt_tx_time, start_tx, ble_off, end_time
+    uart_printf("BS - TX DATA_ACK timing: %dus, %dus, %dus, %dus, %dus\n", p.start, T_PACKET(LL_DATA_H_LEN,ZERO_PAYLOAD), p.start_tx, p.boff, p.end); 
+    uart_printf("BS sent a PDU of %d bytes on the data ch (idx,freq)=(%d,%dMHz)\n", p.pdu_size, p.bs_data_ch_idx, p.bs_ch_freq);
+	
     uart_printf("LLID=%d | NESN=%d | SN=%d | MD=%d | RFU=%d | Length=%d\n",
 	p.bs_tx_data_ack_pdu.LLID, p.bs_tx_data_ack_pdu.NESN, \
 	p.bs_tx_data_ack_pdu.SN, p.bs_tx_data_ack_pdu.MD, \
 	p.bs_tx_data_ack_pdu.RFU, p.bs_tx_data_ack_pdu.Length);	
-    if(gps_tmp == 1) {uart_printf("INFO: BS sent an ACK_GPS PDU. (BS-I4)\n\n");} 
-    else if(gps_tmp ==2) {uart_printf("INFO: BS sent an END_CONNECTION PDU. (BS-I6)\n\n");}				
+    if(p.rec==1){uart_printf("INFO: BS sent an ACK PDU with END_CONNECTION. (BS-I4)\n\n");}
+    else {uart_printf("INFO: BS sent a NACK PDU. (BS-I5)\n\n");} 				
+}
+
+void bs_end_cnt_print(bs_end_cnt_param_s_t p){
+      //start_time, rx_on, ble_off, end_time
+      uart_printf("BS - END CONNECTION timing: %dus, %dus\n\n", p.start, p.end);	  
 }

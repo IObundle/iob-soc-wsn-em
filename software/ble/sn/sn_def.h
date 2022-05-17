@@ -21,10 +21,9 @@ typedef enum SN_STATES {
      SN_STANDBY=1,	   
      SN_TX_ADV_DIRECT_IND,	   
      SN_RX_CONNECT_REQ,
-     SN_TX_DATA_GPS,
-     SN_RX_ACK_GPS, 
      SN_TX_DATA_TMP,
-     SN_RX_END_CONNECTION
+     SN_RX_DATA_ACK,
+     SN_END_CONNECTION
 } sn_states_e_t;
 
 typedef struct {
@@ -60,19 +59,6 @@ typedef struct {
      uint16_t                sn_adv_ch_idx;
      int8_t 	             nbytes;	                           //for debugging purpose    
 } sn_rx_cnt_req_param_s_t;
-
-typedef struct {
-     pdu_lldata_gps_s_t sn_tx_data_gps_pdu;               //GPS Coordinates data PDU
-     uint32_t           nextState;  
-     uint32_t           sn_ch_freq;		          //for debugging purpose		
-     uint32_t           pdu_size;	                  //for debugging purpose
-     uint32_t    	start;				  //for debugging purpose     
-     uint32_t    	start_tx;			  //for debugging purpose  
-     uint32_t           boff;				  //for debugging purpose
-     uint32_t    	end;				  //for debugging purpose
-     uint16_t           sn_data_ch_idx;                   
-     uint8_t            data_ch[MAX_N_DATA_CHANNELS];
-} sn_tx_gps_param_s_t;
     
 typedef struct {
      pdu_lldata_tmp_s_t sn_tx_lldata_tmp_pdu;             //TMP data PDU
@@ -84,6 +70,7 @@ typedef struct {
      uint32_t     boff;				          //for debugging purpose
      uint32_t     end;  			          //for debugging purpose
      uint16_t     sn_data_ch_idx;                            
+     uint8_t      data_ch[MAX_N_DATA_CHANNELS];
 } sn_tx_tmp_param_s_t;
 
 typedef struct {
@@ -100,3 +87,8 @@ typedef struct {
      int8_t 	        nbytes;	                          //for debugging purpose            
 } sn_rx_data_ack_param_s_t;
 
+typedef struct {
+     uint32_t           nextState;  
+     uint32_t    	start;				  //for debugging purpose     
+     uint32_t    	end;				  //for debugging purpose 
+} sn_end_cnt_param_s_t;

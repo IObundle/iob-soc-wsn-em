@@ -13,11 +13,12 @@
 
 #define N_SHIFT(DATA_IN, N) ((DATA_IN >> 8*N) & 0xff) 
 
-#define ITER  29
+#define ITER                29 
 
 #define MAX_N_SN            10
 #define MAX_N_BYTES         39
 #define MAX_N_DATA_CHANNELS 37
+#define N_USED_DATA_CHANNELS 3
 #define ADV_CH_FIRST        37
 #define ADV_CH_SECOND       38
 #define ADV_CH_LAST         39
@@ -27,9 +28,7 @@
 
 #define ADV_H_LEN            2
 #define LL_DATA_H_LEN        2
-#define LL_DATA_GPS_P_LEN   18
 #define LL_DATA_TMP_P_LEN    4
-#define LL_CONTROL_P_LEN     4
 #define ZERO_PAYLOAD	     0
 
 #define PREAMBLE_LEN	     1  
@@ -54,8 +53,6 @@
 #define CONNECT_REQ_P_LEN  34	 
 #define CONNECT_REQ_H_RFU_2 1
 
-//LLID - LL Control PDU
-#define LL_CONTROL_PDU      3
 //LLID - Start of an L2CAP message or a complete L2CAP message with no fragmentation
 #define LL_DATA_PDU_SC      2
 //LLID - Continuation fragment of an L2CAP message or an Empty PDU
@@ -91,6 +88,9 @@
 
 //The transmit window starts at (transmitWindowOffset + 1.25ms) after the end of the CONNECT_REQ PDU
 #define startTransmitWindow(WinOffset) (transmitWindowOffset(WinOffset) + W_MIN)
+
+//Used data channels indices 
+static uint8_t dataChIdx[N_USED_DATA_CHANNELS]={5, 22, 34};
 
 typedef enum {
 	FALSE=0,
@@ -143,7 +143,7 @@ typedef struct CONNECT_REQ_PDU {
 	connect_req_payload_s_t payload; 
 } connect_request_pdu_s_t;   
 //--------------------------------------------------  
-//LL Control and LL Data PDU's header   
+//LL Data PDU's header   
 typedef struct PDU_LLDATA_HEADER { 
 	uint16_t LLID 	: 2,		
 		 NESN 	: 1,		
@@ -153,41 +153,6 @@ typedef struct PDU_LLDATA_HEADER {
 		 Length : 8;		
 } pdu_lldata_h_s_t;
 //-------------------------------------------------- 
-//LL Control PDU's payload 
-typedef struct PDU_LLControl_PAYLOAD {
-	uint32_t  Opcode  : 8,  	
-		  CtrData : 24;       
-} pdu_llcontrol_payload_s_t;  
- 
-//ACK PDU
-typedef struct PDU_LLControl_ACK {
-    pdu_lldata_h_s_t	      h;	     
-    pdu_llcontrol_payload_s_t payload;
-} pdu_llcontrol_s_t;  
-
-//Terminate Connection PDU
-typedef struct PDU_LLControl_TERMINATE {
-    pdu_lldata_h_s_t	      h;	     
-    pdu_llcontrol_payload_s_t payload;
-} pdu_llcontrol_terminate_s_t; 
-//-------------------------------------------------- 
-typedef struct GPS_DATA {
-	uint64_t DMS_Lat_D : 32,
-		 DMS_Lat_M : 16,
-		 DMS_Lat_S : 16,   //not a floating-point number for now	
-		 DMS_Lat_C : 8,
-		 DMS_Lng_D : 32,
-		 DMS_Lng_M : 16,
-		 DMS_Lng_S : 16,   //not a floating-point number for now
-		 DMS_Lng_C : 8;
-} gps_coordinates_s_t;
-//-------------------------------------------------- 
-//LL GPS Data PDU
-typedef struct PDU_LLDATA_GPR {
-	pdu_lldata_h_s_t    h;
-	gps_coordinates_s_t payload;
-} pdu_lldata_gps_s_t;  
-//--------------------------------------------------  
 //LL TMP Data PDU
 typedef struct PDU_LLDATA_TMP {
 	pdu_lldata_h_s_t    h;
@@ -205,3 +170,4 @@ void wp_set_aa(unsigned int aa);
 void sensor_node();
 void base_station();
 void print_data(uint64_t data_in, uint32_t size);
+uint64_t gen_dataChMap(uint8_t dataCh[], unsigned int size);

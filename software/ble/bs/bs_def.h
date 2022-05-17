@@ -24,10 +24,9 @@ typedef enum BS_STATES {
      BS_STANDBY=11,     
      BS_RX_ADV_DIRECT_IND,
      BS_TX_CONNECT_REQ, 
-     BS_RX_DATA_GPS,
-     BS_TX_ACK_GPS,
      BS_RX_DATA_TMP,
-     BS_TX_END_CONNECTION	   
+     BS_TX_DATA_ACK,
+     BS_END_CONNECTION	   
 } bs_states_e_t;
 
 typedef struct {
@@ -65,21 +64,6 @@ typedef struct {
 } bs_tx_cnt_req_param_s_t;
 
 typedef struct {
-     pdu_lldata_gps_s_t bs_rx_data_gps_pdu;                  //GPS coordinates data PDU
-     uint32_t     nextState;  
-     uint32_t     bs_ch_freq;				     //for debugging purpose
-     uint32_t     pdu_size;	                             //for debugging purpose
-     uint32_t     start;				     //for debugging purpose     
-     uint32_t     rx_on;			             //for debugging purpose  
-     uint32_t     boff;				             //for debugging purpose
-     uint32_t     end;				             //for debugging purpose
-     uint32_t     error;	                             //for debugging purpose 
-     uint16_t     bs_data_ch_idx; 
-     uint8_t      data_ch[MAX_N_DATA_CHANNELS];
-     int8_t 	  nbytes;	                             //for debugging purpose
-} bs_rx_gps_param_s_t;
-
-typedef struct {
      pdu_lldata_tmp_s_t bs_rx_lldata_tmp_pdu;                //TMP data PDU
      uint32_t     nextState;  
      uint32_t     bs_ch_freq;				     //for debugging purpose
@@ -90,6 +74,7 @@ typedef struct {
      uint32_t     boff;				             //for debugging purpose
      uint32_t     end;				             //for debugging purpose 
      uint16_t     bs_data_ch_idx;
+     uint8_t      data_ch[MAX_N_DATA_CHANNELS];
      int8_t       nbytes;				     //for debugging purpose
 } bs_rx_tmp_param_s_t;
 
@@ -103,6 +88,7 @@ typedef struct {
      uint32_t    	start_tx;			     //for debugging purpose  
      uint32_t           boff;				     //for debugging purpose
      uint32_t    	end;				     //for debugging purpose
+     uint32_t    	rec;				     //for debugging purpose
      uint16_t           bs_data_ch_idx;                              
      int8_t 	        nbytes;	                             //for debugging purpose            
 } bs_tx_data_ack_param_s_t;
@@ -111,3 +97,9 @@ typedef struct {
      uint32_t da_index;
      int32_t  error; 
 } init_filter_s_t;
+
+typedef struct {
+     uint32_t           nextState;  
+     uint32_t    	start;				  //for debugging purpose     
+     uint32_t    	end;				  //for debugging purpose 
+} bs_end_cnt_param_s_t;

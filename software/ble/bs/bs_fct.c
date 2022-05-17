@@ -12,9 +12,6 @@ bs_s_t bs = {.id = BS_ID, .aa = 0x8E89BED6, .nextState = BS_STANDBY, .nRec=1, .i
 uint32_t aa_plist[MAX_N_SN][2]={{FALSE, 0xA3B9C1E5}, {FALSE, 0x5E2C419D}, {FALSE, 0x3D5C8A2E}, {FALSE, 0xE1B79C3A}, {FALSE, 0xC85B3D1E}, 
 			        {FALSE, 0x4CA3E1B9}, {FALSE, 0x7AD92C5B}, {FALSE, 0xB6CEA18A}, {FALSE, 0x2D5A7B68}, {FALSE, 0x9E1A4CB7}};    
 
-gps_coordinates_s_t gps[MAX_N_SN]={0};
-uint32_t temperature[MAX_N_SN][SAMPLING_RATE]={0};
-
 //------------------------------------------------------------------------------------------------------------------------------------------
 init_filter_s_t bs_initiator_filter(bs_rx_adv_param_s_t p){
     init_filter_s_t pk={0};   
@@ -105,7 +102,7 @@ bs_tx_cnt_req_param_s_t bs_tx_cnt_req(uint16_t bs_adv_ch_idx, uint64_t AdvA){
     p.bs_tx_connect_request_pdu.payload.LLData_Interval=0; 
     p.bs_tx_connect_request_pdu.payload.LLData_Latency=0;		     
     p.bs_tx_connect_request_pdu.payload.LLData_Timeout=0; 
-    p.bs_tx_connect_request_pdu.payload.LLData_ChM=0x400400020;	      
+    p.bs_tx_connect_request_pdu.payload.LLData_ChM=gen_dataChMap(dataChIdx, N_USED_DATA_CHANNELS);	      
     p.bs_tx_connect_request_pdu.payload.LLData_Hop=0; 
     p.bs_tx_connect_request_pdu.payload.LLData_SCA=0;		  
 
@@ -125,7 +122,7 @@ bs_tx_cnt_req_param_s_t bs_tx_cnt_req(uint16_t bs_adv_ch_idx, uint64_t AdvA){
     p.boff = timer_time_us();   //for debugging purpose
 #endif 
     
-    p.nextState=BS_RX_DATA_GPS;   //Go to next state     
+    p.nextState=BS_RX_DATA_TMP;   //Go to next state     
 
 #ifdef DBUG
     p.end = timer_time_us();   //for debugging purpose
@@ -196,8 +193,8 @@ bs_rx_adv_param_s_t bs_rx_adv(uint16_t bs_adv_ch_idx){
     return p;
 }        
 
-bs_rx_gps_param_s_t bs_rx_data_gps(uint32_t LLData_AA, uint64_t LLData_ChM, uint16_t LLData_WinOffset){    //procesing might be optimized in case of ChM and retransmission - te be reviewed  	
-    bs_rx_gps_param_s_t p={0}; uint32_t start_time=0;  
+bs_rx_tmp_param_s_t bs_rx_data_tmp(uint32_t LLData_AA, uint64_t LLData_ChM, uint16_t LLData_WinOffset){    //procesing might be optimized in case of ChM and retransmission - te be reviewed  	
+    bs_rx_tmp_param_s_t p={0}; uint32_t start_time=0;  
 #ifdef DBUG
     p.start = timer_time_us();   //for debugging purpose
 #endif      
@@ -210,21 +207,23 @@ bs_rx_gps_param_s_t bs_rx_data_gps(uint32_t LLData_AA, uint64_t LLData_ChM, uint
 
     for(int i=0; i<MAX_N_DATA_CHANNELS; i++){
 	if(LLData_ChM & mask_data_ch) {
-	     p.data_ch[k++]=i;
+	     p.data_ch[k++]=(39 - i);
 	}
 	mask_data_ch <<= 1; 					
     }
                      
     if(bs.nRec == 1){   //PDU reception for a first time
-       p.bs_data_ch_idx = p.data_ch[0];    //Set the data channel index - data ch=5
+       p.bs_data_ch_idx = p.data_ch[2];    //Set the data channel index - data ch=5
     } else if(bs.nRec == 2){   //Second reception of the same previous PDU
        p.bs_data_ch_idx = p.data_ch[1];    //Set the data channel index - data ch=22
-    }	
+    } else if(bs.nRec == 3){   //Third reception of the same previous PDU
+       p.bs_data_ch_idx = p.data_ch[0];    //Set the data channel index - data ch=34	
+    }
     
     p.bs_ch_freq = get_data_ch_freq(p.bs_data_ch_idx);   //Get the data channel frequency
 
     //Configure PDU's size
-    p.pdu_size = LL_DATA_H_LEN + LL_DATA_GPS_P_LEN;	 
+    p.pdu_size = LL_DATA_H_LEN + LL_DATA_TMP_P_LEN;	 
     ble_payload(p.pdu_size);
        
     ble_config((p.bs_ch_freq-1.0F), 2);   //Configure ADPLL
@@ -243,7 +242,7 @@ bs_rx_gps_param_s_t bs_rx_data_gps(uint32_t LLData_AA, uint64_t LLData_ChM, uint
     start_time = timer_time_us();
     while((timer_time_us() - start_time) < (uint32_t)T_RX);   	
     
-    p.nbytes = ble_receive((uint8_t *)&p.bs_rx_data_gps_pdu, p.pdu_size);   //Read the PDU from the HW
+    p.nbytes = ble_receive((uint8_t *)&p.bs_rx_lldata_tmp_pdu, p.pdu_size);   //Read the PDU from the HW
     
     ble_off();   //Turn off BLE			
 
@@ -252,22 +251,21 @@ bs_rx_gps_param_s_t bs_rx_data_gps(uint32_t LLData_AA, uint64_t LLData_ChM, uint
 #endif
     
     if(p.nbytes == (p.pdu_size + CRC_LEN)) {   //There is data in the RX buffer (pdu +crc)  
-       if(bs.nextExpectedSeqNum == p.bs_rx_data_gps_pdu.h.SN) {   //A new packet is received 
-          if(p.bs_rx_data_gps_pdu.h.MD == MD_VAL_ONE) {   //The SN continues to listen          	           	
-	      if(bs.nRec == 1){p.error=10;}else{p.error=0;}	  	      
-	  } else {p.error=3;}	  
-       } else {p.error=2;}   //The previous packet has been resent - bs.nextExpectedSeqNum should not be changed   	   
+       if(bs.nextExpectedSeqNum == p.bs_rx_lldata_tmp_pdu.h.SN) {   //As expected
+          if(p.bs_rx_lldata_tmp_pdu.h.MD == MD_VAL_ONE) {   //The SN continues to listen          	           	
+	      p.error=0;	  	      
+	  } else {p.error=3;}   //To be reviewed - should the BS close the current connection?	  
+       } else {p.error=2;}    	   
      } else {	 
         p.error=1;  
      }
      
-     if(p.error==0) {bs.nextExpectedSeqNum++; bs.nRec=1;} else {bs.nRec++;}
+     if(p.error==0) {bs.nRec=1;} else {bs.nRec++; }
      
-     if(bs.nRec==1){p.nextState=BS_TX_ACK_GPS;}
-     else if(bs.nRec==2){p.nextState=BS_RX_DATA_GPS;}
-     else {   //In this case, data is unsuccessfully received for the second time
-        bs.nRec=1; bs.transmitSeqNum=0; bs.nextExpectedSeqNum=0;   //Reinitialize nRec, SN and NESN
-	p.nextState=BS_RX_ADV_DIRECT_IND;   //Close the connection event and restart scanning
+     if(bs.nRec==1 || bs.nRec==2 || bs.nRec==3){p.nextState=BS_TX_DATA_ACK;}
+     else {   //In this case, data is unsuccessfully received for the third time
+        bs.nRec=1;   //Reinitialize nRec
+	p.nextState=BS_END_CONNECTION;
      }	
 	
 #ifdef DBUG
@@ -275,71 +273,8 @@ bs_rx_gps_param_s_t bs_rx_data_gps(uint32_t LLData_AA, uint64_t LLData_ChM, uint
 #endif 
     return p;
 }     
-
-bs_rx_tmp_param_s_t bs_rx_data_tmp(uint16_t bs_data_ch_idx){ 
-     bs_rx_tmp_param_s_t p={0};	
-#ifdef DBUG
-     p.start = timer_time_us();   //for debugging purpose
-#endif
-     p.bs_data_ch_idx=bs_data_ch_idx;
-
-     //Wait for inter frame space
-     uint32_t start_time = timer_time_us();
-     while((timer_time_us() - start_time) < (uint32_t)T_IFS);			  
-
-     //Configure PDU's size
-     p.pdu_size = LL_DATA_H_LEN + LL_DATA_TMP_P_LEN;    
-     ble_payload(p.pdu_size);
-    	
-     p.bs_ch_freq = get_data_ch_freq(p.bs_data_ch_idx);   //Get the data channel frequency
-       
-     ble_config((p.bs_ch_freq-1.0F), 2);   //Configure ADPLL
-    
-     ble_recv_on();   //Configure BLE for data reception
-    
-     wp_set_ch_index(p.bs_data_ch_idx);   //Configure the dewhitener channel index  
-
-#ifdef DBUG    
-    p.rx_on = timer_time_us();   //for debugging purpose
-#endif
-
-     //Delay - temporary settings
-     start_time = timer_time_us();
-     while((timer_time_us() - start_time) < (uint32_t)T_RX); 
-     
-     p.nbytes = ble_receive((uint8_t *)&p.bs_rx_lldata_tmp_pdu, p.pdu_size);   //Read the PDU from the HW/RX fifo
-    
-     ble_off();   //Turn off BLE
-
-#ifdef DBUG    
-    p.boff = timer_time_us();   //for debugging purpose
-#endif
-
-     if (p.nbytes == (p.pdu_size + CRC_LEN)) {   //There is data in the RX buffer (pdu + crc) 
-        if(bs.nextExpectedSeqNum == p.bs_rx_lldata_tmp_pdu.h.SN) {   //A new packet is received
-	   if(p.bs_rx_lldata_tmp_pdu.h.MD == MD_VAL_ZERO) {
-              p.error=0;	      
-	   } else {p.error=3;}                
-	} else {p.error=2;}  				 
-     } else {
-        p.error=1;        
-     }
-     
-     if(p.error==0) {
-         bs.nextExpectedSeqNum=0;   //Re-initialize - no more data to expect   
-         p.nextState=BS_TX_END_CONNECTION;
-     } else {   //In this case, data is unsuccessfully received
-         bs.transmitSeqNum=0; bs.nextExpectedSeqNum=0;
-	 p.nextState=BS_RX_ADV_DIRECT_IND;   //Close the connection event and restart scanning 
-     }	    
-     
-#ifdef DBUG
-     p.end = timer_time_us();   //for debugging purpose
-#endif 	
-     return p;
-} 
 	
-bs_tx_data_ack_param_s_t bs_tx_data_ack(uint16_t bs_data_ch_idx, uint32_t gps_tmp){
+bs_tx_data_ack_param_s_t bs_tx_data_ack(uint16_t bs_data_ch_idx){
     bs_tx_data_ack_param_s_t p={0};
 #ifdef DBUG
     p.start = timer_time_us();   //for debugging purpose
@@ -359,25 +294,24 @@ bs_tx_data_ack_param_s_t bs_tx_data_ack(uint16_t bs_data_ch_idx, uint32_t gps_tm
     wp_set_ch_index(p.bs_data_ch_idx);   //Configure the whitener channel index   
          
     p.pdu_size = LL_DATA_H_LEN;   //Configure PDU's size 
-     
+    
     //Build PDU
     p.bs_tx_data_ack_pdu.LLID=LL_DATA_PDU_CE;   //Empty PDU
-    p.bs_tx_data_ack_pdu.NESN=bs.nextExpectedSeqNum;        
+    p.bs_tx_data_ack_pdu.SN=bs.transmitSeqNum;    
     
-    if(gps_tmp == 1) {
-	p.bs_tx_data_ack_pdu.SN=bs.transmitSeqNum;
-    } else if(gps_tmp == 2) {
-	p.bs_tx_data_ack_pdu.SN=++bs.transmitSeqNum;   
-    }	
-    
-    if(gps_tmp == 1) {
-        p.bs_tx_data_ack_pdu.MD=MD_VAL_ONE; 
-    } else if(gps_tmp == 2) {
-        p.bs_tx_data_ack_pdu.MD=MD_VAL_ZERO;   //to close the connection event 
-    }
+    if(bs.nRec == 1){
+       p.bs_tx_data_ack_pdu.NESN=++bs.nextExpectedSeqNum;   //used for the acknowledgment
+       p.bs_tx_data_ack_pdu.MD=MD_VAL_ZERO;   //to close the connection event
+    } else if(bs.nRec == 2 || bs.nRec == 3){   //do not increment bs.nextExpectedSeqNum       
+       p.bs_tx_data_ack_pdu.MD=MD_VAL_ONE; 
+              
+    }     
+            
     p.bs_tx_data_ack_pdu.RFU=0;
     p.bs_tx_data_ack_pdu.Length=ZERO_PAYLOAD; 
 
+    p.rec=bs.nRec; 
+    
 #ifdef DBUG    
     p.start_tx = timer_time_us();   //for debugging purpose
 #endif
@@ -394,15 +328,32 @@ bs_tx_data_ack_param_s_t bs_tx_data_ack(uint16_t bs_data_ch_idx, uint32_t gps_tm
     p.boff = timer_time_us();   //for debugging purpose
 #endif
    
-    if(gps_tmp == 1) {
-        p.nextState=BS_RX_DATA_TMP;
-    } else if(gps_tmp == 2) {   //In this case, data is successfully received
-        bs.transmitSeqNum=0; bs.nextExpectedSeqNum=0;   //Reinitialize SN and NESN
-        p.nextState=BS_RX_ADV_DIRECT_IND;   //Close the connection event - BS_RX_ADV_DIRECT_IND is a temporary setting, it will be replaced by sendind data to the ext MCU
-    } 	
+    if(bs.nRec == 1){p.nextState=BS_END_CONNECTION;}
+    else {p.nextState=BS_RX_DATA_TMP;}
 
 #ifdef DBUG
      p.end=timer_time_us();   //for debugging purpose
 #endif    
      return p; 
 }
+
+bs_end_cnt_param_s_t bs_end_cnt(){
+    bs_end_cnt_param_s_t p={0};
+#ifdef DBUG
+    p.start = timer_time_us();   //for debugging purpose
+#endif
+    bs.transmitSeqNum=0; bs.nextExpectedSeqNum=0;   //Reinitialize SN and NESN 
+    p.nextState=BS_RX_ADV_DIRECT_IND;   //Close the connection event and restart scanning
+    
+#ifdef DBUG
+    p.end = timer_time_us();   //for debugging purpose
+#endif    
+
+    return p; 	
+}
+
+
+
+
+
+

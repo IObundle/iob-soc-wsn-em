@@ -5,10 +5,10 @@ int main() {
 
   id_init(ID_BASE);
   				  
-  if(!get_id()) {  
-    sensor_node();
-  } else {
+  if(get_id() == 1) {  
     base_station();
+  } else {    
+    sensor_node();
   }
   
   return 0;

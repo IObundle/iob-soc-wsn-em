@@ -1,3 +1,4 @@
+#include "iob-uart.h"
 #include "sn_def.h"
 #include "sn_fct.h"
 
@@ -6,11 +7,10 @@ extern sn_s_t sn;
 sn_standby_param_s_t p_sstd={0}; 
 sn_tx_adv_param_s_t p_stv={0};   
 sn_rx_cnt_req_param_s_t p_srq={0};
-sn_tx_gps_param_s_t p_stgps={0}; 
 sn_tx_tmp_param_s_t p_sttmp={0}; 
-sn_rx_data_ack_param_s_t p_srack_gps={0};
-sn_rx_data_ack_param_s_t p_sr_cnt_end={0};
-   
+sn_rx_data_ack_param_s_t p_srack={0};
+sn_end_cnt_param_s_t p_sn_end_cnt={0};
+    
 void sensor_node(){
      uint32_t js=0;
      
@@ -41,36 +41,28 @@ void sensor_node(){
 	     sn.nextState=p_srq.nextState;
 	     break;				
 
-	case SN_TX_DATA_GPS:
-	     p_stgps=sn_tx_data_gps(p_srq.sn_rx_connect_request_pdu.payload.LLData_AA, p_srq.sn_rx_connect_request_pdu.payload.LLData_ChM, p_srq.sn_rx_connect_request_pdu.payload.LLData_WinOffset);
-#ifdef DBUG
-	     sn_tx_data_gps_print(p_stgps);
-#endif
-	     sn.nextState=p_stgps.nextState;	
-	     break; 
-
-  	case SN_RX_ACK_GPS:
-	     p_srack_gps=sn_rx_data_ack(p_stgps.sn_data_ch_idx, 1);	    
-#ifdef DBUG                 
-	     sn_rx_data_ack_print(p_srack_gps, 1);
-#endif	     
-	     sn.nextState=p_srack_gps.nextState;	
-	     break; 	
-	     	     
 	case SN_TX_DATA_TMP:
-	     p_sttmp=sn_tx_data_tmp(p_stgps.sn_data_ch_idx);	
+	     p_sttmp=sn_tx_data_tmp(p_srq.sn_rx_connect_request_pdu.payload.LLData_AA, p_srq.sn_rx_connect_request_pdu.payload.LLData_ChM, p_srq.sn_rx_connect_request_pdu.payload.LLData_WinOffset);
 #ifdef DBUG
 	     sn_tx_data_tmp_print(p_sttmp);
-#endif	     
-	     sn.nextState=p_sttmp.nextState;
-	     break;      
+#endif
+	     sn.nextState=p_sttmp.nextState;	
+	     break; 
 
-  	case SN_RX_END_CONNECTION:
-	     p_sr_cnt_end=sn_rx_data_ack(p_stgps.sn_data_ch_idx, 2);	     
+  	case SN_RX_DATA_ACK:
+	     p_srack=sn_rx_data_ack(p_sttmp.sn_data_ch_idx);	    
+#ifdef DBUG                 
+	     sn_rx_data_ack_print(p_srack);
+#endif	     
+	     sn.nextState=p_srack.nextState;	
+	     break; 	
+
+  	case SN_END_CONNECTION:
+	     p_sn_end_cnt=sn_end_cnt();	     
 #ifdef DBUG                  
-	     sn_rx_data_ack_print(p_sr_cnt_end, 2);
+	     sn_end_cnt_print(p_sn_end_cnt);
 #endif	 
-	     sn.nextState=p_sr_cnt_end.nextState;
+	     sn.nextState=p_sn_end_cnt.nextState;
 	     break; 	
 		     	     
 	default: sn.nextState=0; break;	         	     
