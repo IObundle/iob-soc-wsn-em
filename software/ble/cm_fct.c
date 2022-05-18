@@ -27,18 +27,24 @@ unsigned int get_adv_ch_freq(unsigned short adv_ch_idx) {
    return freq;  
 }
 
-//Get the data channel frequency in MHz - Data channels: 5, 22, 34
+//Get the data channel frequency in MHz
 unsigned int get_data_ch_freq(unsigned short data_ch_idx) {   
-   unsigned int freq;    
-   
-   if (data_ch_idx == 5) {
-   	freq = 2414;		
-   } else if (data_ch_idx == 22) {
-   	freq = 2450;	
-   } else if (data_ch_idx == 34) {	
-   	freq = 2474;
-   }	
+   unsigned int freq;       
+   if(data_ch_idx < 11){
+      freq = 2402 + 2*data_ch_idx + 2;
+   } else {
+      freq = 2402 + 2*data_ch_idx + 4;
+   }
    return freq;  
+}
+
+//Generate a data channel map
+uint64_t gen_dataChMap(uint8_t dataChIdx[], unsigned int size){
+    uint64_t dataChM=0;
+    for(int i=0; i<size; i++){
+	 dataChM = dataChM | ((uint64_t)1 << (39 - dataChIdx[i]));            
+    } 
+    return dataChM;  
 }
 
 //Set the whitener/dewhitener channel index
@@ -57,6 +63,7 @@ void print_data(uint64_t data_in, uint32_t size){
      uart_printf("0x"); for (int i=size-1; i>=0; i--){
         buffer[i]=N_SHIFT(data_in, i);
 	if(!buffer[i]){uart_printf("00");}
+	else if(buffer[i]<16){uart_printf("0%x", buffer[i]);}
 	else{uart_printf("%x", buffer[i]);}
      } 
 }

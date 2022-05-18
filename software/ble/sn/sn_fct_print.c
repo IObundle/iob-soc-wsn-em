@@ -64,23 +64,9 @@ void sn_rx_cnt_req_print(sn_rx_cnt_req_param_s_t p){
        else if(p.error==3){uart_printf("ERROR - Device address: Wrong advertiser device address. (SN-E3)\n\n");}
        else if(p.error==4){uart_printf("ERROR - Device address: Wrong initiator device address. (SN-E4)\n\n");}
        else if(p.error==5){uart_printf("ERROR - Packet type: Does not match a connection request packet type. (SN-E5)\n\n");} 
-       else if(p.error==-1){uart_printf("ERROR - Advertiser filter: Something went wrong, the advertiser filter did not run. (SN-E6)\n\n");}              
+       else if(p.error==-1){uart_printf("ERROR - Advertiser filter: Something went wrong, the advertiser filter did not run. (SN-E6)\n\n");}       
+       else {uart_printf("ERROR: refer to SN-E10\n\n");}        
 }       
-
-void sn_tx_data_gps_print(sn_tx_gps_param_s_t p){
-       //start_time, pkt_tx_time, start_tx, ble_off, end_time
-       uart_printf("SN - TX DATA GPS timing: %dus, %dus, %dus, %dus, %dus\n", p.start, T_PACKET(LL_DATA_H_LEN,LL_DATA_GPS_P_LEN), p.start_tx, p.boff, p.end);
-       uart_printf("SN sent a PDU of %d bytes on the data ch (idx,freq)=(%d,%dMHz)\n", p.pdu_size, p.sn_data_ch_idx, p.sn_ch_freq);		  
-       uart_printf("LLID=%d | NESN=%d | SN=%d | MD=%d | RFU=%d | Length=%d\nGPS coordinates\n\tLatitude : %ddeg %dmin %ds %c\n\tLongitude: %ddeg %dmin %ds %c\n", \
-	   p.sn_tx_data_gps_pdu.h.LLID, p.sn_tx_data_gps_pdu.h.NESN, \
-	   p.sn_tx_data_gps_pdu.h.SN, p.sn_tx_data_gps_pdu.h.MD, \
-	   p.sn_tx_data_gps_pdu.h.RFU, p.sn_tx_data_gps_pdu.h.Length, \
-	   p.sn_tx_data_gps_pdu.payload.DMS_Lat_D, p.sn_tx_data_gps_pdu.payload.DMS_Lat_M, \
-	   p.sn_tx_data_gps_pdu.payload.DMS_Lat_S, p.sn_tx_data_gps_pdu.payload.DMS_Lat_C, \
-	   p.sn_tx_data_gps_pdu.payload.DMS_Lng_D, p.sn_tx_data_gps_pdu.payload.DMS_Lng_M, \
-	   p.sn_tx_data_gps_pdu.payload.DMS_Lng_S, p.sn_tx_data_gps_pdu.payload.DMS_Lng_C);
-      uart_printf("INFO: SN sent a DATA_GPS PDU. (SN-I3)\n\n");		   	   				 
-}
 
 void sn_tx_data_tmp_print(sn_tx_tmp_param_s_t p){    
       //start_time, pkt_tx_time, start_tx, ble_off, end_time
@@ -91,28 +77,27 @@ void sn_tx_data_tmp_print(sn_tx_tmp_param_s_t p){
 	    p.sn_tx_lldata_tmp_pdu.h.SN, p.sn_tx_lldata_tmp_pdu.h.MD, \
 	    p.sn_tx_lldata_tmp_pdu.h.RFU, p.sn_tx_lldata_tmp_pdu.h.Length, \
 	    p.sn_tx_lldata_tmp_pdu.payload);  
-      uart_printf("INFO: SN sent a DATA_TMP PDU. (SN-I5)\n\n");	     
+      uart_printf("INFO: SN sent a DATA_TMP PDU. (SN-I3)\n\n");	     
 }
 
-void sn_rx_data_ack_print(sn_rx_data_ack_param_s_t p, uint32_t gps_tmp){     
-      if(gps_tmp==1) {
-          //start_time, rx_on, ble_off, end_time
-          uart_printf("SN - RX DATA_ACK timing: %dus, %dus, %dus, %dus\n", p.start, p.rx_on, p.boff, p.end);	  
-	  uart_printf("SN received %d bytes on the data ch (idx,freq)=(%d,%dMHz)\n", p.nbytes, p.sn_data_ch_idx, (p.sn_ch_freq - 1));	    	     		      
-      } else if(gps_tmp==2) {
-          //start_time, rx_on, ble_off, end_time
-          uart_printf("SN - RX END_CONNECTION timing: %dus, %dus, %dus, %dus\n", p.start, p.rx_on, p.boff, p.end);  
-          uart_printf("SN received %d bytes on the data ch (idx,freq)=(%d,%dMHz)\n", p.nbytes, p.sn_data_ch_idx, (p.sn_ch_freq - 1));
-      }		
+void sn_rx_data_ack_print(sn_rx_data_ack_param_s_t p){     
+      //start_time, rx_on, ble_off, end_time
+      uart_printf("SN - RX DATA_ACK/NACK timing: %dus, %dus, %dus, %dus\n", p.start, p.rx_on, p.boff, p.end);	  
+      uart_printf("SN received %d bytes on the data ch (idx,freq)=(%d,%dMHz)\n", p.nbytes, p.sn_data_ch_idx, (p.sn_ch_freq - 1));	    	     		      	
       uart_printf("LLID=%d | NESN=%d | SN=%d | MD=%d | RFU=%d | Length=%d\n", \
             p.sn_rx_data_ack_pdu.LLID, p.sn_rx_data_ack_pdu.NESN, \
 	    p.sn_rx_data_ack_pdu.SN, p.sn_rx_data_ack_pdu.MD, \
-	    p.sn_rx_data_ack_pdu.RFU, p.sn_rx_data_ack_pdu.Length);
-      
-      if((p.error == 0) && (gps_tmp == 1)){uart_printf("INFO: SN received an ACK_GPS PDU. (SN-I4)\n\n");}			
-      else if((p.error == 5) && (gps_tmp == 2)){uart_printf("INFO: SN received an END_CONNECTION PDU. (SN-I6)\n\n");}
+	    p.sn_rx_data_ack_pdu.RFU, p.sn_rx_data_ack_pdu.Length);      
+      if(p.error == 0){uart_printf("INFO: SN received an ACK PDU with an END_CONNECTION. (SN-I4)\n\n");}
       else if(p.error==1){uart_printf("ERROR - PDU_CRC size: %d bytes received instead of %d bytes\n\n", p.nbytes, (p.pdu_size + CRC_LEN));}
-      else if(p.error==2){uart_printf("Error - Sequence number: The previous packet sent has not been acknowledged!\n\n");}
+      else if(p.error==2){uart_printf("Error - NACK: The previous packet sent has not been acknowledged!\n\n");}
       else if(p.error==3){uart_printf("Error - Payload size in PDU's H config: It does not match the size of an ACK/NACK packet payload\n\n");}
       else if(p.error==4){uart_printf("Error - LLID: LLID value does not match that of an ACK/NACK PDU\n\n");}
+      else if(p.error==5){uart_printf("Error - ACK with wrong MD: And ACK is received but the BS does not require to close the current connection event\n\n");}
+      else {uart_printf("ERROR: refer to SN-E10\n\n");}
+}
+
+void sn_end_cnt_print(sn_end_cnt_param_s_t p){
+      //start_time, rx_on, ble_off, end_time
+      uart_printf("SN - END CONNECTION timing: %dus, %dus\n", p.start, p.end);	  
 }
