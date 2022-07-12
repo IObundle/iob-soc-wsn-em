@@ -1,9 +1,11 @@
 #include "iob-uart.h"
 #include "bs_def.h"
+#include "id.h"
 
 void bs_standby_print(bs_standby_param_s_t p){
+    uart_printf("\nBS - ID=%d\n", get_id());
     //start_time, end_time
-    uart_printf("\nBS - STANDBY timing: %dus, %dus\n\n", p.start, p.end);
+    uart_printf("BS - STANDBY timing: %dus, %dus\n\n", p.start, p.end);
 }
 
 void bs_tx_cnt_req_print(bs_tx_cnt_req_param_s_t p){ 
@@ -101,4 +103,9 @@ void bs_tx_data_ack_print(bs_tx_data_ack_param_s_t p){
 void bs_end_cnt_print(bs_end_cnt_param_s_t p){
       //start_time, rx_on, ble_off, end_time
       uart_printf("BS - END CONNECTION timing: %dus, %dus\n\n", p.start, p.end);	  
+}
+
+void bs_tx_tosbc_print(bs_tx_tosbc_param_s_t p){
+      //start_time, rx_on, ble_off, end_time
+      uart_printf("BS - BS_TX_TOSBC timing: %dus, %dus\n\n", p.start, p.end);
 }

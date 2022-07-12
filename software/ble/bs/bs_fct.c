@@ -1,3 +1,4 @@
+#include "iob-uart.h"
 #include "iob_timer.h"
 #include "cm_def.h"
 #include "bs_def.h"
@@ -6,7 +7,7 @@
 #define CST 1
 #include "bs_config.h"
 
-bs_s_t bs = {.id = BS_ID, .aa = 0x8E89BED6, .nextState = BS_STANDBY, .nRec=1, .isBusy=FALSE, .transmitSeqNum=0, .nextExpectedSeqNum=0};   //By default, BS is in STANDBY state
+bs_s_t bs = {.id = BS_ID, .aa = 0x8E89BED6, .nextState = BS_STANDBY, .nRec=1, .toSBC = FALSE, .isCount=0, .isBusy=FALSE, .transmitSeqNum=0, .nextExpectedSeqNum=0};   //By default, BS is in STANDBY state
 
 //Temporary setting for debugging purpose
 uint32_t aa_plist[MAX_N_SN][2]={{FALSE, 0xA3B9C1E5}, {FALSE, 0x5E2C419D}, {FALSE, 0x3D5C8A2E}, {FALSE, 0xE1B79C3A}, {FALSE, 0xC85B3D1E}, 
@@ -98,7 +99,7 @@ bs_tx_cnt_req_param_s_t bs_tx_cnt_req(uint16_t bs_adv_ch_idx, uint64_t AdvA){
 	      
     p.bs_tx_connect_request_pdu.payload.LLData_CRCInit=0x555555;    
     p.bs_tx_connect_request_pdu.payload.LLData_WinSize=0; 
-    p.bs_tx_connect_request_pdu.payload.LLData_WinOffset=0;	       
+    p.bs_tx_connect_request_pdu.payload.LLData_WinOffset=bs.isCount;	       
     p.bs_tx_connect_request_pdu.payload.LLData_Interval=0; 
     p.bs_tx_connect_request_pdu.payload.LLData_Latency=0;		     
     p.bs_tx_connect_request_pdu.payload.LLData_Timeout=0; 
@@ -106,6 +107,8 @@ bs_tx_cnt_req_param_s_t bs_tx_cnt_req(uint16_t bs_adv_ch_idx, uint64_t AdvA){
     p.bs_tx_connect_request_pdu.payload.LLData_Hop=0; 
     p.bs_tx_connect_request_pdu.payload.LLData_SCA=0;		  
 
+    bs.isCount++;
+    
 #ifdef DBUG    
     p.start_tx = timer_time_us();   //for debugging purpose
 #endif
@@ -131,7 +134,7 @@ bs_tx_cnt_req_param_s_t bs_tx_cnt_req(uint16_t bs_adv_ch_idx, uint64_t AdvA){
 }     	      	     
 
 bs_rx_adv_param_s_t bs_rx_adv(uint16_t bs_adv_ch_idx){
-    bs_rx_adv_param_s_t p={0}; 	
+    bs_rx_adv_param_s_t p={0}; 	    
 #ifdef DBUG
     p.start = timer_time_us();   //for debugging purpose
 #endif	
@@ -328,7 +331,7 @@ bs_tx_data_ack_param_s_t bs_tx_data_ack(uint16_t bs_data_ch_idx){
     p.boff = timer_time_us();   //for debugging purpose
 #endif
    
-    if(bs.nRec == 1){p.nextState=BS_END_CONNECTION;}
+    if(bs.nRec == 1){bs.toSBC=TRUE; p.nextState=BS_END_CONNECTION;}
     else {p.nextState=BS_RX_DATA_TMP;}
 
 #ifdef DBUG
@@ -343,7 +346,8 @@ bs_end_cnt_param_s_t bs_end_cnt(){
     p.start = timer_time_us();   //for debugging purpose
 #endif
     bs.transmitSeqNum=0; bs.nextExpectedSeqNum=0;   //Reinitialize SN and NESN 
-    p.nextState=BS_RX_ADV_DIRECT_IND;   //Close the connection event and restart scanning
+    if(bs.toSBC == TRUE) {p.nextState=BS_TX_TOSBC;}
+    else {p.nextState=BS_RX_ADV_DIRECT_IND;}   //Close the connection event and restart scanning
     
 #ifdef DBUG
     p.end = timer_time_us();   //for debugging purpose
@@ -352,8 +356,27 @@ bs_end_cnt_param_s_t bs_end_cnt(){
     return p; 	
 }
 
+bs_tx_tosbc_param_s_t bs_tx_tosbc(uint64_t AdvA, uint32_t temperature){ 
+    bs_tx_tosbc_param_s_t p={0};
+#ifdef DBUG
+    p.start = timer_time_us();   //for debugging purpose
+#endif
+    bs.toSBC=FALSE;
+         
+    p.sn_device_addr=AdvA; 
+    p.temperature=temperature;		     
+    
+    //uart_connect();
+    print_data(p.sn_device_addr, 6); uart_puts("\n");     
+    uart_printf("%d\n", p.temperature);
 
+    p.nextState=BS_RX_ADV_DIRECT_IND;
 
-
-
-
+#ifdef DBUG
+    p.end = timer_time_us();   //for debugging purpose
+#endif 
+             
+    timer_reset();
+    
+    return p;	
+}

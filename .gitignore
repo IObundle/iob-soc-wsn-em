@@ -15,6 +15,7 @@ hardware/simulation/icarus/*
 hardware/simulation/ncsim/*
 !hardware/simulation/ncsim/Makefile
 !hardware/simulation/ncsim/run_ncsim.sh
+!hardware/simulation/ncsim/gps_tmp.csv
 
 software/periphs.h
 software/pc-emul/periphs.h

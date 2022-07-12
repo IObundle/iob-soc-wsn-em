@@ -14,7 +14,6 @@ ifeq ($(DBG),1)
 DEFINE+=$(defmacro)DBG
 endif
 
-
 include $(ROOT_DIR)/hardware/hardware.mk
 
 #ASIC libs
@@ -23,8 +22,6 @@ LIBS=/opt/ic_tools/pdk/faraday/umc130/LL/fsc0l_d/2009Q2v3.0/GENERIC_CORE/FrontEn
 else ifeq ($(PR),1)
 LIBS=/opt/ic_tools/pdk/faraday/umc130/LL/fsc0l_d/2009Q2v3.0/GENERIC_CORE/FrontEnd/verilog/fsc0l_d_generic_core_30.lib
 endif
-
-
 
 #SOURCES
 #asic sources
@@ -49,7 +46,7 @@ $(ADPLL_TB_SVSRC)
 #simulation output files
 OUTPUT_FILES:=*.txt
 
-run: sim self-checker
+run: sim self-checker send-data
 
 self-checker:
 ifeq ($(DBG),1)
@@ -58,6 +55,11 @@ ifeq ($(DBG),1)
 else
 	@echo "Warning: DBG flag is disabled! To run self-checker, please re-run simulation with DBG flag enabled."
 endif
+
+send-data:
+ifeq ($(SEND),1)
+	$(PYTHON_DIR)/send_data.py $(SIM_DIR)/soc1.txt $(SIM_DIR)/gps_tmp.csv 
+endif	
 
 #RULES
 #create testbench
