@@ -54,7 +54,7 @@ module system_tb;
    initial begin   	 
    	adc_out_0 = $urandom % 'h50;
    	adc_out_1 = $urandom % 'h50;
-   	$display ("At time=%0t, adc_out_0=0x%0h and adc_out_1=0x%0h", $time, adc_out_0, adc_out_1);  
+   	$display ("At time=%0t, adc_out_0=%0d and adc_out_1=%0d", $time, adc_out_0, adc_out_1);  
    end
 
    //

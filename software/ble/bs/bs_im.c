@@ -10,6 +10,7 @@ bs_rx_adv_param_s_t p_brv={0};
 bs_rx_tmp_param_s_t p_brtmp={0}; 
 bs_tx_data_ack_param_s_t p_btack={0};
 bs_end_cnt_param_s_t p_bs_end_cnt={0};
+bs_tx_tosbc_param_s_t p_tosbc={0};
    
 void base_station(){
      uint32_t jb=0;
@@ -65,6 +66,14 @@ void base_station(){
 	     bs.nextState=p_bs_end_cnt.nextState; 	      	       	      
   	     break;		      
 	
+      case BS_TX_TOSBC:
+	     p_tosbc=bs_tx_tosbc(p_brv.bs_rx_adv_pdu.payload.AdvA, p_brtmp.bs_rx_lldata_tmp_pdu.payload);
+#ifdef DBUG
+	     bs_tx_tosbc_print(p_tosbc);
+#endif                                                                                                     
+             bs.nextState=p_tosbc.nextState;
+             break;
+
 	default: bs.nextState=0; break; 	               
     } 
   jb++; 
